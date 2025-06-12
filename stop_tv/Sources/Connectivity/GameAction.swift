@@ -1,0 +1,25 @@
+//
+//  GameAction.swift
+//  stop_tv
+//
+//  Created by Raissa Bruna Parente on 11/06/25.
+//
+
+import Foundation
+
+struct GameAction: Codable {
+    enum Action: Int, Codable {
+        case sendAnswer, voteAnswer, startGame
+    }
+    
+    let action: Action
+    let playerName: String?
+    
+    var category: String? = nil
+    var answer: String? = nil
+    var isAnswerValid: Bool? = nil
+    
+    func data() -> Data? {
+        try? JSONEncoder().encode(self)
+    }
+}
