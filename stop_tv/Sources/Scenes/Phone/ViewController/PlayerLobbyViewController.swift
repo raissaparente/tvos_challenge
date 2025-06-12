@@ -32,10 +32,13 @@ class PlayerLobbyViewController: UIViewController {
         setupUI()
         connectionManager.setup(game: gameService)
         connectionManager.startAdvertising()
+        
+        observeInvite()
+        observeGameStart()
     }
     
     func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white
         statusLabel.text = "Conectando à TV..."
         statusLabel.textAlignment = .center
         view.addSubview(statusLabel)
@@ -44,6 +47,20 @@ class PlayerLobbyViewController: UIViewController {
             statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             statusLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+    }
+    
+    //navega pro jogo quando todo mundo ta conectado
+    private func observeGameStart() {
+        gameService.$status
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                guard let self = self else { return }
+
+                if status == .startGame {
+                    navigationController?.pushViewController(WaitingViewController(connectionManager: self.connectionManager, gameService: self.gameService), animated: false)
+                }
+            }
+            .store(in: &cancellables)
     }
     
     //pra mostrar o popup de conectar -> trocar por codigo da "sala?

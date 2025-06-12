@@ -36,6 +36,7 @@ class HostLobbyViewController: UIViewController {
         
         observePeers()
         observeConnection()
+        observeGameStart()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -84,24 +85,42 @@ class HostLobbyViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] connected in
                 guard let self = self else { return }
+                guard !viewModel.selectedPeers.isEmpty else { return }
+                
                 
                 //inicio do jogo quando todo mundo aceitar
                 if Set(connected) == Set(self.viewModel.selectedPeers) {
-                    self.gameService.startGame = true
-                    let action = GameAction(action: .startGame, playerName: nil, category: nil, answer: nil, isAnswerValid: nil)
+                    let action = GameAction(action: .changeStatus, status: .startGame)
                     self.connectionManager.send(gameAction: action)
+                    self.gameService.status = .startGame
                 }
             }
             .store(in: &cancellables)
     }
     
+    private func observeGameStart() {
+        gameService.$status
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                guard let self = self else { return }
+
+                if status == .startGame {
+                    navigationController?.pushViewController(GameInstructionViewController(connectionManager: self.connectionManager, gameService: self.gameService), animated: false)
+                }
+            }
+            .store(in: &cancellables)
+
+    }
+    
     private func reloadPeerButtons(_ peers: [MCPeerID]) {
-        stackView.arrangedSubviews
-            .dropFirst()
-            .forEach { $0.removeFromSuperview() }
+        for view in stackView.arrangedSubviews where view.tag == 100 {
+            stackView.removeArrangedSubview(view)
+            view.removeFromSuperview()
+        }
         
         for peer in peers {
             let button = UIButton(type: .system)
+            button.tag = 100
             let isSelected = viewModel.selectedPeers.contains(peer)
             let symbol = isSelected ? "✅" : "◻️"
             button.setTitle("\(symbol) \(peer.displayName)", for: .normal)
