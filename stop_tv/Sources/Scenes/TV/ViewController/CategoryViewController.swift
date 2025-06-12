@@ -17,6 +17,7 @@ class CategoryViewController: UIViewController {
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Essa é a categoria"
+        label.textColor = .white
         label.numberOfLines = 0
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -40,7 +41,7 @@ class CategoryViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
 
         view.addSubview(descriptionLabel)
         

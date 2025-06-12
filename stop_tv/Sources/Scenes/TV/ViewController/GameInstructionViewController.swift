@@ -18,6 +18,7 @@ class GameInstructionViewController: UIViewController {
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "O jogo é assim assim assado"
+        label.textColor = .white
         label.numberOfLines = 0
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -53,7 +54,7 @@ class GameInstructionViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
 
         view.addSubview(descriptionLabel)
         view.addSubview(startButton)
@@ -63,13 +64,13 @@ class GameInstructionViewController: UIViewController {
             descriptionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             descriptionLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            startButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 20),
+            startButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 100),
             startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            startButton.widthAnchor.constraint(equalToConstant: 100)
+            startButton.widthAnchor.constraint(equalToConstant: 500)
         ])
     }
     private func setupButton() {
-        startButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
+        startButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
     }
 
     

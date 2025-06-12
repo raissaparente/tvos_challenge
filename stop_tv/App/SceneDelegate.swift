@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .pad {
+        if idiom == .tv {
             let connectionManager = ConnectionManager(username: "tvHost")
             let tvVC = ConnectionInstructionViewController(connectionManager: connectionManager, gameService: gameService)
             let navController = UINavigationController(rootViewController: tvVC)

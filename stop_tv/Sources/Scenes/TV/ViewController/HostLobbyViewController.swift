@@ -46,8 +46,8 @@ class HostLobbyViewController: UIViewController {
     
     
     private func setupUI() {
-        view.backgroundColor = .white
-        
+        view.backgroundColor = .black
+
         stackView.axis = .vertical
         stackView.spacing = 12
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -61,11 +61,15 @@ class HostLobbyViewController: UIViewController {
         
         let titleLabel = UILabel()
         titleLabel.text = "Jogadores disponíveis:"
+        titleLabel.textColor = .white
         stackView.addArrangedSubview(titleLabel)
         
         let inviteButton = UIButton(type: .system)
         inviteButton.setTitle("Convidar selecionados", for: .normal)
-        inviteButton.addTarget(self, action: #selector(inviteTapped), for: .touchUpInside)
+        inviteButton.backgroundColor = .systemBlue
+        inviteButton.tintColor = .white
+        inviteButton.layer.cornerRadius = 8
+        inviteButton.addTarget(self, action: #selector(inviteTapped), for: .primaryActionTriggered)
         stackView.addArrangedSubview(inviteButton)
     }
     
@@ -124,10 +128,11 @@ class HostLobbyViewController: UIViewController {
             let isSelected = viewModel.selectedPeers.contains(peer)
             let symbol = isSelected ? "✅" : "◻️"
             button.setTitle("\(symbol) \(peer.displayName)", for: .normal)
+            button.tintColor = .white
             button.addAction(UIAction { [weak self] _ in
                 self?.viewModel.toggleSelection(for: peer)
                 self?.reloadPeerButtons(peers)
-            }, for: .touchUpInside)
+            }, for: .primaryActionTriggered)
             stackView.addArrangedSubview(button)
         }
     }

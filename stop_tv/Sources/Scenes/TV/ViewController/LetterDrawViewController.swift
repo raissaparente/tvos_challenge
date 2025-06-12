@@ -17,6 +17,7 @@ class LetterDrawViewController: UIViewController {
     private let letter: UILabel = {
         let label = UILabel()
         label.text = "A"
+        label.textColor = .white
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 100, weight: .black)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -45,7 +46,7 @@ class LetterDrawViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .black
 
         view.addSubview(letter)
         NSLayoutConstraint.activate([
@@ -77,7 +78,7 @@ class LetterDrawViewController: UIViewController {
             let action = GameAction(action: .changeStatus, playerName: self.connectionManager.myPeerId.displayName, status: .category)
             self.connectionManager.send(gameAction: action)
             
-            self.navigationController?.pushViewController(CategoryViewController(connectionManager: self.connectionManager, gameService: self.gameService), animated: false)
+            self.navigationController?.pushViewController(TestReceivedWordsViewController(connectionManager: self.connectionManager, gameService: self.gameService), animated: false)
         }
     }
 }

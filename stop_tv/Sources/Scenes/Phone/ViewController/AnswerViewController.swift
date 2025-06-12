@@ -53,8 +53,8 @@ class AnswerViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .systemBackground
-        
+        view.backgroundColor = .white
+
         [answerTextField, setButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)

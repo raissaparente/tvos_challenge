@@ -17,6 +17,7 @@ class ConnectionInstructionViewController: UIViewController {
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Abra/baixe o app e escolha um nome"
+        label.textColor = .white
         label.numberOfLines = 0
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -52,7 +53,7 @@ class ConnectionInstructionViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
 
         view.addSubview(descriptionLabel)
         view.addSubview(startButton)
@@ -62,17 +63,18 @@ class ConnectionInstructionViewController: UIViewController {
             descriptionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             descriptionLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            startButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 20),
+            startButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 100),
             startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            startButton.widthAnchor.constraint(equalToConstant: 100)
+            startButton.widthAnchor.constraint(equalToConstant: 300)
         ])
     }
     private func setupButton() {
-        startButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
+        startButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
     }
 
     
     @objc private func continueTapped() {
+        print("didtap")
         navigationController?.pushViewController(HostLobbyViewController(connectionManager: connectionManager, gameService: gameService), animated: false)
     }
 }

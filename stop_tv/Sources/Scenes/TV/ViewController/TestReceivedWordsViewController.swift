@@ -39,8 +39,8 @@ class TestReceivedWordsViewController: UIViewController {
     
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
-        
+        view.backgroundColor = .black
+
         stackView.axis = .vertical
         stackView.spacing = 12
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -58,7 +58,7 @@ class TestReceivedWordsViewController: UIViewController {
         
         let inviteButton = UIButton(type: .system)
         inviteButton.setTitle("Proximo", for: .normal)
-        inviteButton.addTarget(self, action: #selector(inviteTapped), for: .touchUpInside)
+        inviteButton.addTarget(self, action: #selector(inviteTapped), for: .primaryActionTriggered)
         stackView.addArrangedSubview(inviteButton)
     }
     
@@ -82,6 +82,7 @@ class TestReceivedWordsViewController: UIViewController {
             let label = UILabel()
             label.tag = 100
             label.text = word
+            label.textColor = .white
             stackView.addArrangedSubview(label)
         }
     }

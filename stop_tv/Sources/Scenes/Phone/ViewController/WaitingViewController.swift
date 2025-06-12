@@ -38,7 +38,7 @@ class WaitingViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white
         statusLabel.text = "Waiting"
         statusLabel.textAlignment = .center
         view.addSubview(statusLabel)

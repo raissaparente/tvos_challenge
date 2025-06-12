@@ -49,8 +49,8 @@ class SetNameViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .systemBackground
-        
+        view.backgroundColor = .white
+
         [descriptionLabel, nameTextField, setButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
