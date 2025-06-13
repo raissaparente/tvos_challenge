@@ -10,50 +10,83 @@ import UIKit
 class AppCoordinator {
     let window: UIWindow
 
-    let connectionManager = ConnectionManager()
+    let connectionManager: ConnectionManager
     let gameService = GameService()
 
-    init(window: UIWindow) {
-        self.window = window
-    }
+    init(window: UIWindow, username: String) {
+            self.window = window
+            self.connectionManager = ConnectionManager(username: username)
+        }
 
     func start() {
         let nav = UINavigationController()
 
-                #if os(tvOS)
-                let vm = ConnectionInstructionViewModel(
-                    connectionManager: connectionManager,
-                    gameService: gameService
-                )
-                let vc = ConnectionInstructionViewController(viewModel: vm, coordinator: self)
-                nav.viewControllers = [vc]
-                #else
-                let vm = PlayerLobbyViewModel(
-                    connectionManager: connectionManager,
-                    gameService: gameService
-                )
-                let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
-                nav.viewControllers = [vc]
-                #endif
-
-                window.rootViewController = nav
-                window.makeKeyAndVisible()
+        let idiom = UIDevice.current.userInterfaceIdiom
+        if idiom == .pad {
+            
+            let vc = ConnectionInstructionViewController(coordinator: self)
+            nav.viewControllers = [vc]
+        } else {
+            let vm = PlayerLobbyViewModel(
+                connectionManager: connectionManager,
+                gameService: gameService
+            )
+            let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
+            nav.viewControllers = [vc]
+        }
+            window.rootViewController = nav
+            window.makeKeyAndVisible()
+        
     }
 
-    func makeConnectionInstructionVC_TV() -> UIViewController {
-        let vm = ConnectionInstructionViewModel(
-            connectionManager: connectionManager,
-            gameService: gameService
-        )
-        return ConnectionInstructionViewController(viewModel: vm, coordinator: self)
-    }
-
-    func showLobbyScreen(from currentVC: UIViewController) {
+    //TV
+    func showLobbyScreen_TV(from currentVC: UIViewController) {
         let vm = HostLobbyViewModel(
             connectionManager: connectionManager,
             gameService: gameService
         )
         let lobbyVC = HostLobbyViewController(viewModel: vm, coordinator: self)
         currentVC.navigationController?.pushViewController(lobbyVC, animated: true)
+    }
+    
+    func showGameInstruction_TV(from currentVC: UIViewController) {
+        let instructionVC = GameInstructionViewController(coordinator: self)
+        currentVC.navigationController?.pushViewController(instructionVC, animated: true)
+    }
+    
+    func showLetterDraw_TV(from currentVC: UIViewController) {
+        let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
+        
+        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self)
+        currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
+    }
+    
+    func showCategory_TV(from currentVC: UIViewController) {
+        //TODO: tirar gameservice daqui
+        
+        let categoryVC = TestReceivedWordsViewController(coordinator: self, gameService: gameService)
+        currentVC.navigationController?.pushViewController(categoryVC, animated: true)
+    }
+    
+    //Phone
+    func showWaitingMessage_phone(from currentVC: UIViewController, type: WaitingType) {
+        let vm = WaitingViewModel(
+            connectionManager: connectionManager,
+            gameService: gameService,
+            type: type
+        )
+        
+        let waitingVC = WaitingViewController(viewModel: vm, coordinator: self)
+        currentVC.navigationController?.pushViewController(waitingVC, animated: true)
+    }
+    
+    func showAnswer_phone(from currentVC: UIViewController) {
+        let vm = AnswerViewModel(
+            connectionManager: connectionManager,
+            gameService: gameService
+        )
+        
+        let answerVC = AnswerViewController(viewModel: vm, coordinator: self)
+        currentVC.navigationController?.pushViewController(answerVC, animated: true)
     }
 }

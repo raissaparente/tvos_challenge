@@ -12,15 +12,14 @@ class HostLobbyViewController: UIViewController {
     
     private var cancellables = Set<AnyCancellable>()
     
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
-    private let viewModel = HostLobbyViewModel()
+    private let viewModel: HostLobbyViewModel
+    private let coordinator: AppCoordinator
     
     private let stackView = UIStackView()
     
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
-        self.gameService = gameService
+    init(viewModel: HostLobbyViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,23 +30,23 @@ class HostLobbyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        connectionManager.setup(game: gameService)
-        connectionManager.startBrowsing()
         
-        observePeers()
-        observeConnection()
-        observeGameStart()
+        viewModel.browseForPeers()
+        viewModel.observeConnection()
+        viewModel.observeGame()
+        
+        observeVM()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        connectionManager.stopBrowsing()
+        viewModel.stopBrowsingForPeers()
     }
     
     
     private func setupUI() {
         view.backgroundColor = .black
-
+        
         stackView.axis = .vertical
         stackView.spacing = 12
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -73,49 +72,25 @@ class HostLobbyViewController: UIViewController {
         stackView.addArrangedSubview(inviteButton)
     }
     
-    //combine
-    private func observePeers() {
-        connectionManager.$availablePeers
+    private func observeVM() {
+        viewModel.$availablePeers
             .receive(on: DispatchQueue.main)
             .sink { [weak self] peers in
                 self?.reloadPeerButtons(peers)
-                print(self?.connectionManager.availablePeers)
             }
             .store(in: &cancellables)
-    }
-    
-    private func observeConnection() {
-        connectionManager.$connectedPeers
+        
+        viewModel.$shouldStartGame
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] connected in
+            .sink { [weak self] shouldStart in
                 guard let self = self else { return }
-                guard !viewModel.selectedPeers.isEmpty else { return }
                 
-                
-                //inicio do jogo quando todo mundo aceitar
-                if Set(connected) == Set(self.viewModel.selectedPeers) {
-                    let action = GameAction(action: .changeStatus, status: .startGame)
-                    self.connectionManager.send(gameAction: action)
-                    self.gameService.status = .startGame
+                if shouldStart {
+                    coordinator.showGameInstruction_TV(from: self)
                 }
             }
             .store(in: &cancellables)
     }
-    
-    private func observeGameStart() {
-        gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self = self else { return }
-
-                if status == .startGame {
-                    navigationController?.pushViewController(GameInstructionViewController(connectionManager: self.connectionManager, gameService: self.gameService), animated: false)
-                }
-            }
-            .store(in: &cancellables)
-
-    }
-    
     private func reloadPeerButtons(_ peers: [MCPeerID]) {
         for view in stackView.arrangedSubviews where view.tag == 100 {
             stackView.removeArrangedSubview(view)
@@ -138,8 +113,6 @@ class HostLobbyViewController: UIViewController {
     }
     
     @objc private func inviteTapped() {
-        for peer in viewModel.selectedPeers {
-            connectionManager.invite(peer: peer)
-        }
+        viewModel.inviteSelectedPeers()
     }
 }

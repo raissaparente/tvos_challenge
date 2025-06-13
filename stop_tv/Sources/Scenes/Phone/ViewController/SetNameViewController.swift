@@ -45,7 +45,6 @@ class SetNameViewController: UIViewController {
         
         setupUI()
         setupBindings()
-        
     }
     
     func setupUI() {

@@ -11,8 +11,8 @@ import Combine
 class LetterDrawViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
+    private let viewModel: LetterDrawViewModel
+    private let coordinator: AppCoordinator
     
     private let letter: UILabel = {
         let label = UILabel()
@@ -24,12 +24,12 @@ class LetterDrawViewController: UIViewController {
         return label
     }()
     
-    
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
-        self.gameService = gameService
+    init(viewModel: LetterDrawViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -39,10 +39,7 @@ class LetterDrawViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        connectionManager.setup(game: gameService)
-        connectionManager.startAdvertising()
-        
-        startCountdown()
+        observeViewModel()
     }
     
     func setupUI() {
@@ -55,30 +52,17 @@ class LetterDrawViewController: UIViewController {
         ])
     }
     
-    //navega pro categoria depois da animacao(?)
-    private func observeStatus() {
-        gameService.$status
+    
+    func observeViewModel() {
+        viewModel.$canGoToCategory
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
+            .sink { [weak self] shouldGo in
                 guard let self = self else { return }
-
-                if status == .startGame {
-                    
+                
+                if shouldGo {
+                    coordinator.showCategory_TV(from: self)
                 }
             }
             .store(in: &cancellables)
-    }
-    
-    
-    private func startCountdown() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.gameService.status = .category
-            
-            //sends to phones
-            let action = GameAction(action: .changeStatus, playerName: self.connectionManager.myPeerId.displayName, status: .category)
-            self.connectionManager.send(gameAction: action)
-            
-            self.navigationController?.pushViewController(TestReceivedWordsViewController(connectionManager: self.connectionManager, gameService: self.gameService), animated: false)
-        }
     }
 }

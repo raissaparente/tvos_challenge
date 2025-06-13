@@ -11,14 +11,15 @@ import Combine
 class PlayerLobbyViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
+    private let viewModel: PlayerLobbyViewModel
+    private let coordinator: AppCoordinator
+    
     
     private let statusLabel = UILabel()
 
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
-        self.gameService = gameService
+    init(viewModel: PlayerLobbyViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -30,12 +31,10 @@ class PlayerLobbyViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        connectionManager.setup(game: gameService)
-        connectionManager.startAdvertising()
-        
-        observeInvite()
-        observeGameStart()
+        observeViewModel()
     }
+    
+    
     
     func setupUI() {
         view.backgroundColor = .white
@@ -49,44 +48,35 @@ class PlayerLobbyViewController: UIViewController {
         ])
     }
     
-    //navega pro jogo quando todo mundo ta conectado
-    private func observeGameStart() {
-        gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self = self else { return }
+    private func observeViewModel() {
+            viewModel.$shouldShowInvite
+                .filter { $0 }
+                .sink { [weak self] _ in self?.showInviteAlert() }
+                .store(in: &cancellables)
 
-                if status == .startGame {
-                    navigationController?.pushViewController(WaitingViewController(connectionManager: self.connectionManager, gameService: self.gameService), animated: false)
+            viewModel.$shouldNavigateToGame
+                .filter { $0 }
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    coordinator.showWaitingMessage_phone(from: self, type: .explaining)
                 }
-            }
-            .store(in: &cancellables)
+                .store(in: &cancellables)
     }
-    
-    //pra mostrar o popup de conectar -> trocar por codigo da "sala?
-    private func observeInvite() {
-         connectionManager.$receivedInvite
-             .receive(on: DispatchQueue.main)
-             .sink { [weak self] received in
-                 guard let self = self, received else { return }
-                 self.showInviteAlert()
-             }
-             .store(in: &cancellables)
-     }
     
     private func showInviteAlert() {
-        let peerName = connectionManager.receivedInviteFrom?.displayName ?? "Unknown"
-        let alert = UIAlertController(
-            title: "Convite recebido",
-            message: "Recebido de \(peerName)",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Aceitar", style: .default) { _ in
-            self.connectionManager.invitationHandler?(true, self.connectionManager.session)
-        })
-        alert.addAction(UIAlertAction(title: "Recusar", style: .cancel) { _ in
-            self.connectionManager.invitationHandler?(false, nil)
-        })
-        present(alert, animated: true)
-    }
+            let peerName = viewModel.receivedInviteFrom?.displayName ?? "Desconhecido"
+            let alert = UIAlertController(
+                title: "Convite recebido",
+                message: "Recebido de \(peerName)",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Aceitar", style: .default) { _ in
+                self.viewModel.acceptInvite()
+            })
+            alert.addAction(UIAlertAction(title: "Recusar", style: .cancel) { _ in
+                self.viewModel.declineInvite()
+            })
+            present(alert, animated: true)
+   }
 }

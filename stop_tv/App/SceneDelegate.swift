@@ -10,8 +10,7 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
-    let gameService = GameService()
-    
+    var coordinator: AppCoordinator?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -20,35 +19,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .tv {
-            let connectionManager = ConnectionManager(username: "tvHost")
-            let tvVC = ConnectionInstructionViewController(connectionManager: connectionManager, gameService: gameService)
-            let navController = UINavigationController(rootViewController: tvVC)
-            window.rootViewController = navController
-            
+        if idiom == .pad {
+            let coordinator = AppCoordinator(window: window, username: "tvHost")
+            self.coordinator = coordinator
+            coordinator.start()
+    
         } else {
-            //se ja tiver username
-            if let name = UserDefaults.standard.string(forKey: "yourname") {
-                let connectionManager = ConnectionManager(username: name)
-                let playerVC = PlayerLobbyViewController(connectionManager: connectionManager, gameService: gameService)
-                let navController = UINavigationController(rootViewController: playerVC)
-                window.rootViewController = navController
-            
-            //se nao tiver username salvo
-            } else {
-                let setNameVC = SetNameViewController()
-                setNameVC.onNameSet = { name in
-                    let connectionManager = ConnectionManager(username: name)
-                    let lobbyVC = PlayerLobbyViewController(connectionManager: connectionManager, gameService: self.gameService)
-                    let navController = UINavigationController(rootViewController: lobbyVC)
-                    window.rootViewController = navController
-                }
-                window.rootViewController = setNameVC
+            let setNameVC = SetNameViewController()
+            setNameVC.onNameSet = { name in
+                let coordinator = AppCoordinator(window: window, username: name)
+                self.coordinator = coordinator
+                coordinator.start()
             }
+            window.rootViewController = setNameVC
+            window.makeKeyAndVisible()
         }
-        
-        self.window = window
-        window.makeKeyAndVisible()
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {

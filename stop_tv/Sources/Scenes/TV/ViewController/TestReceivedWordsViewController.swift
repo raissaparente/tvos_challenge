@@ -14,14 +14,13 @@ class TestReceivedWordsViewController: UIViewController {
     
     private var cancellables = Set<AnyCancellable>()
     
-    private let connectionManager: ConnectionManager
+    private let coordinator: AppCoordinator
     private let gameService: GameService
-    private let viewModel = HostLobbyViewModel()
     
     private let stackView = UIStackView()
     
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
+    init(coordinator: AppCoordinator, gameService: GameService) {
+        self.coordinator = coordinator
         self.gameService = gameService
         super.init(nibName: nil, bundle: nil)
     }
@@ -55,11 +54,6 @@ class TestReceivedWordsViewController: UIViewController {
         let titleLabel = UILabel()
         titleLabel.text = "Letra \(gameService.currentLetter)"
         stackView.addArrangedSubview(titleLabel)
-        
-        let inviteButton = UIButton(type: .system)
-        inviteButton.setTitle("Proximo", for: .normal)
-        inviteButton.addTarget(self, action: #selector(inviteTapped), for: .primaryActionTriggered)
-        stackView.addArrangedSubview(inviteButton)
     }
     
     //combine

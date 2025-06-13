@@ -12,8 +12,7 @@ import MultipeerConnectivity
 
 class GameInstructionViewController: UIViewController {
     
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
+    private let coordinator: AppCoordinator
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
@@ -37,9 +36,8 @@ class GameInstructionViewController: UIViewController {
         return button
     }()
     
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
-        self.gameService = gameService
+    init(coordinator: AppCoordinator) {
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -75,6 +73,6 @@ class GameInstructionViewController: UIViewController {
 
     
     @objc private func continueTapped() {
-        navigationController?.pushViewController(LetterDrawViewController(connectionManager: connectionManager, gameService: gameService), animated: false)
+        coordinator.showLetterDraw_TV(from: self)
     }
 }

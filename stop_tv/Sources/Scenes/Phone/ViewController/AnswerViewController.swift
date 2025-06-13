@@ -13,10 +13,8 @@ import MultipeerConnectivity
 
 class AnswerViewController: UIViewController {
     
-    var answer: String = ""
-    
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
+    private let viewModel: AnswerViewModel
+    private let coordinator: AppCoordinator
     
     private let answerTextField: UITextField = {
         let textField = UITextField()
@@ -35,9 +33,9 @@ class AnswerViewController: UIViewController {
         return button
     }()
         
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
-        self.gameService = gameService
+    init(viewModel: AnswerViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -75,16 +73,15 @@ class AnswerViewController: UIViewController {
     
     private func setupBindings() {
         answerTextField.addTarget(self, action: #selector(textDidChange(_:)), for: .editingChanged)
-        setButton.addTarget(self, action: #selector(setButtonTapped), for: .touchUpInside)
+        setButton.addTarget(self, action: #selector(sendButtonTapped), for: .touchUpInside)
     }
     
     @objc private func textDidChange(_ sender: UITextField) {
-        answer = sender.text ?? ""
-        setButton.isEnabled = !answer.isEmpty
+        viewModel.answer = sender.text ?? ""
+        setButton.isEnabled = !viewModel.answer.isEmpty
     }
     
-    @objc private func setButtonTapped() {
-        let gameaction = GameAction(action: .sendAnswer, playerName: connectionManager.myPeerId.displayName, category: gameService.currentCategory, answer: answer, isAnswerValid: nil)
-        connectionManager.send(gameAction: gameaction)
+    @objc private func sendButtonTapped() {
+        viewModel.sendAnswer()
     }
 }

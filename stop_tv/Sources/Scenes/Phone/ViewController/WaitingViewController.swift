@@ -12,14 +12,14 @@ import Combine
 class WaitingViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
+    private let viewModel: WaitingViewModel
+    private let coordinator: AppCoordinator
     
     private let statusLabel = UILabel()
 
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
-        self.gameService = gameService
+    init(viewModel: WaitingViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,15 +31,12 @@ class WaitingViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        connectionManager.setup(game: gameService)
-        connectionManager.startAdvertising()
-        
-        observeGameStatus()
+        observeViewModel()
     }
     
     func setupUI() {
         view.backgroundColor = .white
-        statusLabel.text = "Waiting"
+        statusLabel.text = viewModel.waitingText
         statusLabel.textAlignment = .center
         view.addSubview(statusLabel)
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -50,16 +47,21 @@ class WaitingViewController: UIViewController {
     }
     
     //navega
-    private func observeGameStatus() {
-        gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self = self else { return }
-
-                if status == .category {
-                    navigationController?.pushViewController(AnswerViewController(connectionManager: self.connectionManager, gameService: self.gameService), animated: false)
-                }
+    private func observeViewModel() {
+        viewModel.$didFinishWaiting
+            .filter { $0 }
+            .sink { [weak self] _ in
+                self?.handleWaitingCompleted()
             }
             .store(in: &cancellables)
+    }
+
+    private func handleWaitingCompleted() {
+        switch viewModel.waitingType {
+        case .explaining:
+            coordinator.showAnswer_phone(from: self)
+            
+            // outros tipos de espera, se forem adicionados no futuro
+        }
     }
 }
