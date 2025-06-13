@@ -10,6 +10,10 @@ import MultipeerConnectivity
 
 class HostLobbyViewModel {
     @Published var selectedPeers: [MCPeerID] = []
+    
+//    var areAllInviteesConnected: Bool {
+//         Set(connected) == Set(selectedPeers)
+//    }
 
     func toggleSelection(for peer: MCPeerID) {
         if selectedPeers.contains(peer) {
