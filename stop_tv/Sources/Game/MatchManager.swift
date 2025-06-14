@@ -8,12 +8,12 @@
 import Foundation
 
 class MatchManager: ObservableObject {
+    var round: RoundManager?
     @Published var maxRoundsCount: Int = 3
     @Published var currentRound: Int? {
         didSet {
-            round?.count
+            currentRound = round?.count
         }
     }
     @Published var isRoundFinished: Bool = false
-    var round: RoundManager?
 }

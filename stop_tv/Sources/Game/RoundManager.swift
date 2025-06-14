@@ -12,7 +12,6 @@ enum RoundState {
     case inProgress
     case drawingLetter // sorteando letra
     case watingForAnswer // esperando entrada de cada categoria
-    case allAnswersReceived // todas as pessoas responderam uma categoria
     case waitingForVotation // mostrando as respostas de uma categoria e aguardando votacao
     case finished // todas as categorias daquela letra finalizadas e votadas
 }
@@ -20,7 +19,7 @@ enum RoundState {
 class RoundManager: ObservableObject {
     @Published var count: Int = 1
     @Published var roundState: RoundState?
-    let categories: [String] = ["nome", "profissao","lugar", "MSE","fruta", "CEP","comida", "filme","animal", "marca","celebridade", "banda","música", "cor","jogo", "objeto","personagem", "hobby","PCH", "time esportivo"]
+    let categories: [String] = ["nome", "profissao", "lugar", "MSE", "fruta", "CEP", "comida", "filme", "animal", "marca", "celebridade", "banda", "música", "cor", "jogo", "objeto", "personagem", "hobby", "PCH", "time esportivo"]
 
     func draw5Categories() -> [String] {
         let shuffledCategories = categories.shuffled()
@@ -28,3 +27,5 @@ class RoundManager: ObservableObject {
         return Array(shuffledCategories[0..<5])
     }
 }
+
+
