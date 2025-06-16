@@ -124,8 +124,6 @@ extension ConnectionManager: MCSessionDelegate {
             self.connectedPeers = session.connectedPeers
             print("Peer \(peerID.displayName) changed state to \(state.rawValue)")
             print("Connected: \(self.connectedPeers)")
-
-//            self.isAvailableToPlay = self.connectedPeers.isEmpty
         }
     }
     
@@ -141,9 +139,10 @@ extension ConnectionManager: MCSessionDelegate {
                 case .voteAnswer:
                     //TODO: CHANGE TO REAL FUNC
                     break
-                case .startGame:
-                    self.game?.startGame = true
-                    print(self.game?.startGame.description)
+                case .changeStatus:
+                    if let status = gameAction.status {
+                        self.game?.status = status
+                    }
                 }
             }
         }

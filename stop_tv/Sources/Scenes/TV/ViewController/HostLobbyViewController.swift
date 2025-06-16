@@ -12,15 +12,14 @@ class HostLobbyViewController: UIViewController {
     
     private var cancellables = Set<AnyCancellable>()
     
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
-    private let viewModel = HostLobbyViewModel()
+    private let viewModel: HostLobbyViewModel
+    private let coordinator: AppCoordinator
     
     private let stackView = UIStackView()
     
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
-        self.gameService = gameService
+    init(viewModel: HostLobbyViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,21 +30,22 @@ class HostLobbyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        connectionManager.setup(game: gameService)
-        connectionManager.startBrowsing()
         
-        observePeers()
-        observeConnection()
+        viewModel.browseForPeers()
+        viewModel.observeConnection()
+        viewModel.observeGame()
+        
+        observeVM()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        connectionManager.stopBrowsing()
+        viewModel.stopBrowsingForPeers()
     }
     
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .black
         
         stackView.axis = .vertical
         stackView.spacing = 12
@@ -60,62 +60,59 @@ class HostLobbyViewController: UIViewController {
         
         let titleLabel = UILabel()
         titleLabel.text = "Jogadores disponíveis:"
+        titleLabel.textColor = .white
         stackView.addArrangedSubview(titleLabel)
         
         let inviteButton = UIButton(type: .system)
         inviteButton.setTitle("Convidar selecionados", for: .normal)
-        inviteButton.addTarget(self, action: #selector(inviteTapped), for: .touchUpInside)
+        inviteButton.backgroundColor = .systemBlue
+        inviteButton.tintColor = .white
+        inviteButton.layer.cornerRadius = 8
+        inviteButton.addTarget(self, action: #selector(inviteTapped), for: .primaryActionTriggered)
         stackView.addArrangedSubview(inviteButton)
     }
     
-    //combine
-    private func observePeers() {
-        connectionManager.$availablePeers
+    private func observeVM() {
+        viewModel.$availablePeers
             .receive(on: DispatchQueue.main)
             .sink { [weak self] peers in
                 self?.reloadPeerButtons(peers)
-                print(self?.connectionManager.availablePeers)
             }
             .store(in: &cancellables)
-    }
-    
-    private func observeConnection() {
-        connectionManager.$connectedPeers
+        
+        viewModel.$shouldStartGame
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] connected in
+            .sink { [weak self] shouldStart in
                 guard let self = self else { return }
                 
-                //inicio do jogo quando todo mundo aceitar
-                if Set(connected) == Set(self.viewModel.selectedPeers) {
-                    self.gameService.startGame = true
-                    let action = GameAction(action: .startGame, playerName: nil, category: nil, answer: nil, isAnswerValid: nil)
-                    self.connectionManager.send(gameAction: action)
+                if shouldStart {
+                    coordinator.showGameInstruction_TV(from: self)
                 }
             }
             .store(in: &cancellables)
     }
-    
     private func reloadPeerButtons(_ peers: [MCPeerID]) {
-        stackView.arrangedSubviews
-            .dropFirst()
-            .forEach { $0.removeFromSuperview() }
+        for view in stackView.arrangedSubviews where view.tag == 100 {
+            stackView.removeArrangedSubview(view)
+            view.removeFromSuperview()
+        }
         
         for peer in peers {
             let button = UIButton(type: .system)
+            button.tag = 100
             let isSelected = viewModel.selectedPeers.contains(peer)
             let symbol = isSelected ? "✅" : "◻️"
             button.setTitle("\(symbol) \(peer.displayName)", for: .normal)
+            button.tintColor = .white
             button.addAction(UIAction { [weak self] _ in
                 self?.viewModel.toggleSelection(for: peer)
                 self?.reloadPeerButtons(peers)
-            }, for: .touchUpInside)
+            }, for: .primaryActionTriggered)
             stackView.addArrangedSubview(button)
         }
     }
     
     @objc private func inviteTapped() {
-        for peer in viewModel.selectedPeers {
-            connectionManager.invite(peer: peer)
-        }
+        viewModel.inviteSelectedPeers()
     }
 }
