@@ -9,24 +9,22 @@ import UIKit
 
 class AppCoordinator {
     let window: UIWindow
-
     let connectionManager: ConnectionManager
     let gameService = GameService()
     let roundVM: RoundViewModel!
 
-
     init(window: UIWindow, username: String) {
-            self.window = window
-            self.connectionManager = ConnectionManager(username: username)
+        self.window = window
+        self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager)
-        }
+    }
 
     func start() {
         let nav = UINavigationController()
 
         let idiom = UIDevice.current.userInterfaceIdiom
         if idiom == .pad {
-            
+
             let vc = ConnectionInstructionViewController(coordinator: self)
             nav.viewControllers = [vc]
         } else {
@@ -38,9 +36,9 @@ class AppCoordinator {
             let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
             nav.viewControllers = [vc]
         }
-            window.rootViewController = nav
-            window.makeKeyAndVisible()
-        
+        window.rootViewController = nav
+        window.makeKeyAndVisible()
+
     }
 
     //TV
@@ -53,24 +51,24 @@ class AppCoordinator {
         let lobbyVC = HostLobbyViewController(viewModel: vm, coordinator: self)
         currentVC.navigationController?.pushViewController(lobbyVC, animated: true)
     }
-    
+
     func showGameInstruction_TV(from currentVC: UIViewController) {
         let instructionVC = GameInstructionViewController(coordinator: self)
         currentVC.navigationController?.pushViewController(instructionVC, animated: true)
     }
-    
+
     func showLetterDraw_TV(from currentVC: UIViewController) {
         let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
-        
+
         let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService)
         currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
     }
-    
-    func showCategory_TV(from currentVC: UIViewController) {        
-        let categoryVC = RoundTVViewController(viewModel: roundVM)
-        currentVC.navigationController?.pushViewController(categoryVC, animated: true)
+
+    func showCategory_TV(from currentVC: UIViewController) {
+        let roundTVVC = RoundTVViewController(viewModel: roundVM)
+        currentVC.navigationController?.pushViewController(roundTVVC, animated: true)
     }
-    
+
     //Phone
     func showWaitingMessage_phone(from currentVC: UIViewController, type: WaitingType) {
         let vm = WaitingViewModel(
@@ -78,19 +76,14 @@ class AppCoordinator {
             gameService: gameService,
             type: type
         )
-        
+
         let waitingVC = WaitingViewController(viewModel: vm, coordinator: self)
         currentVC.navigationController?.pushViewController(waitingVC, animated: true)
     }
-    
+
     func showAnswer_phone(from currentVC: UIViewController) {
-//        let vm = AnswerViewModel(
-//            connectionManager: connectionManager,
-//            gameService: gameService
-//        )
 
-
-        let answerVC = RoundPhoneViewController(viewModel: roundVM)
-        currentVC.navigationController?.pushViewController(answerVC, animated: true)
+        let roundPhoneVC = RoundPhoneViewController(viewModel: roundVM)
+        currentVC.navigationController?.pushViewController(roundPhoneVC, animated: true)
     }
 }
