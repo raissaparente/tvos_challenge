@@ -9,11 +9,10 @@ import Combine
 
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
-
     @Published private(set) var currentIndex = 0
     @Published private(set) var answers: [String: String] = [:]
     var connectionManager: ConnectionManager
-    var gameService: GameService!
+    var gameService: GameService
 
     var categories: [String] {
         gameService.categories
@@ -28,8 +27,9 @@ class RoundViewModel {
         currentIndex >= categories.count
     }
 
-    init(connectionManager: ConnectionManager) {
+    init(connectionManager: ConnectionManager, gameService: GameService) {
         self.connectionManager = connectionManager
+        self.gameService = gameService
     }
 
     func saveAnswer(_ answer: String) {

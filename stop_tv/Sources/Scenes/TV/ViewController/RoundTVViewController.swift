@@ -110,5 +110,5 @@ class RoundTVViewController: UIViewController {
 
 
 #Preview {
-    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia")))
+    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()))
 }

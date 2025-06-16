@@ -9,7 +9,9 @@ import Foundation
 
 struct GameAction: Codable {
     enum Action: Int, Codable {
-        case sendAnswer, voteAnswer, changeStatus
+        case sendAnswer
+        case voteAnswer
+        case changeStatus
     }
     
     let action: Action

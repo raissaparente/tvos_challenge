@@ -16,12 +16,11 @@ class AppCoordinator {
     init(window: UIWindow, username: String) {
         self.window = window
         self.connectionManager = ConnectionManager(username: username)
-        self.roundVM = RoundViewModel(connectionManager: connectionManager)
+        self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
     }
 
     func start() {
         let nav = UINavigationController()
-
         let idiom = UIDevice.current.userInterfaceIdiom
         if idiom == .pad {
 
