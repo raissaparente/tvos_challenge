@@ -9,12 +9,13 @@ import Foundation
 
 struct GameAction: Codable {
     enum Action: Int, Codable {
-        case sendAnswer, voteAnswer, startGame
+        case sendAnswer, voteAnswer, changeStatus
     }
     
     let action: Action
-    let playerName: String?
+    var playerName: String? = nil
     
+    var status: GameStatus? = nil
     var category: String? = nil
     var answer: String? = nil
     var isAnswerValid: Bool? = nil

@@ -11,7 +11,7 @@ class GameService: ObservableObject {
     var currentCategory: String = "Nome"
     @Published var dump: [String] = ["teste"]
     
-    @Published var startGame = false
+    @Published var status: GameStatus = .awaiting
 
     
     func updateAnswers(for category: String, with answer: String) {

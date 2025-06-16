@@ -11,14 +11,15 @@ import Combine
 class PlayerLobbyViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
+    private let viewModel: PlayerLobbyViewModel
+    private let coordinator: AppCoordinator
+    
     
     private let statusLabel = UILabel()
 
-    init(connectionManager: ConnectionManager, gameService: GameService) {
-        self.connectionManager = connectionManager
-        self.gameService = gameService
+    init(viewModel: PlayerLobbyViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -30,12 +31,13 @@ class PlayerLobbyViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        connectionManager.setup(game: gameService)
-        connectionManager.startAdvertising()
+        observeViewModel()
     }
     
+    
+    
     func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .white
         statusLabel.text = "Conectando à TV..."
         statusLabel.textAlignment = .center
         view.addSubview(statusLabel)
@@ -46,30 +48,35 @@ class PlayerLobbyViewController: UIViewController {
         ])
     }
     
-    //pra mostrar o popup de conectar -> trocar por codigo da "sala?
-    private func observeInvite() {
-         connectionManager.$receivedInvite
-             .receive(on: DispatchQueue.main)
-             .sink { [weak self] received in
-                 guard let self = self, received else { return }
-                 self.showInviteAlert()
-             }
-             .store(in: &cancellables)
-     }
+    private func observeViewModel() {
+            viewModel.$shouldShowInvite
+                .filter { $0 }
+                .sink { [weak self] _ in self?.showInviteAlert() }
+                .store(in: &cancellables)
+
+            viewModel.$shouldNavigateToGame
+                .filter { $0 }
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    coordinator.showWaitingMessage_phone(from: self, type: .explaining)
+                }
+                .store(in: &cancellables)
+    }
     
     private func showInviteAlert() {
-        let peerName = connectionManager.receivedInviteFrom?.displayName ?? "Unknown"
-        let alert = UIAlertController(
-            title: "Convite recebido",
-            message: "Recebido de \(peerName)",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Aceitar", style: .default) { _ in
-            self.connectionManager.invitationHandler?(true, self.connectionManager.session)
-        })
-        alert.addAction(UIAlertAction(title: "Recusar", style: .cancel) { _ in
-            self.connectionManager.invitationHandler?(false, nil)
-        })
-        present(alert, animated: true)
-    }
+            let peerName = viewModel.receivedInviteFrom?.displayName ?? "Desconhecido"
+            let alert = UIAlertController(
+                title: "Convite recebido",
+                message: "Recebido de \(peerName)",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Aceitar", style: .default) { _ in
+                self.viewModel.acceptInvite()
+            })
+            alert.addAction(UIAlertAction(title: "Recusar", style: .cancel) { _ in
+                self.viewModel.declineInvite()
+            })
+            present(alert, animated: true)
+   }
 }
