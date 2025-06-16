@@ -21,7 +21,8 @@ struct GameAction: Codable {
     var category: String? = nil
     var answer: String? = nil
     var isAnswerValid: Bool? = nil
-    
+    var currentIndex: Int?
+
     func data() -> Data? {
         try? JSONEncoder().encode(self)
     }

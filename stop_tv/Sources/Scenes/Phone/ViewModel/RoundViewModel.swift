@@ -31,6 +31,12 @@ class RoundViewModel {
         self.connectionManager = connectionManager
         self.gameService = gameService
     }
+    
+    func setCurrentIndex(_ index: Int) {
+        print("🔧 setCurrentIndex chamado com valor: \(index)")
+        currentIndex = index
+
+    }
 
     func saveAnswer(_ answer: String) {
         guard !isFinished else { return }
@@ -40,8 +46,22 @@ class RoundViewModel {
     }
 
     func sendAnswer() {
-        let gameaction = GameAction(action: .sendAnswer, playerName: connectionManager.myPeerId.displayName, category: currentCategory, answer: answers[currentCategory], isAnswerValid: nil)
+        let gameAction = GameAction(
+            action: .sendAnswer,
+            playerName: connectionManager.myPeerId.displayName,
+            category: currentCategory,
+            answer: answers[currentCategory],
+            isAnswerValid: nil,
+            currentIndex: currentIndex
+        )
 
-        connectionManager.send(gameAction: gameaction)
+        print("📤 Enviando GameAction do iPhone:")
+        print("    - Categoria: \(gameAction.category ?? "")")
+        print("    - Resposta: \(gameAction.answer ?? "")")
+        print("    - Índice: \(gameAction.currentIndex ?? -1)")
+
+        connectionManager.send(gameAction: gameAction)
     }
+
+
 }

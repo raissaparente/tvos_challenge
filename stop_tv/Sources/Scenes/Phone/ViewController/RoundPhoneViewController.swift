@@ -97,6 +97,7 @@ class RoundPhoneViewController: UIViewController {
             categoryLabel.text = "Mostrar repostas!"
         } else {
             categoryLabel.text = viewModel.currentCategory
+            print("🖥️ Mostrando nova categoria na TV: \(categoryLabel.text ?? "undefined")")
             textField.text = ""
         }
     }

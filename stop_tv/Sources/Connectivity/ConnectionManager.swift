@@ -13,13 +13,13 @@ extension String {
 
 class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc framework
     private lazy var advertiser: MCNearbyServiceAdvertiser = {
-            MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: String.serviceName)
-        }() //advertises the device availability to connect (has delegates)
+        MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: String.serviceName)
+    }() //advertises the device availability to connect (has delegates)
     private lazy var browser: MCNearbyServiceBrowser = {
-            MCNearbyServiceBrowser(peer: myPeerId, serviceType: String.serviceName)
-        }() //searches for devices available to connect through wifi (has delegates)
-    
-    
+        MCNearbyServiceBrowser(peer: myPeerId, serviceType: String.serviceName)
+    }() //searches for devices available to connect through wifi (has delegates)
+
+
     let serviceType = String.serviceName  //identify the service
     let session: MCSession //enables and manages communication among all peers
     let myPeerId: MCPeerID
@@ -28,17 +28,17 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
 
     @Published var availablePeers: [MCPeerID] = []
     @Published var connectedPeers: [MCPeerID] = []
-    
+
     @Published var receivedInvite: Bool = false
     @Published var receivedInviteFrom: MCPeerID?
     @Published var invitationHandler: ((Bool, MCSession?) -> Void)?
-    
+
     func setup(game: GameService, round: RoundViewModel) {
         self.game = game
         self.round = round
     }
 
-    
+
     init(username: String) {
         myPeerId = MCPeerID(displayName: username)
         session = MCSession(peer: myPeerId)
@@ -47,12 +47,12 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
         advertiser.delegate = self
         browser.delegate = self
     }
-    
+
     deinit {
         stopAdvertising()
         stopBrowsing()
     }
-    
+
     func startAdvertising() {
         advertiser.startAdvertisingPeer()
     }
@@ -60,7 +60,7 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     func stopAdvertising() {
         advertiser.stopAdvertisingPeer()
     }
-    
+
     func startBrowsing() {
         browser.startBrowsingForPeers()
     }
@@ -69,13 +69,13 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
         browser.stopBrowsingForPeers()
         availablePeers.removeAll()
     }
-    
+
 
     func invite(peer: MCPeerID) {
         browser.invitePeer(peer, to: session, withContext: nil, timeout: 30)
     }
 
-    
+
     func send(gameAction: GameAction) {
         if !session.connectedPeers.isEmpty {
             do {
@@ -128,16 +128,20 @@ extension ConnectionManager: MCSessionDelegate {
             print("Connected: \(self.connectedPeers)")
         }
     }
-    
+
     //receives data from peer that needs to be responded - main funcs for the game
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let gameAction = try? JSONDecoder().decode(GameAction.self, from: data) {
             DispatchQueue.main.async {
                 switch gameAction.action {
                 case .sendAnswer:
-                    //ACAO QUE VAI ACONTCER QUANDO RECEBER UM PACOTE DO TIPO GAMEACTION
-                    if let answer = gameAction.answer {
+                    if let answer = gameAction.answer,
+                       let index = gameAction.currentIndex {
+                        print("🖥️ Salvando resposta no viewModel da TV...")
                         self.round?.saveAnswer(answer)
+                        self.round?.setCurrentIndex(index)
+                        print("✅ Atualizado índice para: \(index)")
+
                     }
                 case .voteAnswer:
                     //TODO: CHANGE TO REAL FUNC
@@ -150,11 +154,11 @@ extension ConnectionManager: MCSessionDelegate {
             }
         }
     }
-    
+
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) { }
-    
+
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) { }
-    
+
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: (any Error)?) { }
 }
 
