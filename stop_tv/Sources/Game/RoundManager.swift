@@ -8,12 +8,9 @@
 import Foundation
 
 enum RoundState {
-    case started
     case inProgress
     case drawingLetter // sorteando letra
-    case watingForAnswer // esperando entrada de cada categoria
-    case waitingForVotation // mostrando as respostas de uma categoria e aguardando votacao
-    case finished // todas as categorias daquela letra finalizadas e votadas
+                        // todas as categorias daquela letra finalizadas e votadas
 }
 
 class RoundManager: ObservableObject {

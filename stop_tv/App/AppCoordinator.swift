@@ -11,11 +11,15 @@ class AppCoordinator {
     let window: UIWindow
 
     let connectionManager: ConnectionManager
+    let roundManager = RoundManager()
     let gameService = GameService()
+    let roundVM: RoundViewModel!
+
 
     init(window: UIWindow, username: String) {
             self.window = window
             self.connectionManager = ConnectionManager(username: username)
+        self.roundVM = RoundViewModel(roundManager: roundManager, connectionManager: connectionManager)
         }
 
     func start() {
@@ -29,7 +33,8 @@ class AppCoordinator {
         } else {
             let vm = PlayerLobbyViewModel(
                 connectionManager: connectionManager,
-                gameService: gameService
+                gameService: gameService,
+                roundViewModel: roundVM
             )
             let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
             nav.viewControllers = [vc]
@@ -43,7 +48,8 @@ class AppCoordinator {
     func showLobbyScreen_TV(from currentVC: UIViewController) {
         let vm = HostLobbyViewModel(
             connectionManager: connectionManager,
-            gameService: gameService
+            gameService: gameService,
+            roundViewModel: roundVM
         )
         let lobbyVC = HostLobbyViewController(viewModel: vm, coordinator: self)
         currentVC.navigationController?.pushViewController(lobbyVC, animated: true)
@@ -57,14 +63,12 @@ class AppCoordinator {
     func showLetterDraw_TV(from currentVC: UIViewController) {
         let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
         
-        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self)
+        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService)
         currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
     }
     
-    func showCategory_TV(from currentVC: UIViewController) {
-        //TODO: tirar gameservice daqui
-        
-        let categoryVC = TestReceivedWordsViewController(coordinator: self, gameService: gameService)
+    func showCategory_TV(from currentVC: UIViewController) {        
+        let categoryVC = RoundTVViewController(roundManager: roundManager, viewModel: roundVM)
         currentVC.navigationController?.pushViewController(categoryVC, animated: true)
     }
     
@@ -81,12 +85,13 @@ class AppCoordinator {
     }
     
     func showAnswer_phone(from currentVC: UIViewController) {
-        let vm = AnswerViewModel(
-            connectionManager: connectionManager,
-            gameService: gameService
-        )
-        
-        let answerVC = AnswerViewController(viewModel: vm, coordinator: self)
+//        let vm = AnswerViewModel(
+//            connectionManager: connectionManager,
+//            gameService: gameService
+//        )
+
+
+        let answerVC = RoundPhoneViewController(roundManager: roundManager, viewModel: roundVM)
         currentVC.navigationController?.pushViewController(answerVC, animated: true)
     }
 }

@@ -7,9 +7,9 @@
 
 import UIKit
 
-class RoundTestViewController: UIViewController {
-    var RoundManager: RoundManager
-    var viewModel: RoundTestViewModel
+class RoundPhoneViewController: UIViewController {
+    var roundManager: RoundManager
+    var viewModel: RoundViewModel
 
     private let containerView = UIView()
     private let textField = UITextField()
@@ -17,11 +17,12 @@ class RoundTestViewController: UIViewController {
     private let submitButton = UIButton(type: .custom)
     private let finishButton = UIButton(type: .custom)
 
-    init(RoundManager: RoundManager) {
-        self.RoundManager = RoundManager
-        self.viewModel = RoundTestViewModel(manager: RoundManager)
-
+    init(roundManager: RoundManager, viewModel: RoundViewModel) {
+        self.roundManager = roundManager
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        textField.delegate = self
+
     }
 
     required init?(coder: NSCoder) {
@@ -41,11 +42,6 @@ class RoundTestViewController: UIViewController {
         containerView.backgroundColor = .lightGray
         containerView.layer.cornerRadius = 12
         view.addSubview(containerView)
-
-        // Category label
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
-        containerView.addSubview(categoryLabel)
 
         // TextField
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -81,9 +77,6 @@ class RoundTestViewController: UIViewController {
             containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
 
-            categoryLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
-            categoryLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-
             textField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             textField.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             textField.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
@@ -112,6 +105,8 @@ class RoundTestViewController: UIViewController {
 
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
         viewModel.saveAnswer(textField.text ?? "")
+        viewModel.sendAnswer()
+
         updateCategory()
     }
 
@@ -127,7 +122,14 @@ class RoundTestViewController: UIViewController {
     }
 }
 
+extension RoundPhoneViewController: UITextFieldDelegate {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+}
+
 
 #Preview {
-    RoundTestViewController(RoundManager: .init())
+    RoundPhoneViewController(roundManager: .init(), viewModel: RoundViewModel(roundManager: RoundManager(), connectionManager: ConnectionManager(username: "raissa")))
 }

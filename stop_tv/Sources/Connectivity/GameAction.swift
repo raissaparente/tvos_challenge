@@ -15,7 +15,7 @@ struct GameAction: Codable {
     let action: Action
     var playerName: String? = nil
     
-    var status: GameStatus? = nil
+    var status: ConnectionStatus? = nil
     var category: String? = nil
     var answer: String? = nil
     var isAnswerValid: Bool? = nil

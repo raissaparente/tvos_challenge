@@ -24,7 +24,8 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     let session: MCSession //enables and manages communication among all peers
     let myPeerId: MCPeerID
     weak var game: GameService?
-    
+    weak var round: RoundViewModel?
+
     @Published var availablePeers: [MCPeerID] = []
     @Published var connectedPeers: [MCPeerID] = []
     
@@ -32,8 +33,9 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     @Published var receivedInviteFrom: MCPeerID?
     @Published var invitationHandler: ((Bool, MCSession?) -> Void)?
     
-    func setup(game: GameService) {
+    func setup(game: GameService, round: RoundViewModel) {
         self.game = game
+        self.round = round
     }
 
     
@@ -133,8 +135,9 @@ extension ConnectionManager: MCSessionDelegate {
             DispatchQueue.main.async {
                 switch gameAction.action {
                 case .sendAnswer:
-                    if let category = gameAction.category, let answer = gameAction.answer {
-                        self.game?.updateAnswers(for: category, with: answer)
+                    //ACAO QUE VAI ACONTCER QUANDO RECEBER UM PACOTE DO TIPO GAMEACTION
+                    if let answer = gameAction.answer {
+                        self.round?.saveAnswer(answer)
                     }
                 case .voteAnswer:
                     //TODO: CHANGE TO REAL FUNC
