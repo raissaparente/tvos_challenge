@@ -7,7 +7,7 @@
 import Foundation
 import StopPlay
 
-class GameService: ObservableObject {
+public class GameService: ObservableObject {
     var currentLetter = "a"
     var currentCategory: String = "Nome"
     @Published var dump: [String] = ["teste"]
@@ -31,7 +31,7 @@ class GameService: ObservableObject {
 
 }
 
-extension GameService {
+public extension GameService {
     var categories: [String] {
         return [
             "Nome",
@@ -72,7 +72,8 @@ extension GameService {
     }
 
     var customAlphabet: String
-    { return "ABCDEFGHIJLMNOPQRSTUV"
+    {
+        return "ABCDEFGHIJLMNOPQRSTUV"
 
     }
 }

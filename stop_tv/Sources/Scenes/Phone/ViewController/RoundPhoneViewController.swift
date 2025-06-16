@@ -8,7 +8,6 @@
 import UIKit
 
 class RoundPhoneViewController: UIViewController {
-    var roundManager: RoundManager
     var viewModel: RoundViewModel
 
     private let containerView = UIView()
@@ -17,8 +16,7 @@ class RoundPhoneViewController: UIViewController {
     private let submitButton = UIButton(type: .custom)
     private let finishButton = UIButton(type: .custom)
 
-    init(roundManager: RoundManager, viewModel: RoundViewModel) {
-        self.roundManager = roundManager
+    init(viewModel: RoundViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         textField.delegate = self
@@ -131,5 +129,5 @@ extension RoundPhoneViewController: UITextFieldDelegate {
 
 
 #Preview {
-    RoundPhoneViewController(roundManager: .init(), viewModel: RoundViewModel(roundManager: RoundManager(), connectionManager: ConnectionManager(username: "raissa")))
+    RoundPhoneViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "raissa")))
 }

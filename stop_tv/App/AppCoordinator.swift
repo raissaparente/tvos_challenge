@@ -11,7 +11,6 @@ class AppCoordinator {
     let window: UIWindow
 
     let connectionManager: ConnectionManager
-    let roundManager = RoundManager()
     let gameService = GameService()
     let roundVM: RoundViewModel!
 
@@ -19,7 +18,7 @@ class AppCoordinator {
     init(window: UIWindow, username: String) {
             self.window = window
             self.connectionManager = ConnectionManager(username: username)
-        self.roundVM = RoundViewModel(roundManager: roundManager, connectionManager: connectionManager)
+        self.roundVM = RoundViewModel(connectionManager: connectionManager)
         }
 
     func start() {
@@ -68,7 +67,7 @@ class AppCoordinator {
     }
     
     func showCategory_TV(from currentVC: UIViewController) {        
-        let categoryVC = RoundTVViewController(roundManager: roundManager, viewModel: roundVM)
+        let categoryVC = RoundTVViewController(viewModel: roundVM)
         currentVC.navigationController?.pushViewController(categoryVC, animated: true)
     }
     
@@ -91,7 +90,7 @@ class AppCoordinator {
 //        )
 
 
-        let answerVC = RoundPhoneViewController(roundManager: roundManager, viewModel: roundVM)
+        let answerVC = RoundPhoneViewController(viewModel: roundVM)
         currentVC.navigationController?.pushViewController(answerVC, animated: true)
     }
 }

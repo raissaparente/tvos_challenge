@@ -8,16 +8,15 @@ import Foundation
 import Combine
 
 class RoundViewModel {
-    private let roundManager: RoundManager
     private var cancellables = Set<AnyCancellable>()
 
     @Published private(set) var currentIndex = 0
     @Published private(set) var answers: [String: String] = [:]
-
     var connectionManager: ConnectionManager
+    var gameService: GameService!
 
     var categories: [String] {
-        roundManager.categories
+        gameService.categories
     }
 
     var currentCategory: String {
@@ -29,8 +28,7 @@ class RoundViewModel {
         currentIndex >= categories.count
     }
 
-    init(roundManager: RoundManager, connectionManager: ConnectionManager) {
-        self.roundManager = roundManager
+    init(connectionManager: ConnectionManager) {
         self.connectionManager = connectionManager
     }
 

@@ -9,7 +9,6 @@ import UIKit
 import Combine
 
 class RoundTVViewController: UIViewController {
-    var roundManager: RoundManager
     var viewModel: RoundViewModel
     private var cancellables = Set<AnyCancellable>()
 
@@ -20,8 +19,7 @@ class RoundTVViewController: UIViewController {
     private let submitButton = UIButton(type: .custom)
     private let finishButton = UIButton(type: .custom)
 
-    init(roundManager: RoundManager, viewModel: RoundViewModel) {
-        self.roundManager = roundManager
+    init(viewModel: RoundViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -112,5 +110,5 @@ class RoundTVViewController: UIViewController {
 
 
 #Preview {
-    RoundTVViewController(roundManager: .init(), viewModel: RoundViewModel(roundManager: RoundManager(), connectionManager: ConnectionManager(username: "julia")))
+    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia")))
 }
