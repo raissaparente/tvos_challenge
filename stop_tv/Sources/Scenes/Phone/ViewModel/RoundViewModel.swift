@@ -51,7 +51,9 @@ class RoundViewModel {
             category: currentCategory,
             answer: answers[currentCategory],
             isAnswerValid: nil,
-            currentIndex: currentIndex
+            currentIndex: currentIndex,
+            nextIndex:  currentIndex + 1
+
         )
 
         connectionManager.send(gameAction: gameAction)
