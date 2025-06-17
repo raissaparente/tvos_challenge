@@ -1,0 +1,15 @@
+{
+  "originHash" : "40839cc7ae506c644480ccd4c99361e2dff34a3612da395318f4021539d98dac",
+  "pins" : [
+    {
+      "identity" : "stopplay",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DylanPlutarcoo/StopPlay.git",
+      "state" : {
+        "branch" : "dev",
+        "revision" : "8e94a00888a43e45be63b7ab60230330acf054fb"
+      }
+    }
+  ],
+  "version" : 3
+}

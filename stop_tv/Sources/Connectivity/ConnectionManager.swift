@@ -137,14 +137,9 @@ extension ConnectionManager: MCSessionDelegate {
             DispatchQueue.main.async {
                 switch gameAction.action {
                 case .sendAnswer:
-                    if let answer = gameAction.answer,
-                       let index = gameAction.currentIndex,
-                       let nextIndex = gameAction.nextIndex {
+                    if let answer = gameAction.answer {
                         print("🖥️ Salvando resposta no viewModel da TV...")
                         self.round?.saveAnswer(answer)
-                        self.round?.setCurrentIndex(nextIndex)
-                        print("✅ Atualizado índice para: \(nextIndex)")
-
                     }
                 case .voteAnswer:
                     //TODO: CHANGE TO REAL FUNC
@@ -159,9 +154,14 @@ extension ConnectionManager: MCSessionDelegate {
                         print("✅ Categoriaaaaa: \(categories)")
 
                     }
+                    
+                case .changeCategory:
+                    if let nextIndex = gameAction.nextIndex {
+    
+                        self.round?.setCurrentIndex(nextIndex)
+                        print("✅ Atualizado índice para: \(nextIndex)")
 
-
-                    print("Deu ruim mas chamou")
+                    }
 
                 }
             }

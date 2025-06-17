@@ -104,7 +104,7 @@ class RoundPhoneViewController: UIViewController {
 
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
         viewModel.saveAnswer(textField.text ?? "")
-        viewModel.sendAnswer()
+        viewModel.sendAnswer(textField.text ?? "")
         updateCategory()
     }
 
