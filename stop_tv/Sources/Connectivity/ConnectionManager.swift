@@ -138,11 +138,12 @@ extension ConnectionManager: MCSessionDelegate {
                 switch gameAction.action {
                 case .sendAnswer:
                     if let answer = gameAction.answer,
-                       let index = gameAction.currentIndex {
+                       let index = gameAction.currentIndex,
+                       let nextIndex = gameAction.nextIndex {
                         print("🖥️ Salvando resposta no viewModel da TV...")
                         self.round?.saveAnswer(answer)
-                        self.round?.setCurrentIndex(index)
-                        print("✅ Atualizado índice para: \(index)")
+                        self.round?.setCurrentIndex(nextIndex)
+                        print("✅ Atualizado índice para: \(nextIndex)")
 
                     }
                 case .voteAnswer:

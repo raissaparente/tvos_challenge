@@ -23,6 +23,7 @@ struct GameAction: Codable {
     var answer: String? = nil
     var isAnswerValid: Bool? = nil
     var currentIndex: Int?
+    var nextIndex: Int?
     var categories: [String]? = nil
 
     func data() -> Data? {
