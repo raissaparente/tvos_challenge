@@ -9,17 +9,20 @@ import Foundation
 
 struct GameAction: Codable {
     enum Action: Int, Codable {
-        case sendAnswer, voteAnswer, changeStatus
+        case sendAnswer
+        case voteAnswer
+        case changeStatus
     }
     
     let action: Action
     var playerName: String? = nil
     
-    var status: GameStatus? = nil
+    var status: ConnectionStatus? = nil
     var category: String? = nil
     var answer: String? = nil
     var isAnswerValid: Bool? = nil
-    
+    var currentIndex: Int?
+
     func data() -> Data? {
         try? JSONEncoder().encode(self)
     }

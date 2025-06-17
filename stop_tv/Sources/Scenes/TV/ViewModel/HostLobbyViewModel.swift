@@ -16,12 +16,16 @@ class HostLobbyViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private let connectionManager: ConnectionManager
     private let gameService: GameService
-    
-    init(connectionManager: ConnectionManager, gameService: GameService) {
+    private let roundViewModel: RoundViewModel
+
+
+
+    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel) {
         self.connectionManager = connectionManager
         self.gameService = gameService
+        self.roundViewModel = roundViewModel
     }
-    
+
     
     func observeConnection() {
         //observa peers disponíveis
@@ -57,7 +61,7 @@ class HostLobbyViewModel: ObservableObject {
     }
     
     func browseForPeers() {
-        connectionManager.setup(game: gameService)
+        connectionManager.setup(game: gameService, round: roundViewModel)
         connectionManager.startBrowsing()
     }
     

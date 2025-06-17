@@ -13,10 +13,12 @@ class LetterDrawViewController: UIViewController {
     
     private let viewModel: LetterDrawViewModel
     private let coordinator: AppCoordinator
-    
+    var gameService: GameService
+
+
     private let letter: UILabel = {
         let label = UILabel()
-        label.text = "A"
+        label.text = ""
         label.textColor = .white
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 100, weight: .black)
@@ -24,9 +26,12 @@ class LetterDrawViewController: UIViewController {
         return label
     }()
     
-    init(viewModel: LetterDrawViewModel, coordinator: AppCoordinator) {
+    init(viewModel: LetterDrawViewModel, coordinator: AppCoordinator, gameService: GameService) {
         self.viewModel = viewModel
         self.coordinator = coordinator
+        self.gameService = gameService
+        self.letter.text = gameService.drawLetter()
+
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -43,6 +48,7 @@ class LetterDrawViewController: UIViewController {
     }
     
     func setupUI() {
+        let currentLetter = gameService.currentLetter
         view.backgroundColor = .black
 
         view.addSubview(letter)
