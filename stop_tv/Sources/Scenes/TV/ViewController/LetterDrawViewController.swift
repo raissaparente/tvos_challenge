@@ -14,6 +14,7 @@ class LetterDrawViewController: UIViewController {
     private let viewModel: LetterDrawViewModel
     private let coordinator: AppCoordinator
     var gameService: GameService
+    var roundVM: RoundViewModel
 
 
     private let letter: UILabel = {
@@ -26,10 +27,11 @@ class LetterDrawViewController: UIViewController {
         return label
     }()
     
-    init(viewModel: LetterDrawViewModel, coordinator: AppCoordinator, gameService: GameService) {
+    init(viewModel: LetterDrawViewModel, coordinator: AppCoordinator, gameService: GameService, roundVM: RoundViewModel) {
         self.viewModel = viewModel
         self.coordinator = coordinator
         self.gameService = gameService
+        self.roundVM = roundVM
         self.letter.text = gameService.drawLetter()
 
         super.init(nibName: nil, bundle: nil)
@@ -45,6 +47,8 @@ class LetterDrawViewController: UIViewController {
         
         setupUI()
         observeViewModel()
+        roundVM.setCategories()
+
     }
     
     func setupUI() {

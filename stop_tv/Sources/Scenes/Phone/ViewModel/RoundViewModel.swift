@@ -30,7 +30,6 @@ class RoundViewModel {
     init(connectionManager: ConnectionManager, gameService: GameService) {
         self.connectionManager = connectionManager
         self.gameService = gameService
-        self.categories = gameService.draw5Categories()
     }
     
     func setCurrentIndex(_ index: Int) {
@@ -55,13 +54,24 @@ class RoundViewModel {
             currentIndex: currentIndex
         )
 
-        print("📤 Enviando GameAction do iPhone:")
-        print("    - Categoria: \(gameAction.category ?? "")")
-        print("    - Resposta: \(gameAction.answer ?? "")")
-        print("    - Índice: \(gameAction.currentIndex ?? -1)")
+        connectionManager.send(gameAction: gameAction)
+    }
+
+    func setCategories() {
+        let categories = gameService.draw5Categories()
+
+        self.categories = categories
+
+
+        let gameAction = GameAction(
+            action: .setCategories,
+            categories: categories
+        )
 
         connectionManager.send(gameAction: gameAction)
     }
+
+
 
 
 }

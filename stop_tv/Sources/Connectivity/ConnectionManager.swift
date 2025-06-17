@@ -150,6 +150,10 @@ extension ConnectionManager: MCSessionDelegate {
                     if let status = gameAction.status {
                         self.game?.status = status
                     }
+                case .setCategories:
+                    if let categories = gameAction.categories {
+                        self.round?.categories = categories
+                    }
                 }
             }
         }
