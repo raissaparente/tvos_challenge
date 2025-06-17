@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		82F22C162DFC6A22003173E0 /* StopPlay in Frameworks */ = {isa = PBXBuildFile; productRef = 82F22C152DFC6A22003173E0 /* StopPlay */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		3B0112B52DFA09A30068FFF6 /* stop_tv.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = stop_tv.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82F22C162DFC6A22003173E0 /* StopPlay in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = stop_tv;
 			packageProductDependencies = (
+				82F22C152DFC6A22003173E0 /* StopPlay */,
 			);
 			productName = stop_tv;
 			productReference = 3B0112B52DFA09A30068FFF6 /* stop_tv.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 3B0112AC2DFA09A30068FFF6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				82F22C142DFC6A22003173E0 /* XCRemoteSwiftPackageReference "StopPlay" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3B0112B62DFA09A30068FFF6 /* Products */;
 			projectDirPath = "";
@@ -341,6 +350,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		82F22C142DFC6A22003173E0 /* XCRemoteSwiftPackageReference "StopPlay" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/DylanPlutarcoo/StopPlay.git";
+			requirement = {
+				branch = dev;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		82F22C152DFC6A22003173E0 /* StopPlay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 82F22C142DFC6A22003173E0 /* XCRemoteSwiftPackageReference "StopPlay" */;
+			productName = StopPlay;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3B0112AD2DFA09A30068FFF6 /* Project object */;
 }

@@ -13,30 +13,32 @@ extension String {
 
 class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc framework
     private lazy var advertiser: MCNearbyServiceAdvertiser = {
-            MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: String.serviceName)
-        }() //advertises the device availability to connect (has delegates)
+        MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: String.serviceName)
+    }() //advertises the device availability to connect (has delegates)
     private lazy var browser: MCNearbyServiceBrowser = {
-            MCNearbyServiceBrowser(peer: myPeerId, serviceType: String.serviceName)
-        }() //searches for devices available to connect through wifi (has delegates)
-    
-    
+        MCNearbyServiceBrowser(peer: myPeerId, serviceType: String.serviceName)
+    }() //searches for devices available to connect through wifi (has delegates)
+
+
     let serviceType = String.serviceName  //identify the service
     let session: MCSession //enables and manages communication among all peers
     let myPeerId: MCPeerID
     weak var game: GameService?
-    
+    weak var round: RoundViewModel?
+
     @Published var availablePeers: [MCPeerID] = []
     @Published var connectedPeers: [MCPeerID] = []
-    
+
     @Published var receivedInvite: Bool = false
     @Published var receivedInviteFrom: MCPeerID?
     @Published var invitationHandler: ((Bool, MCSession?) -> Void)?
-    
-    func setup(game: GameService) {
+
+    func setup(game: GameService, round: RoundViewModel) {
         self.game = game
+        self.round = round
     }
 
-    
+
     init(username: String) {
         myPeerId = MCPeerID(displayName: username)
         session = MCSession(peer: myPeerId)
@@ -45,12 +47,12 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
         advertiser.delegate = self
         browser.delegate = self
     }
-    
+
     deinit {
         stopAdvertising()
         stopBrowsing()
     }
-    
+
     func startAdvertising() {
         advertiser.startAdvertisingPeer()
     }
@@ -58,7 +60,7 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     func stopAdvertising() {
         advertiser.stopAdvertisingPeer()
     }
-    
+
     func startBrowsing() {
         browser.startBrowsingForPeers()
     }
@@ -67,13 +69,13 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
         browser.stopBrowsingForPeers()
         availablePeers.removeAll()
     }
-    
+
 
     func invite(peer: MCPeerID) {
         browser.invitePeer(peer, to: session, withContext: nil, timeout: 30)
     }
 
-    
+
     func send(gameAction: GameAction) {
         if !session.connectedPeers.isEmpty {
             do {
@@ -124,35 +126,43 @@ extension ConnectionManager: MCSessionDelegate {
             self.connectedPeers = session.connectedPeers
             print("Peer \(peerID.displayName) changed state to \(state.rawValue)")
             print("Connected: \(self.connectedPeers)")
-
-//            self.isAvailableToPlay = self.connectedPeers.isEmpty
         }
     }
-    
+
     //receives data from peer that needs to be responded - main funcs for the game
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let gameAction = try? JSONDecoder().decode(GameAction.self, from: data) {
             DispatchQueue.main.async {
                 switch gameAction.action {
                 case .sendAnswer:
-                    if let category = gameAction.category, let answer = gameAction.answer {
-                        self.game?.updateAnswers(for: category, with: answer)
+                    if let answer = gameAction.answer,
+                       let index = gameAction.currentIndex {
+                        print("🖥️ Salvando resposta no viewModel da TV...")
+                        self.round?.saveAnswer(answer)
+                        self.round?.setCurrentIndex(index)
+                        print("✅ Atualizado índice para: \(index)")
+
                     }
                 case .voteAnswer:
                     //TODO: CHANGE TO REAL FUNC
                     break
-                case .startGame:
-                    self.game?.startGame = true
-                    print(self.game?.startGame.description)
+                case .changeStatus:
+                    if let status = gameAction.status {
+                        self.game?.status = status
+                    }
+                case .setCategories:
+                    if let categories = gameAction.categories {
+                        self.round?.categories = categories
+                    }
                 }
             }
         }
     }
-    
+
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) { }
-    
+
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) { }
-    
+
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: (any Error)?) { }
 }
 
