@@ -97,7 +97,7 @@ class RoundPhoneViewController: UIViewController {
             categoryLabel.text = "Mostrar repostas!"
         } else {
             categoryLabel.text = viewModel.currentCategory
-            print("🖥️ Mostrando nova categoria na TV: \(categoryLabel.text ?? "undefined")")
+            print("🖥️ Mostrando nova categoria na TV: \(viewModel.currentCategory)")
             textField.text = ""
         }
     }
@@ -105,7 +105,6 @@ class RoundPhoneViewController: UIViewController {
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
         viewModel.saveAnswer(textField.text ?? "")
         viewModel.sendAnswer()
-
         updateCategory()
     }
 

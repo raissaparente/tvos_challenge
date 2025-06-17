@@ -16,7 +16,7 @@ class RoundTVViewController: UIViewController {
     private let containerView = UIView()
     private let textField = UITextField()
     private let categoryLabel = UILabel()
-    private let submitButton = UIButton(type: .custom)
+//    private let submitButton = UIButton(type: .custom)
     private let finishButton = UIButton(type: .custom)
 
     init(viewModel: RoundViewModel) {
@@ -33,13 +33,16 @@ class RoundTVViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupLayout()
         observeViewModel()
-        updateCategory()
     }
+
     private func observeViewModel() {
         viewModel.$currentIndex
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
+                print("esse observe da tv funciona?")
                 self?.updateCategory()
+                print("ele passa do self opctional")
+
             }
             .store(in: &cancellables)
     }
@@ -56,17 +59,6 @@ class RoundTVViewController: UIViewController {
         categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
         containerView.addSubview(categoryLabel)
 
-        // Submit button
-        submitButton.setTitle("Submit", for: .normal)
-        submitButton.setTitleColor(.white, for: .normal)
-        submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        submitButton.backgroundColor = .darkGray
-        submitButton.layer.cornerRadius = 8
-        submitButton.clipsToBounds = true
-        submitButton.translatesAutoresizingMaskIntoConstraints = false
-        submitButton.addTarget(self, action: #selector(handleSubmitButtonTapped), for: .touchUpInside)
-        view.addSubview(submitButton)
-
         NSLayoutConstraint.activate([
             containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
             containerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/3),
@@ -81,19 +73,16 @@ class RoundTVViewController: UIViewController {
 
     private func updateCategory() {
         if viewModel.isFinished {
+            print("view model is finished")
             textField.isHidden = true
-            submitButton.isHidden = true
             finishButton.isHidden = false
             categoryLabel.text = "Mostrar repostas!"
         } else {
+            print("deveria mostrar")
             categoryLabel.text = viewModel.currentCategory
             textField.text = ""
+            print("mostrou categoria\(viewModel.currentCategory)")
         }
-    }
-
-    @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
-        viewModel.saveAnswer(textField.text ?? "")
-        updateCategory()
     }
 
     @objc private func handleFinishButtonTapped(_ sender: UIButton) {

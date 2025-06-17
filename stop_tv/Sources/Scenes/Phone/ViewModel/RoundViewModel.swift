@@ -10,14 +10,14 @@ import Combine
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
     @Published private(set) var currentIndex = 0
-    @Published private(set) var answers: [String: String] = [:]
+    @Published private(set) var answers: [String: String] = [:] {
+        didSet {
+            print("🔧 setAnswers chamado com valor: \(answers) - VIEWMODEL")
+        }
+    }
     var connectionManager: ConnectionManager
     var gameService: GameService
-
-    var categories: [String] {
-        gameService.categories
-    }
-
+    var categories: [String] = []
     var currentCategory: String {
         guard currentIndex < categories.count else { return "" }
         return categories[currentIndex]
@@ -30,12 +30,12 @@ class RoundViewModel {
     init(connectionManager: ConnectionManager, gameService: GameService) {
         self.connectionManager = connectionManager
         self.gameService = gameService
+        self.categories = gameService.draw5Categories()
     }
     
     func setCurrentIndex(_ index: Int) {
         print("🔧 setCurrentIndex chamado com valor: \(index)")
         currentIndex = index
-
     }
 
     func saveAnswer(_ answer: String) {
