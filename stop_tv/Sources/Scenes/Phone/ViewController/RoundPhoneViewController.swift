@@ -36,7 +36,7 @@ class RoundPhoneViewController: UIViewController {
         super.viewDidLoad()
                 view.backgroundColor = .systemBackground
                 setupLayout()
-                updateCategory()
+        observeViewModel()
     }
 
     private func setupLayout() {
@@ -100,6 +100,7 @@ class RoundPhoneViewController: UIViewController {
             .sink { [weak self] status in
                 guard let self = self else { return }
             
+                print("📱 Mudou o status do jogo no celular: \(status)")
                 guard status == .voting else { return }
                 coordinator.showVoting_phone(from: self)
                 
