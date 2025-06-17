@@ -1,17 +1,16 @@
 //
-//  RoundTestViewController.swift
+//  VotingPhoneViewController.swift
 //  stop_tv
 //
-//  Created by Júlia Saboya on 13/06/25.
+//  Created by Raissa Bruna Parente on 17/06/25.
 //
 
 import UIKit
 import Combine
 
-class RoundPhoneViewController: UIViewController {
+class VotingPhoneViewController: UIViewController {
     var viewModel: RoundViewModel
     var coordinator: AppCoordinator
-    private var cancellables = Set<AnyCancellable>()
 
 
     private let containerView = UIView()
@@ -52,7 +51,7 @@ class RoundPhoneViewController: UIViewController {
         containerView.addSubview(textField)
 
         // Submit button
-        submitButton.setTitle("Submit", for: .normal)
+        submitButton.setTitle("Votar", for: .normal)
         submitButton.setTitleColor(.white, for: .normal)
         submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
         submitButton.backgroundColor = .darkGray
@@ -94,18 +93,6 @@ class RoundPhoneViewController: UIViewController {
         ])
     }
     
-    func observeViewModel() {
-        viewModel.gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self = self else { return }
-            
-                guard status == .voting else { return }
-                coordinator.showVoting_phone(from: self)
-                
-            }
-            .store(in: &cancellables)
-    }
 
     private func updateCategory() {
         if viewModel.isFinished {
@@ -138,7 +125,7 @@ class RoundPhoneViewController: UIViewController {
     }
 }
 
-extension RoundPhoneViewController: UITextFieldDelegate {
+extension VotingPhoneViewController: UITextFieldDelegate {
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true

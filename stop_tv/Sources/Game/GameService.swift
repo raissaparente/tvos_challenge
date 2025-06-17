@@ -8,18 +8,10 @@ import Foundation
 import StopPlay
 
 public class GameService: ObservableObject {
-    var currentLetter = "a"
-    var currentCategory: String = "Nome"
-    @Published var dump: [String] = ["teste"]
-    
     @Published var status: ConnectionStatus = .awaiting
     var gameManager = GameManager()
 
     
-    func updateAnswers(for category: String, with answer: String) {
-        dump.append(answer)
-        print(dump)
-    }
 
     func draw5Categories() -> [String] {
         print("draw 5 categorias chamasas")

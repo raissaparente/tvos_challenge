@@ -6,5 +6,5 @@
 //
 
 enum ConnectionStatus: Codable {
-    case awaiting, startGame, category
+    case awaiting, startGame, category, voting
 }
