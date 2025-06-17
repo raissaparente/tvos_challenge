@@ -159,11 +159,12 @@ extension ConnectionManager: MCSessionDelegate {
                     if let nextIndex = gameAction.nextIndex {
     
                         self.round?.setCurrentIndex(nextIndex)
+                        self.game?.status = .endVote
                         print("✅ Atualizado índice para: \(nextIndex)")
 
                     }
                 case .startVote:
-                    self.game?.status = .voting
+                    self.game?.status = .startVote
 
                 }
             }

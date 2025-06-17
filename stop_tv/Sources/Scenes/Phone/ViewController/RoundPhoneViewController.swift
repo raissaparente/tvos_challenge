@@ -25,6 +25,7 @@ class RoundPhoneViewController: UIViewController {
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         textField.delegate = self
+        print(self, #function)
 
     }
 
@@ -101,7 +102,7 @@ class RoundPhoneViewController: UIViewController {
                 guard let self = self else { return }
             
                 print("📱 Mudou o status do jogo no celular: \(status)")
-                guard status == .voting else { return }
+                guard status == .startVote else { return }
                 coordinator.showVoting_phone(from: self)
                 
             }
@@ -124,7 +125,6 @@ class RoundPhoneViewController: UIViewController {
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
         viewModel.saveAnswer(textField.text ?? "")
         viewModel.sendAnswer(textField.text ?? "")
-        updateCategory()
     }
 
     @objc private func handleFinishButtonTapped(_ sender: UIButton) {

@@ -23,6 +23,7 @@ class SetNameViewController: UIViewController {
     private let nameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Seu nome"
+        textField.text = "RAISSA"
         textField.borderStyle = .roundedRect
         return textField
     }()

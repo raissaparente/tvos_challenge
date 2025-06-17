@@ -6,6 +6,7 @@
 //
 import Foundation
 import Combine
+import StopPlay
 
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
@@ -67,6 +68,9 @@ class RoundViewModel {
     }
     
     func changeCategory() {
+        
+        didAllPlayersVote = false
+        
         let gameAction = GameAction(action: .changeCategory, nextIndex: currentIndex + 1)
         
         connectionManager.send(gameAction: gameAction)
@@ -74,12 +78,15 @@ class RoundViewModel {
         currentIndex += 1
         
         print("mandou msg de mudar categoria")
+
     }
     
     func startVoting() {
         let gameAction = GameAction(action: .startVote)
         
         connectionManager.send(gameAction: gameAction)
+        
+        didAllPlayersAnswer = false
     }
 
     func setCategories() {
