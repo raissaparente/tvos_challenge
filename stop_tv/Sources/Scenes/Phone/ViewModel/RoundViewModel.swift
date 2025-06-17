@@ -10,7 +10,7 @@ import Combine
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
     @Published private(set) var currentIndex = 0
-    @Published private(set) var answers: [String: CurrentValueSubject<[String], Never>] = [:]
+    @Published private(set) var answers: [String: [String]] = [:]
     
     var connectionManager: ConnectionManager
     var gameService: GameService
@@ -21,26 +21,18 @@ class RoundViewModel {
     }
 
      var isFinished: Bool {
-             currentIndex >= categories.count
+        currentIndex >= categories.count
     }
     
-    @Published var didAllPlayersAnswer: Bool {
+    @Published var didAllPlayersAnswer: Bool = false
+    @Published var didAllPlayersVote: Bool = false
         
-        didSet {
-            if let answers = answers[currentCategory] {
-                var currentAnswers = answers.value
-                
-                didAllPlayersAnswer = currentAnswers.count == connectionManager.connectedPeers.count
-                
-            } else { didAllPlayersAnswer = false }
-        }
-    }
 
     init(connectionManager: ConnectionManager, gameService: GameService) {
         self.connectionManager = connectionManager
         self.gameService = gameService
         
-        self.didAllPlayersAnswer = false
+//        self.didAllPlayersAnswer = false
     }
     
     func setCurrentIndex(_ index: Int) {
@@ -51,16 +43,11 @@ class RoundViewModel {
 
     func saveAnswer(_ answer: String) {
         guard !isFinished else { return }
+        let category = currentCategory
         
-            let category = currentCategory
-
-            if let subject = answers[category] {
-                var currentAnswers = subject.value
-                currentAnswers.append(answer)
-                subject.send(currentAnswers)
-            } else {
-                answers[category] = CurrentValueSubject<[String], Never>([answer])
-            }
+        var currentAnswers = answers[category] ?? []
+        currentAnswers.append(answer)
+        answers[category] = currentAnswers
     }
 
     func sendAnswer(_ answer: String) {
@@ -80,9 +67,17 @@ class RoundViewModel {
     }
     
     func changeCategory() {
-        currentIndex += 1
-
         let gameAction = GameAction(action: .changeCategory, nextIndex: currentIndex + 1)
+        
+        connectionManager.send(gameAction: gameAction)
+        
+        currentIndex += 1
+        
+        print("mandou msg de mudar categoria")
+    }
+    
+    func startVoting() {
+        let gameAction = GameAction(action: .startVote)
         
         connectionManager.send(gameAction: gameAction)
     }

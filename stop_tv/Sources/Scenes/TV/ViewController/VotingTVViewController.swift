@@ -1,16 +1,15 @@
 //
-//  RoundTestViewController.swift
+//  VotingViewController.swift
 //  stop_tv
 //
-//  Created by Júlia Saboya on 13/06/25.
+//  Created by Raissa Bruna Parente on 17/06/25.
 //
 
 import UIKit
 import Combine
 
-class RoundTVViewController: UIViewController {
+class VotingTVViewController: UIViewController {
     var viewModel: RoundViewModel
-    var coordinator: AppCoordinator
     private var cancellables = Set<AnyCancellable>()
 
     // UI...
@@ -19,12 +18,13 @@ class RoundTVViewController: UIViewController {
     private let categoryLabel = UILabel()
 //    private let submitButton = UIButton(type: .custom)
     private let finishButton = UIButton(type: .custom)
+    private let submitButton = UIButton(type: .custom)
+
     private let stackView = UIStackView()
 
 
-    init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
+    init(viewModel: RoundViewModel) {
         self.viewModel = viewModel
-        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -37,41 +37,17 @@ class RoundTVViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupLayout()
         observeViewModel()
+        reloadWords()
+        
     }
 
     private func observeViewModel() {
-        viewModel.$currentIndex
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                print("esse observe da tv funciona?")
-                self?.updateCategory()
-                print("ele passa do self opctional")
-
-            }
-            .store(in: &cancellables)
         
-        viewModel.$answers
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] allAnswers in
-
-                    guard let self else { return }
-                    guard let currentAnswers = allAnswers[viewModel.currentCategory] else { return }
-                    
-                    reloadWords(currentAnswers)
-                    
-                    if currentAnswers.count == viewModel.connectionManager.connectedPeers.count {
-                        viewModel.didAllPlayersAnswer = true
-                    }
-                }
-                .store(in: &cancellables)
-        
-        viewModel.$didAllPlayersAnswer
+        viewModel.$didAllPlayersVote
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] didAllAnswer in
-                guard let self else { return }
-                if didAllAnswer {
-                    self.viewModel.startVoting()
-                    self.coordinator.showVoting_TV(from: self)
+            .sink { [weak self] didAllVote in
+                if didAllVote {
+                    self?.viewModel.changeCategory()
                 }
 
             }
@@ -88,6 +64,7 @@ class RoundTVViewController: UIViewController {
 
         // Category label
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
+        categoryLabel.text = viewModel.currentCategory
         categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
         containerView.addSubview(categoryLabel)
         
@@ -97,7 +74,16 @@ class RoundTVViewController: UIViewController {
                 stackView.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(stackView)
         
-        
+        // Continuar button
+        submitButton.setTitle("Todos votaram", for: .normal)
+        submitButton.setTitleColor(.white, for: .normal)
+        submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
+        submitButton.backgroundColor = .darkGray
+        submitButton.layer.cornerRadius = 8
+        submitButton.clipsToBounds = true
+        submitButton.translatesAutoresizingMaskIntoConstraints = false
+        submitButton.addTarget(self, action: #selector(handleEndVotingButtonTapped), for: .primaryActionTriggered)
+        containerView.addSubview(submitButton)
 
         NSLayoutConstraint.activate([
             containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
@@ -110,30 +96,22 @@ class RoundTVViewController: UIViewController {
             
             stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 20),
             stackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            
+            submitButton.topAnchor.constraint(equalTo: stackView.safeAreaLayoutGuide.topAnchor, constant: 20),
+            submitButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
 
         ])
     }
 
-    private func updateCategory() {
-        if viewModel.isFinished {
-            print("view model is finished")
-            textField.isHidden = true
-            finishButton.isHidden = false
-            categoryLabel.text = "Mostrar repostas!"
-        } else {
-            print("deveria mostrar")
-            categoryLabel.text = viewModel.currentCategory
-            textField.text = ""
-            print("mostrou categoria\(viewModel.currentCategory)")
-        }
-    }
     
     
-    private func reloadWords(_ words: [String]) {
+    private func reloadWords() {
             for view in stackView.arrangedSubviews where view.tag == 100 {
                 stackView.removeArrangedSubview(view)
                 view.removeFromSuperview()
             }
+        
+        guard let words = viewModel.answers[viewModel.currentCategory] else { return }
             
             for word in words {
                 let label = UILabel()
@@ -144,19 +122,12 @@ class RoundTVViewController: UIViewController {
             }
      }
 
-    @objc private func handleFinishButtonTapped(_ sender: UIButton) {
-        print("Respostas do usuário:")
-        for (categoria, resposta) in viewModel.answers {
-            print("\(categoria): \(resposta)")
-        }
-
-        let alert = UIAlertController(title: "Concluído", message: "Respostas:\n\(viewModel.answers.map { "\($0): \($1)" }.joined(separator: "\n"))", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Fechar", style: .default))
-        present(alert, animated: true)
+    @objc private func handleEndVotingButtonTapped(_ sender: UIButton) {
+        viewModel.didAllPlayersVote = true
     }
 }
 
 
 #Preview {
-    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: "newion"))
+    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()))
 }

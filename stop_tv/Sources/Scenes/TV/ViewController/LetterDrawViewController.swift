@@ -52,7 +52,7 @@ class LetterDrawViewController: UIViewController {
     }
     
     func setupUI() {
-        let currentLetter = gameService.currentLetter
+        let currentLetter = ""
         view.backgroundColor = .black
 
         view.addSubview(letter)

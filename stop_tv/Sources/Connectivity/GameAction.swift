@@ -14,6 +14,7 @@ struct GameAction: Codable {
         case changeStatus
         case setCategories
         case changeCategory
+        case startVote
     }
     
     let action: Action

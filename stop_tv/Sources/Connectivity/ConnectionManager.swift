@@ -138,7 +138,7 @@ extension ConnectionManager: MCSessionDelegate {
                 switch gameAction.action {
                 case .sendAnswer:
                     if let answer = gameAction.answer {
-                        print("🖥️ Salvando resposta no viewModel da TV...")
+                        print("🖥️ Salvando resposta no viewModel da TV = \(answer)")
                         self.round?.saveAnswer(answer)
                     }
                 case .voteAnswer:
@@ -162,6 +162,8 @@ extension ConnectionManager: MCSessionDelegate {
                         print("✅ Atualizado índice para: \(nextIndex)")
 
                     }
+                case .startVote:
+                    self.game?.status = .voting
 
                 }
             }
