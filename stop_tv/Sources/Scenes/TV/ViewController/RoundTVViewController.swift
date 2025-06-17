@@ -18,6 +18,8 @@ class RoundTVViewController: UIViewController {
     private let categoryLabel = UILabel()
 //    private let submitButton = UIButton(type: .custom)
     private let finishButton = UIButton(type: .custom)
+    private let stackView = UIStackView()
+
 
     init(viewModel: RoundViewModel) {
         self.viewModel = viewModel
@@ -45,9 +47,28 @@ class RoundTVViewController: UIViewController {
 
             }
             .store(in: &cancellables)
+        
+        guard let publisher = viewModel.answers[viewModel.currentCategory] else { return }
+                publisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] words in
+                    self?.reloadWords(words)
+                }
+                .store(in: &cancellables)
+        
+        viewModel.$didAllPlayersAnswer
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] didAllAnswer in
+                if didAllAnswer {
+                    self?.viewModel.changeCategory()
+                }
+
+            }
+            .store(in: &cancellables)
     }
 
     private func setupLayout() {
+        
         // Container setup
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.backgroundColor = .lightGray
@@ -58,6 +79,12 @@ class RoundTVViewController: UIViewController {
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
         categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
         containerView.addSubview(categoryLabel)
+        
+        // Words
+        stackView.axis = .vertical
+                stackView.spacing = 12
+                stackView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(stackView)
 
         NSLayoutConstraint.activate([
             containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
@@ -67,6 +94,9 @@ class RoundTVViewController: UIViewController {
 
             categoryLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
             categoryLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            
+            stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 20),
+            stackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
 
         ])
     }
@@ -84,6 +114,22 @@ class RoundTVViewController: UIViewController {
             print("mostrou categoria\(viewModel.currentCategory)")
         }
     }
+    
+    
+    private func reloadWords(_ words: [String]) {
+            for view in stackView.arrangedSubviews where view.tag == 100 {
+                stackView.removeArrangedSubview(view)
+                view.removeFromSuperview()
+            }
+            
+            for word in words {
+                let label = UILabel()
+                label.tag = 100
+                label.text = word
+                label.textColor = .white
+                stackView.addArrangedSubview(label)
+            }
+     }
 
     @objc private func handleFinishButtonTapped(_ sender: UIButton) {
         print("Respostas do usuário:")
