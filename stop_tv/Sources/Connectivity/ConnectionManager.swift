@@ -81,6 +81,8 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
             do {
                 if let data = gameAction.data() {
                     try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+
+                    print("sent \(gameAction)")
                 }
             } catch {
                 print("error sending \(error.localizedDescription)")
@@ -153,7 +155,13 @@ extension ConnectionManager: MCSessionDelegate {
                 case .setCategories:
                     if let categories = gameAction.categories {
                         self.round?.categories = categories
+                        print("✅ Categoriaaaaa: \(categories)")
+
                     }
+
+
+                    print("Deu ruim mas chamou")
+
                 }
             }
         }

@@ -19,7 +19,7 @@ class RoundViewModel {
     var gameService: GameService
     var categories: [String] = []
     var currentCategory: String {
-        guard currentIndex < categories.count else { return "" }
+        guard currentIndex < categories.count else { return "raissa" }
         return categories[currentIndex]
     }
 
@@ -37,11 +37,11 @@ class RoundViewModel {
         currentIndex = index
     }
 
+
     func saveAnswer(_ answer: String) {
         guard !isFinished else { return }
         let category = currentCategory
         answers[category] = answer
-        currentIndex += 1
     }
 
     func sendAnswer() {
@@ -55,6 +55,8 @@ class RoundViewModel {
         )
 
         connectionManager.send(gameAction: gameAction)
+        currentIndex += 1
+
     }
 
     func setCategories() {
@@ -69,6 +71,7 @@ class RoundViewModel {
         )
 
         connectionManager.send(gameAction: gameAction)
+
     }
 
 
