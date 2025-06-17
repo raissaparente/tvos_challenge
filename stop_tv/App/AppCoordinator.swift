@@ -59,7 +59,7 @@ class AppCoordinator {
     func showLetterDraw_TV(from currentVC: UIViewController) {
         let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
 
-        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService)
+        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService, roundVM: roundVM)
         currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
     }
 

@@ -12,6 +12,7 @@ struct GameAction: Codable {
         case sendAnswer
         case voteAnswer
         case changeStatus
+        case setCategories
     }
     
     let action: Action
@@ -22,6 +23,7 @@ struct GameAction: Codable {
     var answer: String? = nil
     var isAnswerValid: Bool? = nil
     var currentIndex: Int?
+    var categories: [String]? = nil
 
     func data() -> Data? {
         try? JSONEncoder().encode(self)
