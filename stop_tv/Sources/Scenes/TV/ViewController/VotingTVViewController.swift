@@ -46,16 +46,16 @@ class VotingTVViewController: UIViewController {
 
     private func observeViewModel() {
         
-        viewModel.$didAllPlayersVote
+        viewModel.gameService.$status
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] didAllVote in
+            .sink { [weak self] status in
                 guard let self else { return }
                 
-                if didAllVote {
+                if status == .endVote {
+                    print("VOTINGTV terminou votação -> chama changeCat e troca tela")
                     self.viewModel.changeCategory()
                     coordinator.showCategory_TV(from: self)
                 }
-
             }
             .store(in: &cancellables)
     }
@@ -129,7 +129,9 @@ class VotingTVViewController: UIViewController {
      }
 
     @objc private func handleEndVotingButtonTapped(_ sender: UIButton) {
-        viewModel.didAllPlayersVote = true
+        //Vai ser um observador de quem votou/timer
+        print("Executou ação da ação")
+        viewModel.endVoting()        
     }
 }
 

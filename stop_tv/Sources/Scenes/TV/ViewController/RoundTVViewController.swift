@@ -35,18 +35,20 @@ class RoundTVViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        
+        print("A ROUNDTV CARREGOU")
+        print("STATUS: \(viewModel.gameService.status)")
+        print("DIDALLANSWER: \(viewModel.didAllPlayersAnswer)")
+        
         setupLayout()
-        observeViewModel()
+        observeViewModel()        
     }
 
     private func observeViewModel() {
         viewModel.$currentIndex
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                print("esse observe da tv funciona?")
                 self?.updateCategory()
-                print("ele passa do self opctional")
-
             }
             .store(in: &cancellables)
         
@@ -56,6 +58,8 @@ class RoundTVViewController: UIViewController {
 
                     guard let self else { return }
                     guard let currentAnswers = allAnswers[viewModel.currentCategory] else { return }
+                    
+                    viewModel.printAnswers()
                     
                     reloadWords(currentAnswers)
                     
@@ -73,7 +77,6 @@ class RoundTVViewController: UIViewController {
                     self.viewModel.startVoting()
                     self.coordinator.showVoting_TV(from: self)
                 }
-
             }
             .store(in: &cancellables)
     }
@@ -121,10 +124,8 @@ class RoundTVViewController: UIViewController {
             finishButton.isHidden = false
             categoryLabel.text = "Mostrar repostas!"
         } else {
-            print("deveria mostrar")
             categoryLabel.text = viewModel.currentCategory
             textField.text = ""
-            print("mostrou categoria\(viewModel.currentCategory)")
         }
     }
     
@@ -145,7 +146,6 @@ class RoundTVViewController: UIViewController {
      }
 
     @objc private func handleFinishButtonTapped(_ sender: UIButton) {
-        print("Respostas do usuário:")
         for (categoria, resposta) in viewModel.answers {
             print("\(categoria): \(resposta)")
         }
@@ -154,6 +154,7 @@ class RoundTVViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "Fechar", style: .default))
         present(alert, animated: true)
     }
+
 }
 
 
