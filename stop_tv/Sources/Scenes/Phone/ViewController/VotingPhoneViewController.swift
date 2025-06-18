@@ -38,8 +38,12 @@ class VotingPhoneViewController: UIViewController {
                 setupLayout()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
+    }
+    
     private func observeViewModel() {
-        
         viewModel.gameService.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in

@@ -97,14 +97,12 @@ class RoundViewModel {
 
         self.categories = categories
 
-
         let gameAction = GameAction(
             action: .setCategories,
             categories: categories
         )
 
         connectionManager.send(gameAction: gameAction)
-
     }
 
     

@@ -41,7 +41,11 @@ class VotingTVViewController: UIViewController {
         setupLayout()
         observeViewModel()
         reloadWords()
-        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
     }
 
     private func observeViewModel() {

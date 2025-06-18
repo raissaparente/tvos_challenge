@@ -43,6 +43,11 @@ class RoundTVViewController: UIViewController {
         setupLayout()
         observeViewModel()        
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
+    }
 
     private func observeViewModel() {
         viewModel.$currentIndex
