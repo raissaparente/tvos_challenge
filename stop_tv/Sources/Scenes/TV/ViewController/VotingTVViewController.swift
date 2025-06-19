@@ -10,6 +10,8 @@ import Combine
 
 class VotingTVViewController: UIViewController {
     var viewModel: RoundViewModel
+    var coordinator: AppCoordinator
+    
     private var cancellables = Set<AnyCancellable>()
 
     // UI...
@@ -23,8 +25,9 @@ class VotingTVViewController: UIViewController {
     private let stackView = UIStackView()
 
 
-    init(viewModel: RoundViewModel) {
+    init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
         self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -38,18 +41,25 @@ class VotingTVViewController: UIViewController {
         setupLayout()
         observeViewModel()
         reloadWords()
-        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
     }
 
     private func observeViewModel() {
         
-        viewModel.$didAllPlayersVote
+        viewModel.gameService.$status
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] didAllVote in
-                if didAllVote {
-                    self?.viewModel.changeCategory()
+            .sink { [weak self] status in
+                guard let self else { return }
+                
+                if status == .endVote {
+                    print("VOTINGTV terminou votação -> chama changeCat e troca tela")
+                    self.viewModel.changeCategory()
+                    coordinator.showCategory_TV(from: self)
                 }
-
             }
             .store(in: &cancellables)
     }
@@ -97,7 +107,7 @@ class VotingTVViewController: UIViewController {
             stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 20),
             stackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             
-            submitButton.topAnchor.constraint(equalTo: stackView.safeAreaLayoutGuide.topAnchor, constant: 20),
+            submitButton.bottomAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             submitButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
 
         ])
@@ -123,11 +133,13 @@ class VotingTVViewController: UIViewController {
      }
 
     @objc private func handleEndVotingButtonTapped(_ sender: UIButton) {
-        viewModel.didAllPlayersVote = true
+        //Vai ser um observador de quem votou/timer
+        print("Executou ação da ação")
+        viewModel.endVoting()        
     }
 }
 
 
 #Preview {
-    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()))
+    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""))
 }

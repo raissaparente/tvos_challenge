@@ -156,15 +156,18 @@ extension ConnectionManager: MCSessionDelegate {
                     }
                     
                 case .changeCategory:
+                    
                     if let nextIndex = gameAction.nextIndex {
     
                         self.round?.setCurrentIndex(nextIndex)
+                        print("SWITCH ACAO ENDVOTE: \(self.round?.didAllPlayersVote)")
                         print("✅ Atualizado índice para: \(nextIndex)")
-
                     }
                 case .startVote:
-                    self.game?.status = .voting
-
+                    self.game?.status = .startVote
+                    
+                case .endVote:
+                    self.game?.status = .endVote
                 }
             }
         }

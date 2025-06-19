@@ -8,15 +8,10 @@ import Foundation
 import StopPlay
 
 public class GameService: ObservableObject {
-    @Published var status: ConnectionStatus = .awaiting {
-        didSet {
-            print("Mudou status direto na vm")
-        }
-    }
+    @Published var status: ConnectionStatus = .awaiting
     var gameManager = GameManager()
 
     func draw5Categories() -> [String] {
-        print("draw 5 categorias chamasas")
         return gameManager.randomCategories(categories: self.categories)
     }
 

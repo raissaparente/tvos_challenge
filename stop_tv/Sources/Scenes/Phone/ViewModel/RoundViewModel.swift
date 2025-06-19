@@ -6,6 +6,7 @@
 //
 import Foundation
 import Combine
+import StopPlay
 
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
@@ -31,8 +32,6 @@ class RoundViewModel {
     init(connectionManager: ConnectionManager, gameService: GameService) {
         self.connectionManager = connectionManager
         self.gameService = gameService
-        
-//        self.didAllPlayersAnswer = false
     }
     
     func setCurrentIndex(_ index: Int) {
@@ -62,21 +61,32 @@ class RoundViewModel {
         )
 
         connectionManager.send(gameAction: gameAction)
-//        currentIndex += 1
-
     }
     
     func changeCategory() {
         let gameAction = GameAction(action: .changeCategory, nextIndex: currentIndex + 1)
-        
         connectionManager.send(gameAction: gameAction)
         
         currentIndex += 1
         
-        print("mandou msg de mudar categoria")
+        //local
+        self.gameService.status = .category
+    }
+    
+    func endVoting(){
+        //é chamada na TV
+        let gameAction = GameAction(action: .endVote)
+        connectionManager.send(gameAction: gameAction)
+        
+        //local
+        self.gameService.status = .endVote
     }
     
     func startVoting() {
+        //é chamada na TV
+        //mudar nome pra +reset
+        didAllPlayersAnswer = false
+        
         let gameAction = GameAction(action: .startVote)
         
         connectionManager.send(gameAction: gameAction)
@@ -87,15 +97,23 @@ class RoundViewModel {
 
         self.categories = categories
 
-
         let gameAction = GameAction(
             action: .setCategories,
             categories: categories
         )
 
         connectionManager.send(gameAction: gameAction)
-
     }
 
-
+    
+    func printAnswers() {
+        print("\n📝 Respostas por categoria:")
+        for (categoria, respostas) in answers {
+            print("📚 Categoria: \(categoria)")
+            for (index, resposta) in respostas.enumerated() {
+                print("   🔹 Resposta \(index + 1): \(resposta)")
+            }
+        }
+        print("🔚 Fim das respostas\n")
+    }
 }

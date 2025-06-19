@@ -69,7 +69,7 @@ class AppCoordinator {
     }
     
     func showVoting_TV(from currentVC: UIViewController) {
-        let roundTVVC = VotingTVViewController(viewModel: roundVM)
+        let roundTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self)
         currentVC.navigationController?.pushViewController(roundTVVC, animated: true)
     }
 
