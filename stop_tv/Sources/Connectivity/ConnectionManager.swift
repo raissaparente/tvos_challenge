@@ -81,6 +81,8 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
             do {
                 if let data = gameAction.data() {
                     try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+
+                    print("sent \(gameAction)")
                 }
             } catch {
                 print("error sending \(error.localizedDescription)")
@@ -135,13 +137,9 @@ extension ConnectionManager: MCSessionDelegate {
             DispatchQueue.main.async {
                 switch gameAction.action {
                 case .sendAnswer:
-                    if let answer = gameAction.answer,
-                       let index = gameAction.currentIndex {
-                        print("🖥️ Salvando resposta no viewModel da TV...")
+                    if let answer = gameAction.answer {
+                        print("🖥️ Salvando resposta no viewModel da TV = \(answer)")
                         self.round?.saveAnswer(answer)
-                        self.round?.setCurrentIndex(index)
-                        print("✅ Atualizado índice para: \(index)")
-
                     }
                 case .voteAnswer:
                     //TODO: CHANGE TO REAL FUNC
@@ -150,6 +148,26 @@ extension ConnectionManager: MCSessionDelegate {
                     if let status = gameAction.status {
                         self.game?.status = status
                     }
+                case .setCategories:
+                    if let categories = gameAction.categories {
+                        self.round?.categories = categories
+                        print("✅ Categoriaaaaa: \(categories)")
+
+                    }
+                    
+                case .changeCategory:
+                    
+                    if let nextIndex = gameAction.nextIndex {
+    
+                        self.round?.setCurrentIndex(nextIndex)
+                        print("SWITCH ACAO ENDVOTE: \(self.round?.didAllPlayersVote)")
+                        print("✅ Atualizado índice para: \(nextIndex)")
+                    }
+                case .startVote:
+                    self.game?.status = .startVote
+                    
+                case .endVote:
+                    self.game?.status = .endVote
                 }
             }
         }

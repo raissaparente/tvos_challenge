@@ -1,16 +1,17 @@
 //
-//  RoundTestViewController.swift
+//  VotingPhoneViewController.swift
 //  stop_tv
 //
-//  Created by Júlia Saboya on 13/06/25.
+//  Created by Raissa Bruna Parente on 17/06/25.
 //
 
 import UIKit
 import Combine
 
-class RoundPhoneViewController: UIViewController {
+class VotingPhoneViewController: UIViewController {
     var viewModel: RoundViewModel
     var coordinator: AppCoordinator
+
     private var cancellables = Set<AnyCancellable>()
 
 
@@ -24,13 +25,7 @@ class RoundPhoneViewController: UIViewController {
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         textField.delegate = self
-        print(self, #function)
-
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        cancellables.removeAll()
+        observeViewModel()
     }
 
     required init?(coder: NSCoder) {
@@ -41,7 +36,24 @@ class RoundPhoneViewController: UIViewController {
         super.viewDidLoad()
                 view.backgroundColor = .systemBackground
                 setupLayout()
-        observeViewModel()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
+    }
+    
+    private func observeViewModel() {
+        viewModel.gameService.$status
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                guard let self else { return }
+                print("Status: \(status)")
+                
+                guard status == .endVote else { return }
+                self.coordinator.showAnswer_phone(from: self)
+            }
+            .store(in: &cancellables)
     }
 
     private func setupLayout() {
@@ -57,7 +69,7 @@ class RoundPhoneViewController: UIViewController {
         containerView.addSubview(textField)
 
         // Submit button
-        submitButton.setTitle("Submit", for: .normal)
+        submitButton.setTitle("Votar", for: .normal)
         submitButton.setTitleColor(.white, for: .normal)
         submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
         submitButton.backgroundColor = .darkGray
@@ -84,39 +96,14 @@ class RoundPhoneViewController: UIViewController {
         ])
     }
     
-    func observeViewModel() {
-        viewModel.gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self = self else { return }
-            
-                print("📱 Mudou o status do jogo no celular: \(status)")
-                guard status == .startVote else { return }
-                coordinator.showVoting_phone(from: self)
-                
-            }
-            .store(in: &cancellables)
-    }
-
-    private func updateCategory() {
-        if viewModel.isFinished {
-            textField.isHidden = true
-            submitButton.isHidden = true
-            categoryLabel.text = "Mostrar repostas!"
-        } else {
-            categoryLabel.text = viewModel.currentCategory
-            print("🖥️ Mostrando nova categoria na TV: \(viewModel.currentCategory)")
-            textField.text = ""
-        }
-    }
 
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
-        viewModel.saveAnswer(textField.text ?? "")
-        viewModel.sendAnswer(textField.text ?? "")
+
     }
+
 }
 
-extension RoundPhoneViewController: UITextFieldDelegate {
+extension VotingPhoneViewController: UITextFieldDelegate {
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true

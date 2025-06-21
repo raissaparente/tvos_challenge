@@ -59,12 +59,17 @@ class AppCoordinator {
     func showLetterDraw_TV(from currentVC: UIViewController) {
         let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
 
-        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService)
+        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService, roundVM: roundVM)
         currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
     }
 
     func showCategory_TV(from currentVC: UIViewController) {
-        let roundTVVC = RoundTVViewController(viewModel: roundVM)
+        let roundTVVC = RoundTVViewController(viewModel: roundVM, coordinator: self)
+        currentVC.navigationController?.pushViewController(roundTVVC, animated: true)
+    }
+    
+    func showVoting_TV(from currentVC: UIViewController) {
+        let roundTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self)
         currentVC.navigationController?.pushViewController(roundTVVC, animated: true)
     }
 
@@ -82,7 +87,13 @@ class AppCoordinator {
 
     func showAnswer_phone(from currentVC: UIViewController) {
 
-        let roundPhoneVC = RoundPhoneViewController(viewModel: roundVM)
+        let roundPhoneVC = RoundPhoneViewController(viewModel: roundVM, coordinator: self)
         currentVC.navigationController?.pushViewController(roundPhoneVC, animated: true)
+    }
+    
+    func showVoting_phone(from currentVC: UIViewController) {
+
+        let votingPhoneVC = VotingPhoneViewController(viewModel: roundVM, coordinator: self)
+        currentVC.navigationController?.pushViewController(votingPhoneVC, animated: true)
     }
 }

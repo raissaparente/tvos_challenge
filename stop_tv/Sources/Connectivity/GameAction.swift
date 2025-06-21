@@ -7,6 +7,27 @@
 
 import Foundation
 
+struct GameAction: Codable {
+    enum Action: Int, Codable {
+        case sendAnswer
+        case voteAnswer
+        case changeStatus
+        case setCategories
+        case changeCategory
+        case startVote
+        case endVote
+    }
+    
+    let action: Action
+    var playerName: String? = nil
+    
+    var status: ConnectionStatus? = nil
+    var category: String? = nil
+    var answer: String? = nil
+    var isAnswerValid: Bool? = nil
+    var currentIndex: Int?
+    var nextIndex: Int?
+    var categories: [String]? = nil
 import Foundation
 
 enum GameActionType: String, Codable {
