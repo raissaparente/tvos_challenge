@@ -41,7 +41,7 @@ class HostLobbyViewModel: ObservableObject {
                 guard !selectedPeers.isEmpty else { return }
                 if Set(connected) == Set(self.selectedPeers) {
                     // payload com o novo status
-                            let payload = ChangeStatusPayload(status: .category)
+                    let payload = ChangeStatusPayload(status: .startGame)
                             let action = GameAction(type: .changeStatus, payload: payload)
 
                             // envia para os peers
