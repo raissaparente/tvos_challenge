@@ -39,6 +39,9 @@ class RoundViewModel {
         currentIndex = index
     }
 
+    func advanceCategory() {
+        currentIndex += 1
+    }
 
     func saveAnswer(_ answer: String) {
         guard !isFinished else { return }
@@ -50,33 +53,30 @@ class RoundViewModel {
     }
 
     func sendAnswer(_ answer: String) {
-        let gameAction = GameAction(
-            action: .sendAnswer,
+        let payload = SendAnswerPayload(
             playerName: connectionManager.myPeerId.displayName,
-            category: currentCategory,
-            answer: answer,
-            isAnswerValid: nil,
-            currentIndex: currentIndex,
-            nextIndex:  currentIndex + 1
+            answer: answer
         )
-
-        connectionManager.send(gameAction: gameAction)
+        
+        let action = GameAction(type: .sendAnswer, payload: payload)
+        connectionManager.send(gameAction: action)
     }
     
     func changeCategory() {
-        let gameAction = GameAction(action: .changeCategory, nextIndex: currentIndex + 1)
-        connectionManager.send(gameAction: gameAction)
-        
-        currentIndex += 1
-        
-        //local
+        let nextIndex = currentIndex + 1
+        let action = GameAction(type: .changeCategory, payload: EmptyPayload())
+        connectionManager.send(gameAction: action)
+
+        // local
+        currentIndex = nextIndex
         self.gameService.status = .category
     }
     
     func endVoting(){
         //é chamada na TV
-        let gameAction = GameAction(action: .endVote)
-        connectionManager.send(gameAction: gameAction)
+        let payload = ChangeStatusPayload(status: .endVote)
+        let action = GameAction(type: .changeStatus, payload: payload)
+        connectionManager.send(gameAction: action)
         
         //local
         self.gameService.status = .endVote
@@ -87,22 +87,30 @@ class RoundViewModel {
         //mudar nome pra +reset
         didAllPlayersAnswer = false
         
-        let gameAction = GameAction(action: .startVote)
-        
-        connectionManager.send(gameAction: gameAction)
+        let payload = ChangeStatusPayload(status: .startVote)
+            let action = GameAction(type: .changeStatus, payload: payload)
+            connectionManager.send(gameAction: action)
     }
 
     func setCategories() {
         let categories = gameService.draw5Categories()
-
         self.categories = categories
 
-        let gameAction = GameAction(
-            action: .setCategories,
-            categories: categories
-        )
+        let payload = SetCategoriesPayload(categories: categories)
+            let action = GameAction(type: .setCategories, payload: payload)
+            connectionManager.send(gameAction: action)
+    }
+    
+    func changeStatus(to newStatus: ConnectionStatus) {
+        // Atualiza status local
+        gameService.status = newStatus
 
-        connectionManager.send(gameAction: gameAction)
+        // Cria e envia a ação
+        let payload = ChangeStatusPayload(status: newStatus)
+        let action = GameAction(type: .changeStatus, payload: payload)
+        connectionManager.send(gameAction: action)
+
+        print("🔁 Status alterado e enviado: \(newStatus)")
     }
 
     

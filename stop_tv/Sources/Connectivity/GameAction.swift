@@ -7,33 +7,13 @@
 
 import Foundation
 
-struct GameAction: Codable {
-    enum Action: Int, Codable {
-        case sendAnswer
-        case voteAnswer
-        case changeStatus
-        case setCategories
-        case changeCategory
-        case startVote
-        case endVote
-    }
-    
-    let action: Action
-    var playerName: String? = nil
-    
-    var status: ConnectionStatus? = nil
-    var category: String? = nil
-    var answer: String? = nil
-    var isAnswerValid: Bool? = nil
-    var currentIndex: Int?
-    var nextIndex: Int?
-    var categories: [String]? = nil
-import Foundation
 
 enum GameActionType: String, Codable {
     case sendAnswer
     case voteAnswer
     case changeStatus
+    case changeCategory
+    case setCategories
 }
 
 struct GameAction<Payload: Codable>: Codable {
@@ -46,6 +26,8 @@ struct GameAction<Payload: Codable>: Codable {
 }
 
 //payloads
+struct EmptyPayload: Codable {}
+
 struct SendAnswerPayload: Codable {
     let playerName: String
     let answer: String
@@ -54,4 +36,13 @@ struct SendAnswerPayload: Codable {
 
 struct ChangeStatusPayload: Codable {
     let status: ConnectionStatus
+}
+
+struct SetCategoriesPayload: Codable {
+    let categories: [String]
+}
+
+//struct pra desembrulhar e saber o tipo de payload
+struct GameActionTypeWrapper: Codable {
+    let type: GameActionType
 }

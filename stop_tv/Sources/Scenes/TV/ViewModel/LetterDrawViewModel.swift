@@ -23,14 +23,18 @@ class LetterDrawViewModel {
     
     private func startCountdown() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            
             self.gameService.status = .category
             
-            //sends to phones
-            let action = GameAction(action: .changeStatus, playerName: self.connectionManager.myPeerId.displayName, status: .category)
+            // payload com o novo status
+            let payload = ChangeStatusPayload(status: .category)
+            let action = GameAction(type: .changeStatus, payload: payload)
+            
+            // envia para os peers
             self.connectionManager.send(gameAction: action)
             
             self.canGoToCategory = true
         }
     }
-
+    
 }
