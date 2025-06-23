@@ -6,17 +6,27 @@
 //
 import Foundation
 import StopPlay
+import MultipeerConnectivity
 
 public class GameService: ObservableObject {
     @Published var status: ConnectionStatus = .awaiting
     var gameManager = GameManager()
 
     func draw5Categories() -> [String] {
+        
         return gameManager.randomCategories(categories: self.categories)
     }
 
     func drawLetter() -> String {
         return String(gameManager.randomLetter(letras: self.customAlphabet))
+    }
+    
+    func makePlayers(from peers: [MCPeerID]) -> [Player] {
+        return peers.map { Player(name: $0.displayName, id: UUID(), points: 0)}
+    }
+    
+    func makeRanking(from players: [Player]) -> [Player] {
+        return gameManager.ranking(players: players)
     }
 
 }

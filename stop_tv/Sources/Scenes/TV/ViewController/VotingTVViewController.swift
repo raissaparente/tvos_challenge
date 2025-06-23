@@ -57,8 +57,14 @@ class VotingTVViewController: UIViewController {
                 
                 if status == .endVote {
                     print("VOTINGTV terminou votação -> chama changeCat e troca tela")
-                    self.viewModel.changeCategory()
-                    coordinator.showCategory_TV(from: self)
+                    
+                    if viewModel.isLastCategory {
+                        coordinator.showPartialRanking_TV(from: self)
+                        //TODO: AVISAR PRO CELULAR IR PRA UMA TELA DE ESPERA
+                    } else {
+                        self.viewModel.changeCategory()
+                        coordinator.showCategory_TV(from: self)
+                    }
                 }
             }
             .store(in: &cancellables)
