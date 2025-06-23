@@ -10,9 +10,10 @@ import StopPlay
 
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
-    @Published private(set) var currentIndex = 0
+    @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
     @Published private(set) var answers: [String: [String]] = [:]
-    
+    @Published var answerIndex: Int?
+
     var connectionManager: ConnectionManager
     var gameService: GameService
     var categories: [String] = []
@@ -113,7 +114,30 @@ class RoundViewModel {
         print("🔁 Status alterado e enviado: \(newStatus)")
     }
 
-    
+    func mockAnswers() {
+        let category = currentCategory
+        answers[category] = [
+            "Rato",
+            "Rinoceronte",
+            "Régua",
+            "Roupa",
+            "Relógio"
+        ]
+    }
+
+    func getAnswerString(from index: Int?) -> String {
+        if let index = index {
+            print("🔍 Resposta mostrada: \(answers[currentCategory]?[index] ?? "Resposta inválida")")
+            return answers[currentCategory]?[index] ?? "Resposta inválida"
+        } else {
+            return "index inválido"
+        }
+    }
+
+    func isVotingComplete() -> Bool {
+        return false
+    }
+
     func printAnswers() {
         print("\n📝 Respostas por categoria:")
         for (categoria, respostas) in answers {

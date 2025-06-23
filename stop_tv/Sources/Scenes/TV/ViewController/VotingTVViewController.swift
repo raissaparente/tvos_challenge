@@ -56,7 +56,6 @@ class VotingTVViewController: UIViewController {
                 guard let self else { return }
                 
                 if status == .endVote {
-                    print("VOTINGTV terminou votação -> chama changeCat e troca tela")
                     self.viewModel.changeCategory()
                     coordinator.showCategory_TV(from: self)
                 }

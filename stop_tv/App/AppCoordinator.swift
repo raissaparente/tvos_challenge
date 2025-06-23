@@ -23,8 +23,9 @@ class AppCoordinator {
         let nav = UINavigationController()
         let idiom = UIDevice.current.userInterfaceIdiom
         if idiom == .pad {
+            let vc = VotingTVViewController(viewModel: roundVM, coordinator: self)
 
-            let vc = ConnectionInstructionViewController(coordinator: self)
+//            let vc = ConnectionInstructionViewController(coordinator: self)
             nav.viewControllers = [vc]
         } else {
             let vm = PlayerLobbyViewModel(
@@ -32,7 +33,9 @@ class AppCoordinator {
                 gameService: gameService,
                 roundViewModel: roundVM
             )
-            let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
+//            let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
+            let vc = VotingPhoneViewController(viewModel: roundVM, coordinator: self)
+
             nav.viewControllers = [vc]
         }
         window.rootViewController = nav
