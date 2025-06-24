@@ -20,7 +20,7 @@ class RoundViewModel {
     var gameService: GameService
     var categories: [String] = []
     var currentCategory: String {
-        guard currentIndex < categories.count else { return "Categoria ndefinida" }
+        guard currentIndex < categories.count else { return "Categoria indefinida" }
         return categories[currentIndex]
     }
 
@@ -124,6 +124,7 @@ class RoundViewModel {
         let answer = Response(text: text)
         return answer
     }
+
 
     func appendPlayerVote(for index: Int){
 

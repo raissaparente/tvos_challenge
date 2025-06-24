@@ -184,6 +184,7 @@ class VotingPhoneViewController: UIViewController {
     private func setSendButton(isEnabled: Bool) {
         sendButtonRef.isEnabled = isEnabled
         sendButtonRef.backgroundColor = isEnabled ? .systemGreen : .darkGray
+        
     }
 
 }
