@@ -11,14 +11,16 @@ import StopPlay
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
     @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
-    @Published private(set) var answers: [String: [String]] = [:]
+
+    @Published private(set) var answers: [String: [Response]] = [:]
     @Published var answerIndex: Int?
+    @Published var votes: [Int: [Bool]] = [:]
 
     var connectionManager: ConnectionManager
     var gameService: GameService
     var categories: [String] = []
     var currentCategory: String {
-        guard currentIndex < categories.count else { return "raissa" }
+        guard currentIndex < categories.count else { return "Categoria ndefinida" }
         return categories[currentIndex]
     }
 
@@ -44,7 +46,7 @@ class RoundViewModel {
         currentIndex += 1
     }
 
-    func saveAnswer(_ answer: String) {
+    func saveAnswer(_ answer: Response) {
         guard !isFinished else { return }
         let category = currentCategory
         
@@ -53,9 +55,13 @@ class RoundViewModel {
         answers[category] = currentAnswers
     }
 
-    func sendAnswer(_ answer: String) {
+    func sendAnswer(_ answer: Response) {
+    //FIXME: PLACEHOLDER DE PLAYER
+        let player = Player(name: "Player 1")
+
+
         let payload = SendAnswerPayload(
-            playerName: connectionManager.myPeerId.displayName,
+            playerName: player,
             answer: answer
         )
         
@@ -114,28 +120,41 @@ class RoundViewModel {
         print("🔁 Status alterado e enviado: \(newStatus)")
     }
 
+    func createAnswer(text: String) -> Response {
+        let answer = Response(text: text)
+        return answer
+    }
+
+    func appendPlayerVote(for index: Int){
+
+    }
+
+
+}
+
+extension RoundViewModel {
+
     func mockAnswers() {
         let category = currentCategory
         answers[category] = [
-            "Rato",
-            "Rinoceronte",
-            "Régua",
-            "Roupa",
-            "Relógio"
+            Response(text: "Rato"),
+            Response(text: "Rinoceronte"),
+            Response(text: "Régua"),
+            Response(text: "Roupa"),
+            Response(text: "Relógio")
         ]
     }
 
     func getAnswerString(from index: Int?) -> String {
-        if let index = index {
-            print("🔍 Resposta mostrada: \(answers[currentCategory]?[index] ?? "Resposta inválida")")
-            return answers[currentCategory]?[index] ?? "Resposta inválida"
-        } else {
-            return "index inválido"
+        guard let index = index else {
+            return "Index inválido"
         }
-    }
 
-    func isVotingComplete() -> Bool {
-        return false
+        guard let response = answers[currentCategory]?[safe: index] else {
+            return "Resposta inválida"
+        }
+
+        return response.text
     }
 
     func printAnswers() {
@@ -147,5 +166,12 @@ class RoundViewModel {
             }
         }
         print("🔚 Fim das respostas\n")
+    }
+
+}
+
+extension Collection {
+    subscript(safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
     }
 }
