@@ -34,6 +34,9 @@ class GameInstructionViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        interfaceView.bottomPanel.inviteButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
+        
         observeVM()
     }
     

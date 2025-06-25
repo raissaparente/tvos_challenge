@@ -36,7 +36,7 @@ final class GameInstructionPostitView: UIView {
 
             bottomPanel.leadingAnchor.constraint(equalTo: leadingAnchor),
             bottomPanel.trailingAnchor.constraint(equalTo: trailingAnchor),
-            bottomPanel.topAnchor.constraint(equalTo: topPanel.bottomAnchor),
+            bottomPanel.topAnchor.constraint(equalTo: topPanel.bottomAnchor, constant: 50),
             bottomPanel.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
         

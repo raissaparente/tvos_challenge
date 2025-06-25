@@ -32,21 +32,25 @@ final class ConnectedPlayersView: UIView {
         titleLabel.textColor = .white
         titleLabel.numberOfLines = 0
 
+        //POSTITS
         postitStack.axis = .horizontal
         postitStack.spacing = 20
         postitStack.alignment = .center
         postitStack.distribution = .fill
 
+        //BOTAO
         let buttonWrapper = UIView()
-        buttonWrapper.translatesAutoresizingMaskIntoConstraints = false
-        buttonWrapper.addSubview(inviteButton)
-        inviteButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            inviteButton.topAnchor.constraint(equalTo: buttonWrapper.topAnchor),
-            inviteButton.bottomAnchor.constraint(equalTo: buttonWrapper.bottomAnchor),
-            inviteButton.centerXAnchor.constraint(equalTo: buttonWrapper.centerXAnchor)
-        ])
-
+          buttonWrapper.translatesAutoresizingMaskIntoConstraints = false
+          inviteButton.translatesAutoresizingMaskIntoConstraints = false
+          buttonWrapper.addSubview(inviteButton)
+          
+          NSLayoutConstraint.activate([
+              inviteButton.topAnchor.constraint(equalTo: buttonWrapper.topAnchor),
+              inviteButton.bottomAnchor.constraint(equalTo: buttonWrapper.bottomAnchor),
+              inviteButton.trailingAnchor.constraint(equalTo: buttonWrapper.trailingAnchor)
+          ])
+ 
+        //TUDO
         let stack = UIStackView(arrangedSubviews: [
             titleLabel,
             postitStack,
@@ -54,7 +58,7 @@ final class ConnectedPlayersView: UIView {
         ])
         stack.axis = .vertical
         stack.spacing = 20
-        stack.alignment = .fill
+        stack.alignment = .leading
         stack.translatesAutoresizingMaskIntoConstraints = false
 
         addSubview(stack)
@@ -63,7 +67,8 @@ final class ConnectedPlayersView: UIView {
             stack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
             stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
-            stack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
+            stack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+            buttonWrapper.widthAnchor.constraint(equalTo: stack.widthAnchor)
         ])
     }
     
@@ -99,6 +104,7 @@ final class ConnectedPlayersView: UIView {
         text.textColor = .black
         text.textAlignment = .center
         text.numberOfLines = 0
+
         text.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(postitImage)
@@ -110,6 +116,7 @@ final class ConnectedPlayersView: UIView {
             
             text.centerYAnchor.constraint(equalTo: postitImage.centerYAnchor),
             text.centerXAnchor.constraint(equalTo: postitImage.centerXAnchor),
+            text.widthAnchor.constraint(lessThanOrEqualTo: postitImage.widthAnchor, constant: -16)
         ])
         
         return view

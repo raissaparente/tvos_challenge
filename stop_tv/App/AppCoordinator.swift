@@ -23,7 +23,7 @@ class AppCoordinator {
     func start() {
         let nav = UINavigationController()
         let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .tv {
+        if idiom == .pad {
             
             let vm = HostLobbyViewModel(
                 connectionManager: connectionManager,
@@ -36,7 +36,7 @@ class AppCoordinator {
             
             
             let instructionVC = GameInstructionViewController(viewModel: vm, coordinator: self)
-            nav.viewControllers = [instructionVC]
+            nav.viewControllers = [vc]
         } else {
             let vm = PlayerLobbyViewModel(
                 connectionManager: connectionManager,
