@@ -9,8 +9,9 @@ import UIKit
 import Combine
 
 class VotingPhoneViewController: UIViewController {
-    var viewModel: RoundViewModel
+    var roundVM: RoundViewModel
     var coordinator: AppCoordinator
+    var votingVM: VotingViewModel
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -21,10 +22,11 @@ class VotingPhoneViewController: UIViewController {
     private let sendButtonRef = UIButton()
 
 
-    init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
-        self.viewModel = viewModel
+    init(viewModel: RoundViewModel, coordinator: AppCoordinator, votingVM: VotingViewModel) {
+        self.roundVM = viewModel
         viewModel.mockAnswers()
         self.coordinator = coordinator
+        self.votingVM = votingVM
         super.init(nibName: nil, bundle: nil)
         observeViewModel()
     }
@@ -36,7 +38,7 @@ class VotingPhoneViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // mock
-        let count = viewModel.answers[viewModel.currentCategory]?.count ?? 0
+        let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
             updateAnswersGridView(with: count)
         view.backgroundColor = .black
                 setupLayout()
@@ -48,7 +50,7 @@ class VotingPhoneViewController: UIViewController {
     }
 
     private func observeViewModel() {
-        viewModel.gameService.$status
+        roundVM.gameService.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self else { return }
@@ -157,14 +159,14 @@ class VotingPhoneViewController: UIViewController {
 
         guard let selectedIndex = selectedAnswerIndex else { return }
 
-            viewModel.answerIndex = selectedIndex
-            viewModel.appendPlayerVote(for: selectedIndex)
+            roundVM.answerIndex = selectedIndex
+            votingVM.appendPlayerVote(for: selectedIndex)
 
             // opcional: desabilitar botão após envio
             setSendButton(isEnabled: false)
 
             // Atualiza grid com possíveis mudanças visuais (opcional)
-            let count = viewModel.answers[viewModel.currentCategory]?.count ?? 0
+            let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
             updateAnswersGridView(with: count)
     }
 
