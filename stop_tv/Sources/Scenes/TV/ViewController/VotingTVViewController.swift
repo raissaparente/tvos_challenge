@@ -16,11 +16,8 @@ class VotingTVViewController: UIViewController {
 
     // UI...
     private let containerView = UIView()
-    private let textField = UITextField()
     private let categoryLabel = UILabel()
-//    private let submitButton = UIButton(type: .custom)
     private let finishButton = UIButton(type: .custom)
-    private let submitButton = UIButton(type: .custom)
 
     private let stackView = UIStackView()
 
@@ -56,6 +53,7 @@ class VotingTVViewController: UIViewController {
                 guard let self else { return }
                 
                 if status == .endVote {
+
                     print("VOTINGTV terminou votação -> chama changeCat e troca tela")
                     
                     if viewModel.isLastCategory {
@@ -89,17 +87,7 @@ class VotingTVViewController: UIViewController {
                 stackView.spacing = 12
                 stackView.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(stackView)
-        
-        // Continuar button
-        submitButton.setTitle("Todos votaram", for: .normal)
-        submitButton.setTitleColor(.white, for: .normal)
-        submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        submitButton.backgroundColor = .darkGray
-        submitButton.layer.cornerRadius = 8
-        submitButton.clipsToBounds = true
-        submitButton.translatesAutoresizingMaskIntoConstraints = false
-        submitButton.addTarget(self, action: #selector(handleEndVotingButtonTapped), for: .primaryActionTriggered)
-        containerView.addSubview(submitButton)
+
 
         NSLayoutConstraint.activate([
             containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
@@ -112,9 +100,7 @@ class VotingTVViewController: UIViewController {
             
             stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 20),
             stackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            
-            submitButton.bottomAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            submitButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+
 
         ])
     }
@@ -132,17 +118,11 @@ class VotingTVViewController: UIViewController {
             for word in words {
                 let label = UILabel()
                 label.tag = 100
-                label.text = word
+                label.text = word.text
                 label.textColor = .white
                 stackView.addArrangedSubview(label)
             }
      }
-
-    @objc private func handleEndVotingButtonTapped(_ sender: UIButton) {
-        //Vai ser um observador de quem votou/timer
-        print("Executou ação da ação")
-        viewModel.endVoting()        
-    }
 }
 
 

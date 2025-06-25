@@ -111,8 +111,9 @@ class RoundPhoneViewController: UIViewController {
     }
 
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
-        viewModel.saveAnswer(textField.text ?? "")
-        viewModel.sendAnswer(textField.text ?? "")
+        let answer = viewModel.createAnswer(text: textField.text ?? "")
+        viewModel.saveAnswer(answer)
+        viewModel.sendAnswer(answer)
     }
 }
 
