@@ -156,11 +156,15 @@ class VotingPhoneViewController: UIViewController {
 
     @objc private func handleSendButtonTapped(_ sender: UIButton) {
 
-        if let selectedAnswerIndex = selectedAnswerIndex {
-            viewModel.answerIndex = selectedAnswerIndex
-            viewModel.getAnswerString(from: selectedAnswerIndex)
-        }
+        guard let selectedIndex = selectedAnswerIndex else { return }
 
+            viewModel.answerIndex = selectedIndex
+            viewModel.appendPlayerVote(for: selectedIndex)
+
+            // opcional: desabilitar botão após envio
+            setSendButton(isEnabled: false)
+
+            // Atualiza grid com possíveis mudanças visuais (opcional)
             let count = viewModel.answers[viewModel.currentCategory]?.count ?? 0
             updateAnswersGridView(with: count)
     }

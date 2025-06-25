@@ -24,19 +24,23 @@ class RoundViewModel {
         return categories[currentIndex]
     }
 
-     var isFinished: Bool {
+    var totalPlayers: Int {
+        connectionManager.connectedPeers.count
+    }
+
+    var isFinished: Bool {
         currentIndex >= categories.count
     }
-    
+
     @Published var didAllPlayersAnswer: Bool = false
     @Published var didAllPlayersVote: Bool = false
-        
+
 
     init(connectionManager: ConnectionManager, gameService: GameService) {
         self.connectionManager = connectionManager
         self.gameService = gameService
     }
-    
+
     func setCurrentIndex(_ index: Int) {
         print("🔧 setCurrentIndex chamado com valor: \(index)")
         currentIndex = index
@@ -49,14 +53,14 @@ class RoundViewModel {
     func saveAnswer(_ answer: Response) {
         guard !isFinished else { return }
         let category = currentCategory
-        
+
         var currentAnswers = answers[category] ?? []
         currentAnswers.append(answer)
         answers[category] = currentAnswers
     }
 
     func sendAnswer(_ answer: Response) {
-    //FIXME: PLACEHOLDER DE PLAYER
+        //FIXME: PLACEHOLDER DE PLAYER
         let player = Player(name: "Player 1")
 
 
@@ -64,11 +68,11 @@ class RoundViewModel {
             playerName: player,
             answer: answer
         )
-        
+
         let action = GameAction(type: .sendAnswer, payload: payload)
         connectionManager.send(gameAction: action)
     }
-    
+
     func changeCategory() {
         let nextIndex = currentIndex + 1
         let action = GameAction(type: .changeCategory, payload: EmptyPayload())
@@ -78,25 +82,25 @@ class RoundViewModel {
         currentIndex = nextIndex
         self.gameService.status = .category
     }
-    
+
     func endVoting(){
         //é chamada na TV
         let payload = ChangeStatusPayload(status: .endVote)
         let action = GameAction(type: .changeStatus, payload: payload)
         connectionManager.send(gameAction: action)
-        
+
         //local
         self.gameService.status = .endVote
     }
-    
+
     func startVoting() {
         //é chamada na TV
         //mudar nome pra +reset
         didAllPlayersAnswer = false
-        
+
         let payload = ChangeStatusPayload(status: .startVote)
-            let action = GameAction(type: .changeStatus, payload: payload)
-            connectionManager.send(gameAction: action)
+        let action = GameAction(type: .changeStatus, payload: payload)
+        connectionManager.send(gameAction: action)
     }
 
     func setCategories() {
@@ -104,10 +108,10 @@ class RoundViewModel {
         self.categories = categories
 
         let payload = SetCategoriesPayload(categories: categories)
-            let action = GameAction(type: .setCategories, payload: payload)
-            connectionManager.send(gameAction: action)
+        let action = GameAction(type: .setCategories, payload: payload)
+        connectionManager.send(gameAction: action)
     }
-    
+
     func changeStatus(to newStatus: ConnectionStatus) {
         // Atualiza status local
         gameService.status = newStatus
@@ -127,9 +131,37 @@ class RoundViewModel {
 
 
     func appendPlayerVote(for index: Int){
+        var currentVotes = votes[index] ?? []
+        currentVotes.append(false)
+        votes[index] = currentVotes
+
+        print("🗳️ Voto registrado: \(votes)")
+        checkIfAllPlayersVoted()
 
     }
 
+    private func checkIfAllPlayersVoted() {
+        let totalVotes = votes.values.flatMap { $0 }.count
+        if totalVotes >= totalPlayers {
+            endVoting()
+            print("✅ Todos os jogadores votaram! (\(totalVotes)/\(totalPlayers))")
+            finalizeVotes()
+        }
+    }
+
+    func finalizeVotes() {
+        guard let answerList = answers[currentCategory] else { return }
+        for index in 0..<answerList.count {
+            var current = votes[index] ?? []
+            let missing = totalPlayers - current.count
+            if missing > 0 {
+                current.append(contentsOf: Array(repeating: true, count: missing))
+            }
+            votes[index] = current
+        }
+
+        print("🔚 Votos finalizados com preenchimento: \(votes)")
+    }
 
 }
 
@@ -157,7 +189,7 @@ extension RoundViewModel {
 
         return response.text
     }
-
+    
     func printAnswers() {
         print("\n📝 Respostas por categoria:")
         for (categoria, respostas) in answers {
