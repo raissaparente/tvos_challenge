@@ -11,6 +11,7 @@ class AppCoordinator {
     let window: UIWindow
     let connectionManager: ConnectionManager
     let gameService = GameService()
+    let matchManager = MatchManager()
     let roundVM: RoundViewModel!
 
     init(window: UIWindow, username: String) {
@@ -48,7 +49,8 @@ class AppCoordinator {
         let vm = HostLobbyViewModel(
             connectionManager: connectionManager,
             gameService: gameService,
-            roundViewModel: roundVM
+            roundViewModel: roundVM,
+            matchManager: matchManager
         )
         let lobbyVC = HostLobbyViewController(viewModel: vm, coordinator: self)
         currentVC.navigationController?.pushViewController(lobbyVC, animated: true)
@@ -72,8 +74,18 @@ class AppCoordinator {
     }
     
     func showVoting_TV(from currentVC: UIViewController) {
-        let roundTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self)
-        currentVC.navigationController?.pushViewController(roundTVVC, animated: true)
+        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self)
+        currentVC.navigationController?.pushViewController(votingTVVC, animated: true)
+    }
+    
+    func showPartialRanking_TV(from currentVC: UIViewController) {
+        let partialRankingVC = PartialRankingViewController(coordinator: self, viewModel: roundVM, matchManager: matchManager)
+        currentVC.navigationController?.pushViewController(partialRankingVC, animated: true)
+    }
+    
+    func showFinalRanking_TV(from currentVC: UIViewController) {
+        let finalRankingVC = FinalRankingViewController(coordinator: self, viewModel: roundVM, matchManager: matchManager)
+        currentVC.navigationController?.pushViewController(finalRankingVC, animated: true)
     }
 
     //Phone

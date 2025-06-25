@@ -6,6 +6,7 @@
 //
 import Foundation
 import StopPlay
+import MultipeerConnectivity
 
 public class GameService: ObservableObject {
     @Published var status: ConnectionStatus = .awaiting
@@ -18,45 +19,47 @@ public class GameService: ObservableObject {
     func drawLetter() -> String {
         return String(gameManager.randomLetter(letras: self.customAlphabet))
     }
+    
+    func makePlayers(from peers: [MCPeerID]) -> [Player] {
+        return peers.map { Player(name: $0.displayName, id: UUID(), points: 0)}
+    }
+    
+    func makeRanking(from players: [Player]) -> [Player] {
+        return gameManager.ranking(players: players)
+    }
 
 }
 
 public extension GameService {
     var categories: [String] {
         return [
-            "Nome",
-            "Animal",
-            "Cor",
-            "Comida",
-            "Bebida",
-            "Lugar",
-            "Objeto",
-            "Profissão",
-            "Filme",
-            "Série",
-            "Livro",
-            "Personagem Famoso",
-            "Marca",
-            "Esporte",
-            "Time",
-            "Ator/Atriz",
-            "Cantor(a)",
-            "Banda",
-            "Palavra em Inglês",
-            "Doença",
-            "Partes do Corpo",
-            "App ou Site",
-            "Celebridade",
-            "Jogo",
-            "Instrumento Musical",
-            "Estilo Musical",
-            "Doces/Sobremesas",
-            "Verbo",
-            "Adjetivo",
-            "Coisa de Praia",
-            "Coisa de Festa",
-            "Fulano é..."
-
+            "Superpoder inútil",
+            "Problema da terapia",
+            "Coisa que está fora do meu orçamento",
+            "Motivo de cancelamento",
+            "Deveria ser crime",
+            "O novo Prêmio Nobel",
+            "Formas de morrer",
+            "Motivo pra beber",
+            "Futuro esporte olímpico",
+            "Subcelebridade",
+            "Nome de remédio",
+            "Nome muito brasileiro",
+            "Aplicativo",
+            "Comida que a nutricionista aprova",
+            "Dá pra botar num cachorro quente",
+            "Nome de idoso",
+            "Tem no banheiro",
+            "Chamaria pro churrasco",
+            "Coisas redondas",
+            "Coisas de inverno",
+            "Palavra de 5 letras",
+            "Nome de música",
+            "Tenho medo de...",
+            "Hoje eu vou...",
+            "Pessoa histórica",
+            "Coisa de religião",
+            "Fantasias de carnaval"
         ]
 
     }

@@ -162,6 +162,18 @@ class RoundViewModel {
 
         print("🔚 Votos finalizados com preenchimento: \(votes)")
     }
+  
+      var isLastCategory: Bool {
+        return currentIndex + 1 >= categories.count
+    }
+    
+    func reset() {
+        currentIndex = 0
+        answers = [:]
+        categories = []
+        didAllPlayersAnswer = false
+        didAllPlayersVote = false
+    }
 
 }
 
@@ -188,7 +200,8 @@ extension RoundViewModel {
         }
 
         return response.text
-    }
+    
+
     
     func printAnswers() {
         print("\n📝 Respostas por categoria:")

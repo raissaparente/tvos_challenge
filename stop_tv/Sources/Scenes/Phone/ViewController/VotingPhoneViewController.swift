@@ -35,12 +35,11 @@ class VotingPhoneViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        setupLayout()
-
         // mock
         let count = viewModel.answers[viewModel.currentCategory]?.count ?? 0
             updateAnswersGridView(with: count)
+        view.backgroundColor = .black
+                setupLayout()
     }
 
     override func viewWillDisappear(_ animated: Bool) {

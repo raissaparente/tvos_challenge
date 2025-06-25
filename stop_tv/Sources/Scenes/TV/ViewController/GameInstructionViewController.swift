@@ -14,15 +14,7 @@ class GameInstructionViewController: UIViewController {
     
     private let coordinator: AppCoordinator
     
-    private let descriptionLabel: UILabel = {
-        let label = UILabel()
-        label.text = "O jogo é assim assim assado"
-        label.textColor = .white
-        label.numberOfLines = 0
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let interfaceView = InstructionsView()
     
     
     private let startButton: UIButton = {
@@ -45,24 +37,26 @@ class GameInstructionViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func loadView() {
+            self.view = interfaceView
+        }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        setupButton()
+//        setupUI()
+//        setupButton()
     }
     
     func setupUI() {
         view.backgroundColor = .black
 
-        view.addSubview(descriptionLabel)
         view.addSubview(startButton)
         
         
         NSLayoutConstraint.activate([
-            descriptionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            descriptionLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+
             
-            startButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 100),
+            startButton.topAnchor.constraint(equalTo: view.bottomAnchor, constant: 100),
             startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             startButton.widthAnchor.constraint(equalToConstant: 500)
         ])
