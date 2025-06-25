@@ -34,8 +34,8 @@ class RoundTVViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        
+        view.backgroundColor = .black
+
         print("A ROUNDTV CARREGOU")
         print("STATUS: \(viewModel.gameService.status)")
         print("DIDALLANSWER: \(viewModel.didAllPlayersAnswer)")

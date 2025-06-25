@@ -14,18 +14,19 @@ class HostLobbyViewModel: ObservableObject {
     @Published var shouldStartGame: Bool = false
     
     private var cancellables = Set<AnyCancellable>()
+    
     private let connectionManager: ConnectionManager
     private let gameService: GameService
     private let roundViewModel: RoundViewModel
-
-
-
-    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel) {
+    private let matchManager: MatchManager
+    
+    
+    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel, matchManager: MatchManager) {
         self.connectionManager = connectionManager
         self.gameService = gameService
         self.roundViewModel = roundViewModel
+        self.matchManager = matchManager
     }
-
     
     func observeConnection() {
         //observa peers disponíveis
@@ -42,10 +43,14 @@ class HostLobbyViewModel: ObservableObject {
                 if Set(connected) == Set(self.selectedPeers) {
                     // payload com o novo status
                     let payload = ChangeStatusPayload(status: .startGame)
-                            let action = GameAction(type: .changeStatus, payload: payload)
-
-                            // envia para os peers
-                            self.connectionManager.send(gameAction: action)
+                    let action = GameAction(type: .changeStatus, payload: payload)
+                    
+                    // envia para os peers
+                    self.connectionManager.send(gameAction: action)
+                    
+                    //guarda os jogadores
+                    let players = gameService.makePlayers(from: selectedPeers)
+                    matchManager.players = players
                     
                     self.gameService.status = .startGame
                 }

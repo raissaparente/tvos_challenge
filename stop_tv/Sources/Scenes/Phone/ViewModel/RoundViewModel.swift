@@ -112,7 +112,18 @@ class RoundViewModel {
 
         print("🔁 Status alterado e enviado: \(newStatus)")
     }
-
+    
+    var isLastCategory: Bool {
+        return currentIndex + 1 >= categories.count
+    }
+    
+    func reset() {
+        currentIndex = 0
+        answers = [:]
+        categories = []
+        didAllPlayersAnswer = false
+        didAllPlayersVote = false
+    }
     
     func printAnswers() {
         print("\n📝 Respostas por categoria:")
