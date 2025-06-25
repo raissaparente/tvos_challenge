@@ -16,7 +16,7 @@ class HostLobbyViewController: UIViewController {
     private let coordinator: AppCoordinator
     
     private let interfaceView = HostLobbyView()
-
+    
     
     init(viewModel: HostLobbyViewModel, coordinator: AppCoordinator) {
         self.viewModel = viewModel
@@ -29,13 +29,13 @@ class HostLobbyViewController: UIViewController {
     }
     
     override func loadView() {
-            self.view = interfaceView
-        }
+        self.view = interfaceView
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         interfaceView.rightPanel.inviteButton.addTarget(self, action: #selector(inviteTapped), for: .primaryActionTriggered)
-
+        
         
         viewModel.browseForPeers()
         viewModel.observeConnection()
@@ -57,58 +57,47 @@ class HostLobbyViewController: UIViewController {
                 self?.reloadPlayers(from: peers)
             }
             .store(in: &cancellables)
-        
-        viewModel.$shouldStartGame
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] shouldStart in
-                guard let self = self else { return }
-                
-                if shouldStart {
-                    coordinator.showGameInstruction_TV(from: self)
-                }
-            }
-            .store(in: &cancellables)
     }
     
     private func reloadPlayers(from peers: [MCPeerID]) {
         let nameList = interfaceView.rightPanel.nameList
         nameList.arrangedSubviews.forEach { $0.removeFromSuperview() }
-
+        
         for nome in peers {
             let container = UIView()
             container.translatesAutoresizingMaskIntoConstraints = false
-
+            
             let label = UILabel()
             label.text = nome.displayName
             label.font = UIFont(name: "ClashDisplay-Regular", size: 30)
             label.textColor = .black
             label.translatesAutoresizingMaskIntoConstraints = false
-
+            
             let underline = UIView()
             underline.backgroundColor = UIColor.systemBlue
             underline.translatesAutoresizingMaskIntoConstraints = false
-
+            
             container.addSubview(label)
             container.addSubview(underline)
-
+            
             NSLayoutConstraint.activate([
                 label.topAnchor.constraint(equalTo: container.topAnchor),
                 label.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-
+                
                 underline.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 2),
-                    underline.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-                    underline.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-                    underline.heightAnchor.constraint(equalToConstant: 5),
-                    underline.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+                underline.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+                underline.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+                underline.heightAnchor.constraint(equalToConstant: 5),
+                underline.bottomAnchor.constraint(equalTo: container.bottomAnchor)
             ])
-
+            
             nameList.addArrangedSubview(container)
         }
     }
     
     @objc private func inviteTapped() {
-        viewModel.inviteSelectedPeers()
-        print("invite")
+        viewModel.inviteAvailablePeers()
+        coordinator.showGameInstruction_TV(from: self)
     }
     
     func addBackgroundImage(named imageName: String, to containerView: UIView) {
@@ -116,12 +105,11 @@ class HostLobbyViewController: UIViewController {
         backgroundImageView.contentMode = .scaleAspectFill
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         backgroundImageView.clipsToBounds = true
-
-
+        
         containerView.addSubview(backgroundImageView)
         containerView.sendSubviewToBack(backgroundImageView)
         containerView.clipsToBounds = true
-
+        
         NSLayoutConstraint.activate([
             backgroundImageView.topAnchor.constraint(equalTo: containerView.topAnchor),
             backgroundImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),

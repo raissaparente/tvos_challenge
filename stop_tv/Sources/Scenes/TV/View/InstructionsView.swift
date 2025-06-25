@@ -10,7 +10,7 @@ final class InstructionsView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .black
+        backgroundColor = .clear
         setupViews()
     }
 
@@ -46,21 +46,9 @@ final class InstructionsView: UIView {
         addSubview(stack)
 
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 30),
+            stack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
             stack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -32)
-        ])
-
-        //TODO: DELETE
-        let bg = UIImageView(image: UIImage(named: "paperTexture"))
-        bg.contentMode = .scaleAspectFill
-        bg.translatesAutoresizingMaskIntoConstraints = false
-        insertSubview(bg, at: 0)
-        NSLayoutConstraint.activate([
-            bg.topAnchor.constraint(equalTo: topAnchor),
-            bg.bottomAnchor.constraint(equalTo: bottomAnchor),
-            bg.leadingAnchor.constraint(equalTo: leadingAnchor),
-            bg.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
     }
     
