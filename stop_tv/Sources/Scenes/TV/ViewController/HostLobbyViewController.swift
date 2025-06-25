@@ -15,7 +15,8 @@ class HostLobbyViewController: UIViewController {
     private let viewModel: HostLobbyViewModel
     private let coordinator: AppCoordinator
     
-    private let stackView = UIStackView()
+    private let interfaceView = HostLobbyView()
+
     
     init(viewModel: HostLobbyViewModel, coordinator: AppCoordinator) {
         self.viewModel = viewModel
@@ -27,9 +28,14 @@ class HostLobbyViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func loadView() {
+            self.view = interfaceView
+        }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
+        interfaceView.rightPanel.inviteButton.addTarget(self, action: #selector(inviteTapped), for: .primaryActionTriggered)
+
         
         viewModel.browseForPeers()
         viewModel.observeConnection()
@@ -44,39 +50,11 @@ class HostLobbyViewController: UIViewController {
     }
     
     
-    private func setupUI() {
-        view.backgroundColor = .black
-        
-        stackView.axis = .vertical
-        stackView.spacing = 12
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
-        ])
-        
-        let titleLabel = UILabel()
-        titleLabel.text = "Jogadores disponíveis:"
-        titleLabel.textColor = .white
-        stackView.addArrangedSubview(titleLabel)
-        
-        let inviteButton = UIButton(type: .system)
-        inviteButton.setTitle("Convidar selecionados", for: .normal)
-        inviteButton.backgroundColor = .systemBlue
-        inviteButton.tintColor = .white
-        inviteButton.layer.cornerRadius = 8
-        inviteButton.addTarget(self, action: #selector(inviteTapped), for: .primaryActionTriggered)
-        stackView.addArrangedSubview(inviteButton)
-    }
-    
     private func observeVM() {
         viewModel.$availablePeers
             .receive(on: DispatchQueue.main)
             .sink { [weak self] peers in
-                self?.reloadPeerButtons(peers)
+                self?.reloadPlayers(from: peers)
             }
             .store(in: &cancellables)
         
@@ -91,28 +69,64 @@ class HostLobbyViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    private func reloadPeerButtons(_ peers: [MCPeerID]) {
-        for view in stackView.arrangedSubviews where view.tag == 100 {
-            stackView.removeArrangedSubview(view)
-            view.removeFromSuperview()
-        }
-        
-        for peer in peers {
-            let button = UIButton(type: .system)
-            button.tag = 100
-            let isSelected = viewModel.selectedPeers.contains(peer)
-            let symbol = isSelected ? "✅" : "◻️"
-            button.setTitle("\(symbol) \(peer.displayName)", for: .normal)
-            button.tintColor = .white
-            button.addAction(UIAction { [weak self] _ in
-                self?.viewModel.toggleSelection(for: peer)
-                self?.reloadPeerButtons(peers)
-            }, for: .primaryActionTriggered)
-            stackView.addArrangedSubview(button)
+    
+    private func reloadPlayers(from peers: [MCPeerID]) {
+        let nameList = interfaceView.rightPanel.nameList
+        nameList.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        for nome in peers {
+            let container = UIView()
+            container.translatesAutoresizingMaskIntoConstraints = false
+
+            let label = UILabel()
+            label.text = nome.displayName
+            label.font = UIFont(name: "ClashDisplay-Regular", size: 30)
+            label.textColor = .black
+            label.translatesAutoresizingMaskIntoConstraints = false
+
+            let underline = UIView()
+            underline.backgroundColor = UIColor.systemBlue
+            underline.translatesAutoresizingMaskIntoConstraints = false
+
+            container.addSubview(label)
+            container.addSubview(underline)
+
+            NSLayoutConstraint.activate([
+                label.topAnchor.constraint(equalTo: container.topAnchor),
+                label.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+
+                underline.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 2),
+                    underline.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+                    underline.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+                    underline.heightAnchor.constraint(equalToConstant: 5),
+                    underline.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+            ])
+
+            nameList.addArrangedSubview(container)
         }
     }
     
     @objc private func inviteTapped() {
         viewModel.inviteSelectedPeers()
+        print("invite")
+    }
+    
+    func addBackgroundImage(named imageName: String, to containerView: UIView) {
+        let backgroundImageView = UIImageView(image: UIImage(named: imageName))
+        backgroundImageView.contentMode = .scaleAspectFill
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundImageView.clipsToBounds = true
+
+
+        containerView.addSubview(backgroundImageView)
+        containerView.sendSubviewToBack(backgroundImageView)
+        containerView.clipsToBounds = true
+
+        NSLayoutConstraint.activate([
+            backgroundImageView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            backgroundImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            backgroundImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+        ])
     }
 }
