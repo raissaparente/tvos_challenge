@@ -5,6 +5,8 @@
 //  Created by Raissa Bruna Parente on 11/06/25.
 //
 import MultipeerConnectivity
+//import StopPlay
+
 //first: infoplist - bonjour with _name._tcp/udp and local network string
 
 extension String {

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import StopPlay
 
 enum GameActionType: String, Codable {
     case sendAnswer
@@ -29,8 +29,8 @@ struct GameAction<Payload: Codable>: Codable {
 struct EmptyPayload: Codable {}
 
 struct SendAnswerPayload: Codable {
-    let playerName: String
-    let answer: String
+    let playerName: Player
+    let answer: Response
 }
 
 

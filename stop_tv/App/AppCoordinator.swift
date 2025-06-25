@@ -32,10 +32,7 @@ class AppCoordinator {
                 matchManager: matchManager
             )
             let vc = HostLobbyViewController(viewModel: vm, coordinator: self)
-            
-            
-            
-            let instructionVC = GameInstructionViewController(viewModel: vm, coordinator: self)
+
             nav.viewControllers = [vc]
         } else {
             let vm = PlayerLobbyViewModel(
@@ -44,6 +41,8 @@ class AppCoordinator {
                 roundViewModel: roundVM
             )
             let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
+//            let vc = VotingPhoneViewController(viewModel: roundVM, coordinator: self)
+
             nav.viewControllers = [vc]
         }
         window.rootViewController = nav

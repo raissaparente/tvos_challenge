@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import StopPlay
 
 class RoundTVViewController: UIViewController {
     var viewModel: RoundViewModel
@@ -64,8 +65,8 @@ class RoundTVViewController: UIViewController {
                     guard let self else { return }
                     guard let currentAnswers = allAnswers[viewModel.currentCategory] else { return }
                     
-                    viewModel.printAnswers()
-                    
+//                    viewModel.printAnswers()
+
                     reloadWords(currentAnswers)
                     
                     if currentAnswers.count == viewModel.connectionManager.connectedPeers.count {
@@ -135,7 +136,7 @@ class RoundTVViewController: UIViewController {
     }
     
     
-    private func reloadWords(_ words: [String]) {
+    private func reloadWords(_ words: [Response]) {
             for view in stackView.arrangedSubviews where view.tag == 100 {
                 stackView.removeArrangedSubview(view)
                 view.removeFromSuperview()
@@ -144,7 +145,7 @@ class RoundTVViewController: UIViewController {
             for word in words {
                 let label = UILabel()
                 label.tag = 100
-                label.text = word
+                label.text = word.text
                 label.textColor = .white
                 stackView.addArrangedSubview(label)
             }

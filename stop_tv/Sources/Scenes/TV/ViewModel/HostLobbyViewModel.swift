@@ -43,6 +43,7 @@ class HostLobbyViewModel: ObservableObject {
                 if Set(connected) == Set(self.selectedPeers) {
                     // payload com o novo status
                     let payload = ChangeStatusPayload(status: .startGame)
+
                     let action = GameAction(type: .changeStatus, payload: payload)
                     
                     // envia para os peers
@@ -50,8 +51,7 @@ class HostLobbyViewModel: ObservableObject {
                     
                     //guarda os jogadores
                     let players = gameService.makePlayers(from: selectedPeers)
-                    matchManager.players = players
-                    
+                    matchManager.players = players                    
                     self.gameService.status = .startGame
                 }
             }
