@@ -12,23 +12,14 @@ import MultipeerConnectivity
 
 class GameInstructionViewController: UIViewController {
     
+    private let interfaceView = GameInstructionPostitView()
+    private var cancellables = Set<AnyCancellable>()
+
+    private let viewModel: HostLobbyViewModel
     private let coordinator: AppCoordinator
     
-    private let interfaceView = InstructionsView()
-    
-    
-    private let startButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Estamos prontos!", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.tintColor = .white
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
-
-        return button
-    }()
-    
-    init(coordinator: AppCoordinator) {
+    init(viewModel: HostLobbyViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
@@ -43,28 +34,32 @@ class GameInstructionViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        setupUI()
-//        setupButton()
+        
+        interfaceView.bottomPanel.inviteButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
+        
+        observeVM()
     }
     
-    func setupUI() {
-        view.backgroundColor = .black
-
-        view.addSubview(startButton)
+    private func observeVM() {
+        viewModel.connectionManager.$connectedPeers
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] peers in
+                let peerNames = peers.map( \.displayName )
+                
+                self?.interfaceView.bottomPanel.reloadPlayers(from: peerNames)
+            }
+            .store(in: &cancellables)
         
-        
-        NSLayoutConstraint.activate([
-
-            
-            startButton.topAnchor.constraint(equalTo: view.bottomAnchor, constant: 100),
-            startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            startButton.widthAnchor.constraint(equalToConstant: 500)
-        ])
+        viewModel.$shouldStartGame
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] shouldStart in
+                guard let self = self else { return }
+                
+                if shouldStart {
+                    coordinator.showLetterDraw_TV(from: self)                }
+            }
+            .store(in: &cancellables)
     }
-    private func setupButton() {
-        startButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
-    }
-
     
     @objc private func continueTapped() {
         coordinator.showLetterDraw_TV(from: self)

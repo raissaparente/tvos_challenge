@@ -7,14 +7,18 @@
 import UIKit
 
 final class ConnectedPlayersView: UIView {
+    
+    let testNames = ["Raissa", "Beyanca", "Julia Saboya", "Plutarco"]
 
-    let nameList = UIStackView()
+    let postitStack = UIStackView()
     let inviteButton = CapsuleButton.create(withTitle: "Continuar", target: nil, action: #selector(dummy))
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .white
+        backgroundColor = .clear
         setupViews()
+        
+        reloadPlayers(from: testNames)
     }
 
     required init?(coder: NSCoder) {
@@ -23,54 +27,99 @@ final class ConnectedPlayersView: UIView {
 
     private func setupViews() {
         let titleLabel = UILabel()
-        titleLabel.text = "Prontos...\npelo menos no nome"
-        titleLabel.font = UIFont(name: "Chalkduster", size: 52)
-        titleLabel.textColor = .black
+        titleLabel.text = "Falta alguém?"
+        titleLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 50)
+        titleLabel.textColor = .white
         titleLabel.numberOfLines = 0
 
-        nameList.axis = .vertical
-        nameList.spacing = 12
-        nameList.alignment = .fill
+        //POSTITS
+        postitStack.axis = .horizontal
+        postitStack.spacing = 20
+        postitStack.alignment = .center
+        postitStack.distribution = .fill
 
+        //BOTAO
         let buttonWrapper = UIView()
-        buttonWrapper.translatesAutoresizingMaskIntoConstraints = false
-        buttonWrapper.addSubview(inviteButton)
-        inviteButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            inviteButton.topAnchor.constraint(equalTo: buttonWrapper.topAnchor),
-            inviteButton.bottomAnchor.constraint(equalTo: buttonWrapper.bottomAnchor),
-            inviteButton.centerXAnchor.constraint(equalTo: buttonWrapper.centerXAnchor)
-        ])
-
+          buttonWrapper.translatesAutoresizingMaskIntoConstraints = false
+          inviteButton.translatesAutoresizingMaskIntoConstraints = false
+          buttonWrapper.addSubview(inviteButton)
+          
+          NSLayoutConstraint.activate([
+              inviteButton.topAnchor.constraint(equalTo: buttonWrapper.topAnchor),
+              inviteButton.bottomAnchor.constraint(equalTo: buttonWrapper.bottomAnchor),
+              inviteButton.trailingAnchor.constraint(equalTo: buttonWrapper.trailingAnchor)
+          ])
+ 
+        //TUDO
         let stack = UIStackView(arrangedSubviews: [
             titleLabel,
-            nameList,
-            UIView(),
+            postitStack,
             buttonWrapper
         ])
         stack.axis = .vertical
         stack.spacing = 20
-        stack.alignment = .fill
+        stack.alignment = .leading
         stack.translatesAutoresizingMaskIntoConstraints = false
 
         addSubview(stack)
 
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 40),
+            stack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32)
+            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
+            stack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+            buttonWrapper.widthAnchor.constraint(equalTo: stack.widthAnchor)
         ])
+    }
+    
+    func reloadPlayers(from names: [String]) {
+        postitStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
-        let bg = UIImageView(image: UIImage(named: "notebookPaper"))
-        bg.contentMode = .scaleAspectFill
-        bg.translatesAutoresizingMaskIntoConstraints = false
-        insertSubview(bg, at: 0)
+        for name in names {
+            let postit = makePlayerPostit(name: name)
+            postitStack.addArrangedSubview(postit)
+        }
+    }
+
+    
+    private func makePlayerPostit(name: String) -> UIView {
+        let size = 200.0
+        
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.widthAnchor.constraint(equalToConstant: size).isActive = true
+        view.heightAnchor.constraint(equalToConstant: size).isActive = true
+        view.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        view.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        
+        let postitImage = UIImageView(image: UIImage(named: "postit"))
+        postitImage.contentMode = .scaleAspectFill
+        postitImage.translatesAutoresizingMaskIntoConstraints = false
+        postitImage.widthAnchor.constraint(equalToConstant: size).isActive = true
+        postitImage.heightAnchor.constraint(equalToConstant: size).isActive = true
+
+        let text = UILabel()
+        text.text = name
+        text.font = UIFont(name: "Chalkduster", size: 30)
+        text.textColor = .black
+        text.textAlignment = .center
+        text.numberOfLines = 0
+
+        text.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(postitImage)
+        view.addSubview(text)
+        
         NSLayoutConstraint.activate([
-            bg.topAnchor.constraint(equalTo: topAnchor),
-            bg.bottomAnchor.constraint(equalTo: bottomAnchor),
-            bg.leadingAnchor.constraint(equalTo: leadingAnchor),
-            bg.trailingAnchor.constraint(equalTo: trailingAnchor)
+            postitImage.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            postitImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            text.centerYAnchor.constraint(equalTo: postitImage.centerYAnchor),
+            text.centerXAnchor.constraint(equalTo: postitImage.centerXAnchor),
+            text.widthAnchor.constraint(lessThanOrEqualTo: postitImage.widthAnchor, constant: -16)
         ])
+        
+        return view
     }
 
     @objc private func dummy() {}
