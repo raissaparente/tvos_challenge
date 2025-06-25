@@ -65,8 +65,8 @@ class RoundTVViewController: UIViewController {
                     guard let self else { return }
                     guard let currentAnswers = allAnswers[viewModel.currentCategory] else { return }
                     
-                    viewModel.printAnswers()
-                    
+//                    viewModel.printAnswers()
+
                     reloadWords(currentAnswers)
                     
                     if currentAnswers.count == viewModel.connectionManager.connectedPeers.count {

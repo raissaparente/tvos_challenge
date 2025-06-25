@@ -200,18 +200,19 @@ extension RoundViewModel {
         }
 
         return response.text
-    
 
-    
-    func printAnswers() {
-        print("\n📝 Respostas por categoria:")
-        for (categoria, respostas) in answers {
-            print("📚 Categoria: \(categoria)")
-            for (index, resposta) in respostas.enumerated() {
-                print("   🔹 Resposta \(index + 1): \(resposta)")
+
+
+        func printAnswers() {
+            print("\n📝 Respostas por categoria:")
+            for (categoria, respostas) in answers {
+                print("📚 Categoria: \(categoria)")
+                for (index, resposta) in respostas.enumerated() {
+                    print("   🔹 Resposta \(index + 1): \(resposta)")
+                }
             }
+            print("🔚 Fim das respostas\n")
         }
-        print("🔚 Fim das respostas\n")
     }
 
 }
