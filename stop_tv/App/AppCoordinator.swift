@@ -35,7 +35,7 @@ class AppCoordinator {
             
             
             
-            let instructionVC = GameInstructionViewController(coordinator: self)
+            let instructionVC = GameInstructionViewController(viewModel: vm, coordinator: self)
             nav.viewControllers = [instructionVC]
         } else {
             let vm = PlayerLobbyViewModel(
@@ -64,7 +64,14 @@ class AppCoordinator {
     }
     
     func showGameInstruction_TV(from currentVC: UIViewController) {
-        let instructionVC = GameInstructionViewController(coordinator: self)
+        let vm = HostLobbyViewModel(
+            connectionManager: connectionManager,
+            gameService: gameService,
+            roundViewModel: roundVM,
+            matchManager: matchManager
+        )
+        
+        let instructionVC = GameInstructionViewController(viewModel: vm, coordinator: self)
         currentVC.navigationController?.pushViewController(instructionVC, animated: true)
     }
     

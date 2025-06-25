@@ -12,22 +12,14 @@ import MultipeerConnectivity
 
 class GameInstructionViewController: UIViewController {
     
-    private let coordinator: AppCoordinator
     private let interfaceView = GameInstructionPostitView()
-    
-    
-    private let startButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Estamos prontos!", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.tintColor = .white
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
+    private var cancellables = Set<AnyCancellable>()
 
-        return button
-    }()
+    private let viewModel: HostLobbyViewModel
+    private let coordinator: AppCoordinator
     
-    init(coordinator: AppCoordinator) {
+    init(viewModel: HostLobbyViewModel, coordinator: AppCoordinator) {
+        self.viewModel = viewModel
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
@@ -42,6 +34,28 @@ class GameInstructionViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        observeVM()
+    }
+    
+    private func observeVM() {
+        viewModel.connectionManager.$connectedPeers
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] peers in
+                let peerNames = peers.map( \.displayName )
+                
+                self?.interfaceView.bottomPanel.reloadPlayers(from: peerNames)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$shouldStartGame
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] shouldStart in
+                guard let self = self else { return }
+                
+                if shouldStart {
+                    coordinator.showLetterDraw_TV(from: self)                }
+            }
+            .store(in: &cancellables)
     }
     
     @objc private func continueTapped() {

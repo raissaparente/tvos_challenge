@@ -67,7 +67,7 @@ final class ConnectedPlayersView: UIView {
         ])
     }
     
-    private func reloadPlayers(from names: [String]) {
+    func reloadPlayers(from names: [String]) {
         postitStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
         for name in names {
@@ -77,7 +77,7 @@ final class ConnectedPlayersView: UIView {
     }
 
     
-    func makePlayerPostit(name: String) -> UIView {
+    private func makePlayerPostit(name: String) -> UIView {
         let size = 200.0
         
         let view = UIView()
