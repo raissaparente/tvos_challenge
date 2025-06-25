@@ -13,8 +13,7 @@ import MultipeerConnectivity
 class GameInstructionViewController: UIViewController {
     
     private let coordinator: AppCoordinator
-    
-    private let interfaceView = InstructionsView()
+    private let interfaceView = GameInstructionPostitView()
     
     
     private let startButton: UIButton = {
@@ -43,28 +42,7 @@ class GameInstructionViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        setupUI()
-//        setupButton()
     }
-    
-    func setupUI() {
-        view.backgroundColor = .black
-
-        view.addSubview(startButton)
-        
-        
-        NSLayoutConstraint.activate([
-
-            
-            startButton.topAnchor.constraint(equalTo: view.bottomAnchor, constant: 100),
-            startButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            startButton.widthAnchor.constraint(equalToConstant: 500)
-        ])
-    }
-    private func setupButton() {
-        startButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
-    }
-
     
     @objc private func continueTapped() {
         coordinator.showLetterDraw_TV(from: self)
