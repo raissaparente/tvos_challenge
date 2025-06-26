@@ -14,7 +14,6 @@ class RoundViewModel {
 
     @Published private(set) var answers: [String: [Response]] = [:]
     @Published var answerIndex: Int?
-    @Published var votes: [Int: [Bool]] = [:]
 
     var connectionManager: ConnectionManager
     var gameService: GameService
@@ -22,10 +21,6 @@ class RoundViewModel {
     var currentCategory: String {
         guard currentIndex < categories.count else { return "Categoria indefinida" }
         return categories[currentIndex]
-    }
-
-    var totalPlayers: Int {
-        connectionManager.connectedPeers.count
     }
 
     var isFinished: Bool {
@@ -82,17 +77,7 @@ class RoundViewModel {
         currentIndex = nextIndex
         self.gameService.status = .category
     }
-
-    func endVoting(){
-        //é chamada na TV
-        let payload = ChangeStatusPayload(status: .endVote)
-        let action = GameAction(type: .changeStatus, payload: payload)
-        connectionManager.send(gameAction: action)
-
-        //local
-        self.gameService.status = .endVote
-    }
-
+    
     func startVoting() {
         //é chamada na TV
         //mudar nome pra +reset
@@ -102,6 +87,7 @@ class RoundViewModel {
         let action = GameAction(type: .changeStatus, payload: payload)
         connectionManager.send(gameAction: action)
     }
+
 
     func setCategories() {
         let categories = gameService.draw5Categories()
@@ -129,40 +115,6 @@ class RoundViewModel {
         return answer
     }
 
-
-    func appendPlayerVote(for index: Int){
-        var currentVotes = votes[index] ?? []
-        currentVotes.append(false)
-        votes[index] = currentVotes
-
-        print("🗳️ Voto registrado: \(votes)")
-        checkIfAllPlayersVoted()
-
-    }
-
-    private func checkIfAllPlayersVoted() {
-        let totalVotes = votes.values.flatMap { $0 }.count
-        if totalVotes >= totalPlayers {
-            endVoting()
-            print("✅ Todos os jogadores votaram! (\(totalVotes)/\(totalPlayers))")
-            finalizeVotes()
-        }
-    }
-
-    func finalizeVotes() {
-        guard let answerList = answers[currentCategory] else { return }
-        for index in 0..<answerList.count {
-            var current = votes[index] ?? []
-            let missing = totalPlayers - current.count
-            if missing > 0 {
-                current.append(contentsOf: Array(repeating: true, count: missing))
-            }
-            votes[index] = current
-        }
-
-        print("🔚 Votos finalizados com preenchimento: \(votes)")
-    }
-  
       var isLastCategory: Bool {
         return currentIndex + 1 >= categories.count
     }

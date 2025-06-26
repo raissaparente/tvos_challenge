@@ -13,11 +13,13 @@ class AppCoordinator {
     let gameService = GameService()
     let matchManager = MatchManager()
     let roundVM: RoundViewModel!
-    
+    let votingVM: VotingViewModel!
+
     init(window: UIWindow, username: String) {
         self.window = window
         self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
+        self.votingVM = VotingViewModel(connectionManager: connectionManager, gameService: gameService)
     }
     
     func start() {
@@ -87,7 +89,7 @@ class AppCoordinator {
     }
     
     func showVoting_TV(from currentVC: UIViewController) {
-        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self)
+        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self, votingVM: votingVM)
         currentVC.navigationController?.pushViewController(votingTVVC, animated: true)
     }
     
@@ -120,8 +122,8 @@ class AppCoordinator {
     }
     
     func showVoting_phone(from currentVC: UIViewController) {
-        
-        let votingPhoneVC = VotingPhoneViewController(viewModel: roundVM, coordinator: self)
+
+        let votingPhoneVC = VotingPhoneViewController(viewModel: roundVM, coordinator: self, votingVM: votingVM)
         currentVC.navigationController?.pushViewController(votingPhoneVC, animated: true)
     }
 }

@@ -9,9 +9,10 @@ import UIKit
 import Combine
 
 class VotingTVViewController: UIViewController {
-    var viewModel: RoundViewModel
+    var roundVM: RoundViewModel
     var coordinator: AppCoordinator
-    
+    var votingVM: VotingViewModel
+
     private var cancellables = Set<AnyCancellable>()
 
     // UI...
@@ -21,10 +22,10 @@ class VotingTVViewController: UIViewController {
 
     private let stackView = UIStackView()
 
-
-    init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
-        self.viewModel = viewModel
+    init(viewModel: RoundViewModel, coordinator: AppCoordinator, votingVM: VotingViewModel) {
+        self.roundVM = viewModel
         self.coordinator = coordinator
+        self.votingVM = votingVM
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -47,7 +48,7 @@ class VotingTVViewController: UIViewController {
 
     private func observeViewModel() {
         
-        viewModel.gameService.$status
+        roundVM.gameService.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self else { return }
@@ -56,11 +57,11 @@ class VotingTVViewController: UIViewController {
 
                     print("VOTINGTV terminou votação -> chama changeCat e troca tela")
                     
-                    if viewModel.isLastCategory {
+                    if roundVM.isLastCategory {
                         coordinator.showPartialRanking_TV(from: self)
                         //TODO: AVISAR PRO CELULAR IR PRA UMA TELA DE ESPERA
                     } else {
-                        self.viewModel.changeCategory()
+                        self.roundVM.changeCategory()
                         coordinator.showCategory_TV(from: self)
                     }
                 }
@@ -78,7 +79,7 @@ class VotingTVViewController: UIViewController {
 
         // Category label
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        categoryLabel.text = viewModel.currentCategory
+        categoryLabel.text = roundVM.currentCategory
         categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
         containerView.addSubview(categoryLabel)
         
@@ -113,7 +114,7 @@ class VotingTVViewController: UIViewController {
                 view.removeFromSuperview()
             }
         
-        guard let words = viewModel.answers[viewModel.currentCategory] else { return }
+        guard let words = roundVM.answers[roundVM.currentCategory] else { return }
             
             for word in words {
                 let label = UILabel()
@@ -127,5 +128,5 @@ class VotingTVViewController: UIViewController {
 
 
 #Preview {
-    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""))
+    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""), votingVM: VotingViewModel(connectionManager: ConnectionManager(username: "julia"), gameService: GameService()))
 }
