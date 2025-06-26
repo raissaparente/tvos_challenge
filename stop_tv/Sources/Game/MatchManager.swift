@@ -10,12 +10,17 @@ import MultipeerConnectivity
 import StopPlay
 
 class MatchManager: ObservableObject {
-    @Published var maxRoundsCount: Int = 3
-    @Published var currentRound: Int = 1
+    @Published var maxRoundsCount: Int = 2
+    @Published var currentRound: Int = 0
     @Published var isGameFinished: Bool = false
     @Published var isRoundFinished: Bool = false
     
+    var letters: [String] = []
     var players: [Player] = []
+    
+    var currentLetter: String {
+        return letters[currentRound]
+    }
     
     func finishRound() {
         isRoundFinished = true
@@ -34,6 +39,10 @@ class MatchManager: ObservableObject {
     
     private func finishGame() {
         isGameFinished = true
+    }
+    
+    func addLetter(_ letter: String) {
+        letters.append(letter)
     }
     
     //só no fim do jogo todo

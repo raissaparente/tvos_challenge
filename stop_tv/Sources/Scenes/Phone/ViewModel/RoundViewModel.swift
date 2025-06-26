@@ -17,6 +17,8 @@ class RoundViewModel {
 
     var connectionManager: ConnectionManager
     var gameService: GameService
+    var matchManager: MatchManager
+    
     var categories: [String] = []
     var currentCategory: String {
         guard currentIndex < categories.count else { return "Categoria indefinida" }
@@ -31,9 +33,10 @@ class RoundViewModel {
     @Published var didAllPlayersVote: Bool = false
 
 
-    init(connectionManager: ConnectionManager, gameService: GameService) {
+    init(connectionManager: ConnectionManager, gameService: GameService, matchManager: MatchManager) {
         self.connectionManager = connectionManager
         self.gameService = gameService
+        self.matchManager = matchManager
     }
 
     func setCurrentIndex(_ index: Int) {
@@ -48,7 +51,7 @@ class RoundViewModel {
     func saveAnswer(_ answer: Response) {
         guard !isFinished else { return }
         let category = currentCategory
-
+        
         var currentAnswers = answers[category] ?? []
         currentAnswers.append(answer)
         answers[category] = currentAnswers
@@ -57,7 +60,6 @@ class RoundViewModel {
     func sendAnswer(_ answer: Response) {
         //FIXME: PLACEHOLDER DE PLAYER
         let player = Player(name: "Player 1")
-
 
         let payload = SendAnswerPayload(
             playerName: player,
@@ -114,10 +116,12 @@ class RoundViewModel {
         let answer = Response(text: text)
         return answer
     }
-
-      var isLastCategory: Bool {
+    
+    var isLastCategory: Bool {
         return currentIndex + 1 >= categories.count
     }
+    
+    
     
     func reset() {
         currentIndex = 0
