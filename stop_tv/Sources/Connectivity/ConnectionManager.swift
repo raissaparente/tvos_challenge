@@ -27,7 +27,9 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     let myPeerId: MCPeerID
     weak var game: GameService?
     weak var round: RoundViewModel?
-    
+    weak var votingVM: VotingViewModel?
+
+
     @Published var availablePeers: [MCPeerID] = []
     @Published var connectedPeers: [MCPeerID] = []
     
@@ -35,9 +37,10 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     @Published var receivedInviteFrom: MCPeerID?
     @Published var invitationHandler: ((Bool, MCSession?) -> Void)?
     
-    func setup(game: GameService, round: RoundViewModel) {
+    func setup(game: GameService, round: RoundViewModel, votingVM: VotingViewModel) {
         self.game = game
         self.round = round
+        self.votingVM = votingVM
     }
     
     
@@ -147,19 +150,31 @@ extension ConnectionManager: MCSessionDelegate {
             case .sendAnswer:
                 if let action = try? JSONDecoder().decode(GameAction<SendAnswerPayload>.self, from: data) {
                     let answer = action.payload.answer
-                    print("🖥️ Salvando resposta = \(answer)")
                     self.round?.saveAnswer(answer)
                 }
                 
             case .voteAnswer:
-                // Ainda não implementado
-                print("🗳️ Voto recebido (não implementado)")
-                
+                if let action = try? JSONDecoder().decode(GameAction<VotePayload>.self, from: data) {
+                    let category = action.payload.category
+                    let voterName = action.payload.voterName
+                    let selectedIndexes = action.payload.selectedIndexes
+
+
+                    self.votingVM?.appendRemotePlayerVote(
+                        voterName: voterName,
+                        selectedIndexes: selectedIndexes,
+                        category: category
+                    )
+                }
+            case .setAnswers:
+                if let action = try? JSONDecoder().decode(GameAction<SetAnswersPayload>.self, from: data) {
+                    self.round?.answers = action.payload.answers
+                }
+
             case .changeStatus:
                 if let action = try? JSONDecoder().decode(GameAction<ChangeStatusPayload>.self, from: data) {
                     let status = action.payload.status
                     self.game?.status = status
-                    print("🔄 Status alterado para: \(status)")
                 }
                 
             case .changeCategory:

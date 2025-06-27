@@ -58,6 +58,12 @@ class RoundViewModel {
         answers[category] = currentAnswers
     }
 
+    func setAnsers() {
+        let payload = SetAnswersPayload(answers: self.answers)
+        let action = GameAction(type: .setAnswers, payload: payload)
+        connectionManager.send(gameAction: action)
+    }
+
     func sendAnswer(_ answer: Response) {
         //FIXME: PLACEHOLDER DE PLAYER
         let player = Player(name: "Player 1")

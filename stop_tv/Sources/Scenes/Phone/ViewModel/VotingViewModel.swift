@@ -9,6 +9,8 @@ import Foundation
 class VotingViewModel {
     let round: RoundViewModel
     @Published var votesByCategory: [String: [Int: [Bool]]] = [:]
+    @Published var playersWhoVotedByCategory: [String: Set<String>] = [:]
+    @Published var selectedAnswerIndexes: Set<Int> = []
 
     init(round: RoundViewModel) {
         self.round = round
@@ -18,9 +20,54 @@ class VotingViewModel {
         round.connectionManager.connectedPeers.count
     }
 
+    func sendVote() {
+        let category = round.currentCategory
+        let voterName = round.connectionManager.myPeerId.displayName
+        let payload = VotePayload(
+            category: category,
+            voterName: voterName,
+            selectedIndexes: selectedAnswerIndexes
+        )
+
+        let action = GameAction(type: .voteAnswer, payload: payload)
+        round.connectionManager.send(gameAction: action)
+
+        // ✅ Aplica o próprio voto localmente, já que MCSession não envia pra si mesmo
+        appendRemotePlayerVote(
+            voterName: voterName,
+            selectedIndexes: selectedAnswerIndexes,
+            category: category
+        )
+    }
+
+    func appendRemotePlayerVote(voterName: String, selectedIndexes: Set<Int>, category: String) {
+        var votesForCategory = votesByCategory[category] ?? [:]
+        var playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
+        playersWhoVoted.insert(voterName)
+        playersWhoVotedByCategory[category] = playersWhoVoted
+
+        let totalAnswers = round.answers[category]?.count ?? 0
+
+        for index in 0..<totalAnswers {
+            let isSelected = selectedIndexes.contains(index)
+            let vote = !isSelected
+            var currentVotes = votesForCategory[index] ?? []
+            currentVotes.append(vote)
+            votesForCategory[index] = currentVotes
+        }
+
+        votesByCategory[category] = votesForCategory
+        checkIfAllPlayersVoted()
+    }
+
     func appendPlayerVote(selectedIndexes: Set<Int>, totalAnswers: Int) {
         let category = round.currentCategory
+        let playerName = round.connectionManager.myPeerId.displayName
         var votesForCategory = votesByCategory[category] ?? [:]
+
+        var playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
+        playersWhoVoted.insert(playerName)
+        playersWhoVotedByCategory[category] = playersWhoVoted
 
         for index in 0..<totalAnswers {
             let isSelected = selectedIndexes.contains(index)
@@ -28,28 +75,19 @@ class VotingViewModel {
             var currentVotes = votesForCategory[index] ?? []
             currentVotes.append(vote)
             votesForCategory[index] = currentVotes
-            print("🔹 Categoria: \(category), Voto para índice \(index): \(vote), total votos agora: \(currentVotes.count)")
         }
 
         votesByCategory[category] = votesForCategory
-
-        print("📦 Total de votos para categoria \(category): \(votesByCategory[category] ?? [:])")
-
         checkIfAllPlayersVoted()
     }
 
     private func checkIfAllPlayersVoted() {
         let category = round.currentCategory
-        let allVotes = votesByCategory[category]?.values.flatMap { $0 } ?? []
-        let totalVotes = allVotes.count
+        let playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
+        let totalVoted = playersWhoVoted.count
 
-        print("checkIfAllPlayersVoted [\(category)] - totalVotes: \(totalVotes), totalPlayers: \(totalPlayers)")
-
-        if totalVotes >= totalPlayers {
-            print("✅ Todos os jogadores votaram na categoria \(category)")
-
+        if totalVoted >= totalPlayers {
             guard !round.isFinished else {
-                print("🏁 Rodada finalizada")
                 return
             }
 
@@ -88,5 +126,7 @@ class VotingViewModel {
         round.connectionManager.send(gameAction: action)
         round.gameService.status = .endVote
     }
+
+
 }
 

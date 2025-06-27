@@ -44,8 +44,6 @@ class LetterDrawViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("🔵 LetterDrawViewController carregou (viewDidLoad)")
-
         setupUI()
         observeViewModel()
         roundVM.setCategories()

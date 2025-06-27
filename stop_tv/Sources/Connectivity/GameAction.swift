@@ -14,6 +14,7 @@ enum GameActionType: String, Codable {
     case changeStatus
     case changeCategory
     case setCategories
+    case setAnswers
 }
 
 struct GameAction<Payload: Codable>: Codable {
@@ -40,6 +41,16 @@ struct ChangeStatusPayload: Codable {
 
 struct SetCategoriesPayload: Codable {
     let categories: [String]
+}
+
+struct VotePayload: Codable {
+    let category: String
+    let voterName: String
+    let selectedIndexes: Set<Int>
+}
+
+struct SetAnswersPayload: Codable {
+    let answers: [String: [Response]]
 }
 
 //struct pra desembrulhar e saber o tipo de payload

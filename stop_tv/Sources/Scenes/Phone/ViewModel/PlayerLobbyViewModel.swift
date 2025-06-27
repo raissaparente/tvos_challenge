@@ -17,18 +17,20 @@ class PlayerLobbyViewModel: ObservableObject {
     private let connectionManager: ConnectionManager
     private let gameService: GameService
     private let roundViewModel: RoundViewModel
+    private let votingViewModel: VotingViewModel
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel) {
+    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel, votingViewModel: VotingViewModel) {
         self.connectionManager = connectionManager
         self.gameService = gameService
         self.roundViewModel = roundViewModel
+        self.votingViewModel = votingViewModel
 
         observeConnection()
         observeGame()
         
-        connectionManager.setup(game: gameService, round: roundViewModel)
+        connectionManager.setup(game: gameService, round: roundViewModel, votingVM: votingViewModel)
         connectionManager.startAdvertising()
     }
 

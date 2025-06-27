@@ -38,14 +38,16 @@ class VotingPhoneViewController: UIViewController {
         super.viewDidLoad()
         // mock
         let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
-            updateAnswersGridView(with: count)
+        updateAnswersGridView(with: count)
         view.backgroundColor = .black
-                setupLayout()
+        setupLayout()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         cancellables.removeAll()
+        votingVM.selectedAnswerIndexes.removeAll()
+
     }
 
     private func observeViewModel() {
@@ -55,6 +57,15 @@ class VotingPhoneViewController: UIViewController {
                 guard let self else { return }
                 guard status == .endVote else { return }
                 self.coordinator.showAnswer_phone(from: self)
+            }
+            .store(in: &cancellables)
+
+        roundVM.$answers
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                let count = self.roundVM.answers[self.roundVM.currentCategory]?.count ?? 0
+                self.updateAnswersGridView(with: count)
             }
             .store(in: &cancellables)
     }
@@ -70,8 +81,8 @@ class VotingPhoneViewController: UIViewController {
 
 
         NSLayoutConstraint.activate([
-//            answersGridView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            answersGridView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            //            answersGridView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            //            answersGridView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             answersGridView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             answersGridView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
 
@@ -91,7 +102,7 @@ class VotingPhoneViewController: UIViewController {
     private func updateAnswersGridView(with count: Int) {
         answersGridView.subviews.forEach { $0.removeFromSuperview() }
         answerButtons = []
-        selectedAnswerIndexes = [] 
+        selectedAnswerIndexes = []
 
         let grid = UIStackView()
         grid.axis = .vertical
@@ -156,7 +167,8 @@ class VotingPhoneViewController: UIViewController {
         let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
         let selected = selectedAnswerIndexes
 
-        votingVM.appendPlayerVote(selectedIndexes: selected, totalAnswers: count)
+        votingVM.selectedAnswerIndexes = selected
+        votingVM.sendVote()
 
         updateAnswersGridView(with: count)
     }

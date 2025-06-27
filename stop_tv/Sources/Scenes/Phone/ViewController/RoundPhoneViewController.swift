@@ -91,7 +91,6 @@ class RoundPhoneViewController: UIViewController {
             .sink { [weak self] status in
                 guard let self = self else { return }
             
-                print("📱 Mudou o status do jogo no celular: \(status)")
                 guard status == .startVote else { return }
                 coordinator.showVoting_phone(from: self)
                 
