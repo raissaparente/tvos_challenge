@@ -9,7 +9,7 @@ import UIKit
 import Combine
 
 class RoundPhoneViewController: UIViewController {
-    var viewModel: RoundViewModel
+    var roundVM: RoundViewModel
     var coordinator: AppCoordinator
     private var cancellables = Set<AnyCancellable>()
 
@@ -20,7 +20,7 @@ class RoundPhoneViewController: UIViewController {
     private let submitButton = UIButton(type: .custom)
 
     init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
-        self.viewModel = viewModel
+        self.roundVM = viewModel
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         textField.delegate = self
@@ -42,6 +42,7 @@ class RoundPhoneViewController: UIViewController {
                 view.backgroundColor = .black
                 setupLayout()
         observeViewModel()
+
     }
 
     private func setupLayout() {
@@ -85,7 +86,7 @@ class RoundPhoneViewController: UIViewController {
     }
     
     func observeViewModel() {
-        viewModel.gameService.$status
+        roundVM.gameService.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self = self else { return }
@@ -99,21 +100,21 @@ class RoundPhoneViewController: UIViewController {
     }
 
     private func updateCategory() {
-        if viewModel.isFinished {
+        if roundVM.isFinished {
             textField.isHidden = true
             submitButton.isHidden = true
             categoryLabel.text = "Mostrar repostas!"
         } else {
-            categoryLabel.text = viewModel.currentCategory
-            print("🖥️ Mostrando nova categoria na TV: \(viewModel.currentCategory)")
+            categoryLabel.text = roundVM.currentCategory
+            print("🖥️ Mostrando nova categoria na TV: \(roundVM.currentCategory)")
             textField.text = ""
         }
     }
 
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
-        let answer = viewModel.createAnswer(text: textField.text ?? "")
-        viewModel.saveAnswer(answer)
-        viewModel.sendAnswer(answer)
+        let answer = roundVM.createAnswer(text: textField.text ?? "")
+        roundVM.saveAnswer(answer)
+        roundVM.sendAnswer(answer)
     }
 }
 

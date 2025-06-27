@@ -19,7 +19,7 @@ class AppCoordinator {
         self.window = window
         self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
-        self.votingVM = VotingViewModel(connectionManager: connectionManager, gameService: gameService)
+        self.votingVM = VotingViewModel(round: roundVM)
     }
     
     func start() {

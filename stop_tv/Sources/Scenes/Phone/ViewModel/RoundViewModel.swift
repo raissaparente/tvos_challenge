@@ -11,8 +11,7 @@ import StopPlay
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
     @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
-
-    @Published private(set) var answers: [String: [Response]] = [:]
+    @Published var answers: [String: [Response]] = [:]
     @Published var answerIndex: Int?
 
     var connectionManager: ConnectionManager
@@ -36,9 +35,14 @@ class RoundViewModel {
         self.gameService = gameService
     }
 
-    func setCurrentIndex(_ index: Int) {
-        print("🔧 setCurrentIndex chamado com valor: \(index)")
-        currentIndex = index
+    func setCategories() {
+            let newCategories = gameService.draw5Categories()
+            print("🟢 categorias sorteadas: \(newCategories)")
+            self.categories = newCategories
+
+        let payload = SetCategoriesPayload(categories: newCategories)
+        let action = GameAction(type: .setCategories, payload: payload)
+        connectionManager.send(gameAction: action)
     }
 
     func advanceCategory() {
@@ -79,24 +83,12 @@ class RoundViewModel {
     }
     
     func startVoting() {
-        //é chamada na TV
-        //mudar nome pra +reset
         didAllPlayersAnswer = false
-
         let payload = ChangeStatusPayload(status: .startVote)
         let action = GameAction(type: .changeStatus, payload: payload)
         connectionManager.send(gameAction: action)
     }
 
-
-    func setCategories() {
-        let categories = gameService.draw5Categories()
-        self.categories = categories
-
-        let payload = SetCategoriesPayload(categories: categories)
-        let action = GameAction(type: .setCategories, payload: payload)
-        connectionManager.send(gameAction: action)
-    }
 
     func changeStatus(to newStatus: ConnectionStatus) {
         // Atualiza status local
@@ -129,48 +121,4 @@ class RoundViewModel {
 
 }
 
-extension RoundViewModel {
 
-    func mockAnswers() {
-        let category = currentCategory
-        answers[category] = [
-            Response(text: "Rato"),
-            Response(text: "Rinoceronte"),
-            Response(text: "Régua"),
-            Response(text: "Roupa"),
-            Response(text: "Relógio")
-        ]
-    }
-
-    func getAnswerString(from index: Int?) -> String {
-        guard let index = index else {
-            return "Index inválido"
-        }
-
-        guard let response = answers[currentCategory]?[safe: index] else {
-            return "Resposta inválida"
-        }
-
-        return response.text
-
-
-
-        func printAnswers() {
-            print("\n📝 Respostas por categoria:")
-            for (categoria, respostas) in answers {
-                print("📚 Categoria: \(categoria)")
-                for (index, resposta) in respostas.enumerated() {
-                    print("   🔹 Resposta \(index + 1): \(resposta)")
-                }
-            }
-            print("🔚 Fim das respostas\n")
-        }
-    }
-
-}
-
-extension Collection {
-    subscript(safe index: Index) -> Element? {
-        return indices.contains(index) ? self[index] : nil
-    }
-}

@@ -6,54 +6,87 @@
 //
 import Foundation
 
-class VotingViewModel: RoundViewModel {
-    @Published var votes: [Int: [Bool]] = [:]
+class VotingViewModel {
+    let round: RoundViewModel
+    @Published var votesByCategory: [String: [Int: [Bool]]] = [:]
+
+    init(round: RoundViewModel) {
+        self.round = round
+    }
 
     var totalPlayers: Int {
-        connectionManager.connectedPeers.count
+        round.connectionManager.connectedPeers.count
     }
 
+    func appendPlayerVote(selectedIndexes: Set<Int>, totalAnswers: Int) {
+        let category = round.currentCategory
+        var votesForCategory = votesByCategory[category] ?? [:]
 
-    func appendPlayerVote(for index: Int){
-        var currentVotes = votes[index] ?? []
-        currentVotes.append(false)
-        votes[index] = currentVotes
+        for index in 0..<totalAnswers {
+            let isSelected = selectedIndexes.contains(index)
+            let vote = !isSelected // false se selecionado, true se não (penalidade)
+            var currentVotes = votesForCategory[index] ?? []
+            currentVotes.append(vote)
+            votesForCategory[index] = currentVotes
+            print("🔹 Categoria: \(category), Voto para índice \(index): \(vote), total votos agora: \(currentVotes.count)")
+        }
 
-        print("🗳️ Voto registrado: \(votes)")
+        votesByCategory[category] = votesForCategory
+
+        print("📦 Total de votos para categoria \(category): \(votesByCategory[category] ?? [:])")
+
         checkIfAllPlayersVoted()
-
-    }
-
-    func endVoting(){
-        //é chamada na TV
-        let payload = ChangeStatusPayload(status: .endVote)
-        let action = GameAction(type: .changeStatus, payload: payload)
-        connectionManager.send(gameAction: action)
-
-        //local
-        self.gameService.status = .endVote
     }
 
     private func checkIfAllPlayersVoted() {
-        let totalVotes = votes.values.flatMap { $0 }.count
+        let category = round.currentCategory
+        let allVotes = votesByCategory[category]?.values.flatMap { $0 } ?? []
+        let totalVotes = allVotes.count
+
+        print("checkIfAllPlayersVoted [\(category)] - totalVotes: \(totalVotes), totalPlayers: \(totalPlayers)")
+
         if totalVotes >= totalPlayers {
-            endVoting()
-            print("✅ Todos os jogadores votaram! (\(totalVotes)/\(totalPlayers))")
+            print("✅ Todos os jogadores votaram na categoria \(category)")
+
+            guard !round.isFinished else {
+                print("🏁 Rodada finalizada")
+                return
+            }
+
             finalizeVotes()
+            endVoting()
         }
     }
 
     func finalizeVotes() {
-        guard let answerList = answers[currentCategory] else { return }
+        let category = round.currentCategory
+        guard let answerList = round.answers[category] else {
+            return
+        }
+
+        var votesForCategory = votesByCategory[category] ?? [:]
+
         for index in 0..<answerList.count {
-            var current = votes[index] ?? []
+            var current = votesForCategory[index] ?? []
             let missing = totalPlayers - current.count
             if missing > 0 {
                 current.append(contentsOf: Array(repeating: true, count: missing))
             }
-            votes[index] = current
+            votesForCategory[index] = current
         }
 
-        print("🔚 Votos finalizados com preenchimento: \(votes)")
+        votesByCategory[category] = votesForCategory
+
+        for (index, votos) in votesForCategory.sorted(by: { $0.key < $1.key }) {
+            print("📊 [\(category)] Resposta \(index): \(votos)")
+        }
+    }
+
+    func endVoting() {
+        let payload = ChangeStatusPayload(status: .endVote)
+        let action = GameAction(type: .changeStatus, payload: payload)
+        round.connectionManager.send(gameAction: action)
+        round.gameService.status = .endVote
     }
 }
+
