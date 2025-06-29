@@ -189,7 +189,6 @@ class VotingPhoneViewController: UIViewController {
     private func setSendButton(isEnabled: Bool) {
         sendButtonRef.isEnabled = isEnabled
         sendButtonRef.backgroundColor = isEnabled ? .systemGreen : .darkGray
-        
     }
 
 }
@@ -203,5 +202,5 @@ extension VotingPhoneViewController: UITextFieldDelegate {
 
 
 #Preview {
-    RoundPhoneViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "raissa"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""))
+    RoundPhoneViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "raissa"), gameService: GameService(), matchManager: MatchManager()), coordinator: AppCoordinator(window: .init(), username: ""))
 }

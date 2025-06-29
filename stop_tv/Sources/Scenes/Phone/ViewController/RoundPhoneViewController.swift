@@ -126,5 +126,5 @@ extension RoundPhoneViewController: UITextFieldDelegate {
 
 
 #Preview {
-    RoundPhoneViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "raissa"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""))
+    RoundPhoneViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "raissa"), gameService: GameService(), matchManager: MatchManager()), coordinator: AppCoordinator(window: .init(), username: ""))
 }

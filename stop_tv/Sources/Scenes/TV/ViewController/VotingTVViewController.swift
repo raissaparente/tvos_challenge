@@ -128,5 +128,5 @@ class VotingTVViewController: UIViewController {
 
 
 #Preview {
-    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""), votingVM: VotingViewModel(connectionManager: ConnectionManager(username: "julia"), gameService: GameService()))
+    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService(), matchManager: MatchManager()), coordinator: AppCoordinator(window: .init(), username: ""), votingVM: VotingViewModel(connectionManager: ConnectionManager(username: "julia"), gameService: GameService(), matchManager: MatchManager()))
 }
