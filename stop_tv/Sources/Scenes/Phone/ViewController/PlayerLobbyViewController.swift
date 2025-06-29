@@ -14,8 +14,20 @@ class PlayerLobbyViewController: UIViewController {
     private let viewModel: PlayerLobbyViewModel
     private let coordinator: AppCoordinator
     
+    let postitView = PostitAlertView()
+
     
-    private let statusLabel = UILabel()
+    private let descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Procurando a partida...\nFique por perto, já vai começar"
+        label.font = UIFont(name: "Clash Display", size: 20)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
 
     init(viewModel: PlayerLobbyViewModel, coordinator: AppCoordinator) {
         self.viewModel = viewModel
@@ -37,21 +49,20 @@ class PlayerLobbyViewController: UIViewController {
     
     
     func setupUI() {
-        view.backgroundColor = .white
-        statusLabel.text = "Conectando à TV..."
-        statusLabel.textAlignment = .center
-        view.addSubview(statusLabel)
-        statusLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addBackgroundView(StarsBackgroundView())
+
+        view.addSubview(descriptionLabel)
+
         NSLayoutConstraint.activate([
-            statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            statusLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            descriptionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            descriptionLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
     private func observeViewModel() {
             viewModel.$shouldShowInvite
                 .filter { $0 }
-                .sink { [weak self] _ in self?.showInviteAlert() }
+                .sink { [weak self] _ in self?.showPostit() }
                 .store(in: &cancellables)
 
             viewModel.$shouldNavigateToGame
@@ -79,4 +90,26 @@ class PlayerLobbyViewController: UIViewController {
             })
             present(alert, animated: true)
    }
+    
+    @objc func acceptInvite() {
+        viewModel.acceptInvite()
+    }
+    
+    @objc func rejectInvite() {
+        viewModel.declineInvite()
+    }
+    
+    func showPostit() {
+        view.addSubview(postitView)
+        
+        NSLayoutConstraint.activate([
+            postitView.topAnchor.constraint(equalTo: view.topAnchor),
+            postitView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            postitView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            postitView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+        
+        postitView.acceptButton.addTarget(self, action: #selector(acceptInvite), for: .primaryActionTriggered)
+        postitView.refuseButton.addTarget(self, action: #selector(rejectInvite), for: .primaryActionTriggered)
+    }
 }
