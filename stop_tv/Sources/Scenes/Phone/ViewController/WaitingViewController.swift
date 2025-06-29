@@ -15,7 +15,24 @@ class WaitingViewController: UIViewController {
     private let viewModel: WaitingViewModel
     private let coordinator: AppCoordinator
     
-    private let statusLabel = UILabel()
+    private let image: UIImageView = {
+        let image = UIImageView(image: UIImage(systemName: "sparkles.tv"))
+        image.tintColor = .systemYellow
+        image.contentMode = .scaleAspectFit
+        image.translatesAutoresizingMaskIntoConstraints = false
+        return image
+    }()
+    
+    private let statusLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Atenção na tela grande!"
+        label.font = UIFont(name: "ClashDisplay-Regular", size: 24)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
     init(viewModel: WaitingViewModel, coordinator: AppCoordinator) {
         self.viewModel = viewModel
@@ -35,14 +52,31 @@ class WaitingViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .white
-        statusLabel.text = viewModel.waitingText
-        statusLabel.textAlignment = .center
+        view.backgroundColor = .black
+
+        view.addSubview(image)
         view.addSubview(statusLabel)
-        statusLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
+            image.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            image.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            image.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.7),
+            
             statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            statusLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            statusLabel.topAnchor.constraint(equalTo: image.topAnchor)
+        ])
+        
+        
+        //bg
+        let bg = UIImageView(image: UIImage(named: "paperTexture"))
+        bg.contentMode = .scaleAspectFill
+        bg.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(bg, at: 0)
+        NSLayoutConstraint.activate([
+            bg.topAnchor.constraint(equalTo: view.topAnchor),
+            bg.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bg.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bg.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
     
