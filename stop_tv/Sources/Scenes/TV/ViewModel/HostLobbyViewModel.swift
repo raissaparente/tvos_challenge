@@ -14,18 +14,21 @@ class HostLobbyViewModel: ObservableObject {
     @Published var shouldStartGame: Bool = false
     
     private var cancellables = Set<AnyCancellable>()
-    private let connectionManager: ConnectionManager
-    private let gameService: GameService
-    private let roundViewModel: RoundViewModel
+    
+    let connectionManager: ConnectionManager
+    let gameService: GameService
+    let roundViewModel: RoundViewModel
+    let matchManager: MatchManager
+    let votingViewModel: VotingViewModel
 
-
-
-    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel) {
+    
+    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel, matchManager: MatchManager, votingViewModel: VotingViewModel) {
         self.connectionManager = connectionManager
         self.gameService = gameService
         self.roundViewModel = roundViewModel
+        self.matchManager = matchManager
+        self.votingViewModel = votingViewModel
     }
-
     
     func observeConnection() {
         //observa peers disponíveis
@@ -40,8 +43,17 @@ class HostLobbyViewModel: ObservableObject {
                 guard let self = self else { return }
                 guard !selectedPeers.isEmpty else { return }
                 if Set(connected) == Set(self.selectedPeers) {
-                    let action = GameAction(action: .changeStatus, status: .startGame)
+                    // payload com o novo status
+                    let payload = ChangeStatusPayload(status: .startGame)
+
+                    let action = GameAction(type: .changeStatus, payload: payload)
+                    
+                    // envia para os peers
                     self.connectionManager.send(gameAction: action)
+                    
+                    //guarda os jogadores
+                    let players = gameService.makePlayers(from: selectedPeers)
+                    matchManager.players = players                    
                     self.gameService.status = .startGame
                 }
             }
@@ -61,7 +73,7 @@ class HostLobbyViewModel: ObservableObject {
     }
     
     func browseForPeers() {
-        connectionManager.setup(game: gameService, round: roundViewModel)
+        connectionManager.setup(game: gameService, round: roundViewModel, votingVM: votingViewModel)
         connectionManager.startBrowsing()
     }
     
@@ -69,8 +81,10 @@ class HostLobbyViewModel: ObservableObject {
         connectionManager.stopBrowsing()
     }
     
-    func inviteSelectedPeers() {
-        for peer in selectedPeers {
+    func inviteAvailablePeers() {
+        selectedPeers = availablePeers
+        
+        for peer in availablePeers {
             connectionManager.invite(peer: peer)
         }
     }

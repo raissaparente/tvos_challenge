@@ -9,22 +9,25 @@ import UIKit
 import Combine
 
 class VotingPhoneViewController: UIViewController {
-    var viewModel: RoundViewModel
+    var roundVM: RoundViewModel
     var coordinator: AppCoordinator
+    var votingVM: VotingViewModel
+
+    private var cancellables = Set<AnyCancellable>()
+
+    private let categoryIndicator = UILabel()
+    private let answersGridView = UIView()
+    private var selectedAnswerIndexes: Set<Int> = []
+    private var answerButtons: [UIButton] = []
+    private let sendButtonRef = UIButton()
 
 
-    private let containerView = UIView()
-    private let textField = UITextField()
-    private let categoryLabel = UILabel()
-    private let submitButton = UIButton(type: .custom)
-    private let finishButton = UIButton(type: .custom)
-
-    init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
-        self.viewModel = viewModel
+    init(viewModel: RoundViewModel, coordinator: AppCoordinator, votingVM: VotingViewModel) {
+        self.roundVM = viewModel
         self.coordinator = coordinator
+        self.votingVM = votingVM
         super.init(nibName: nil, bundle: nil)
-        textField.delegate = self
-
+        observeViewModel()
     }
 
     required init?(coder: NSCoder) {
@@ -33,97 +36,158 @@ class VotingPhoneViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // tava view.backgroundColor = .systemBackground e deu que nao funciona na tv ent eu mudei para .purple
-        view.backgroundColor = .purple
-                setupLayout()
-                updateCategory()
+        // mock
+        let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
+        updateAnswersGridView(with: count)
+        view.backgroundColor = .black
+        setupLayout()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
+        votingVM.selectedAnswerIndexes.removeAll()
+
+    }
+
+    private func observeViewModel() {
+        roundVM.gameService.$status
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                guard let self else { return }
+                guard status == .endVote else { return }
+                self.coordinator.showAnswer_phone(from: self)
+            }
+            .store(in: &cancellables)
+
+        roundVM.$answers
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                let count = self.roundVM.answers[self.roundVM.currentCategory]?.count ?? 0
+                self.updateAnswersGridView(with: count)
+            }
+            .store(in: &cancellables)
     }
 
     private func setupLayout() {
-        // Container setup
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = .lightGray
-        containerView.layer.cornerRadius = 12
-        view.addSubview(containerView)
+        let sendButton = sendButton()
 
-        // TextField
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.borderStyle = .roundedRect
-        containerView.addSubview(textField)
+        // Send button
+        view.addSubview(sendButton)
+        view.addSubview(answersGridView)
+        answersGridView.translatesAutoresizingMaskIntoConstraints = false
+        sendButton.translatesAutoresizingMaskIntoConstraints = false
 
-        // Submit button
-        submitButton.setTitle("Votar", for: .normal)
-        submitButton.setTitleColor(.white, for: .normal)
-        submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        submitButton.backgroundColor = .darkGray
-        submitButton.layer.cornerRadius = 8
-        submitButton.clipsToBounds = true
-        submitButton.translatesAutoresizingMaskIntoConstraints = false
-        submitButton.addTarget(self, action: #selector(handleSubmitButtonTapped), for: .touchUpInside)
-        view.addSubview(submitButton)
-
-        // Finish button (oculto inicialmente)
-        finishButton.setTitle("Finalizar", for: .normal)
-        finishButton.setTitleColor(.white, for: .normal)
-        finishButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        finishButton.backgroundColor = .systemBlue
-        finishButton.layer.cornerRadius = 8
-        finishButton.clipsToBounds = true
-        finishButton.translatesAutoresizingMaskIntoConstraints = false
-        finishButton.addTarget(self, action: #selector(handleFinishButtonTapped), for: .touchUpInside)
-        finishButton.isHidden = true
-        view.addSubview(finishButton)
 
         NSLayoutConstraint.activate([
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
-            containerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/3),
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            //            answersGridView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            //            answersGridView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            answersGridView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            answersGridView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
 
-            textField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            textField.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            answersGridView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 2/3),
+            answersGridView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 2/3),
 
-            submitButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
-            submitButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            submitButton.widthAnchor.constraint(equalToConstant: 100),
 
-            finishButton.topAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 20),
-            finishButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            finishButton.widthAnchor.constraint(equalToConstant: 140),
+            sendButton.topAnchor.constraint(equalTo: answersGridView.bottomAnchor, constant: 24),
+            sendButton.centerXAnchor.constraint(equalTo: answersGridView.centerXAnchor),
+            sendButton.widthAnchor.constraint(equalToConstant: 100),
+
+        ])
+
+        answersGridView.layer.borderColor = UIColor.cyan.cgColor
+    }
+
+    private func updateAnswersGridView(with count: Int) {
+        answersGridView.subviews.forEach { $0.removeFromSuperview() }
+        answerButtons = []
+        selectedAnswerIndexes = []
+
+        let grid = UIStackView()
+        grid.axis = .vertical
+        grid.spacing = 8
+        grid.distribution = .fillEqually
+        grid.translatesAutoresizingMaskIntoConstraints = false
+
+        let columns = 2
+        let rows = Int(ceil(Double(count) / Double(columns)))
+        var number = 1
+
+        for _ in 0..<rows {
+            let rowStack = UIStackView()
+            rowStack.axis = .horizontal
+            rowStack.spacing = 8
+            rowStack.distribution = .fillEqually
+
+            for _ in 0..<columns {
+                if number > count { break }
+
+                let button = UIButton(type: .system)
+                button.setTitle("\(number)", for: .normal)
+                button.setTitleColor(.white, for: .normal)
+                button.backgroundColor = .systemBlue
+                button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
+                button.layer.cornerRadius = 8
+                button.tag = number - 1 // 0-based index
+                button.addTarget(self, action: #selector(handleGridTapped(_:)), for: .touchUpInside)
+                button.clipsToBounds = true
+
+                rowStack.addArrangedSubview(button)
+                answerButtons.append(button)
+
+                number += 1
+            }
+
+            grid.addArrangedSubview(rowStack)
+        }
+
+        answersGridView.addSubview(grid)
+
+        NSLayoutConstraint.activate([
+            grid.topAnchor.constraint(equalTo: answersGridView.topAnchor),
+            grid.bottomAnchor.constraint(equalTo: answersGridView.bottomAnchor),
+            grid.leadingAnchor.constraint(equalTo: answersGridView.leadingAnchor),
+            grid.trailingAnchor.constraint(equalTo: answersGridView.trailingAnchor),
         ])
     }
-    
 
-    private func updateCategory() {
-        if viewModel.isFinished {
-            textField.isHidden = true
-            submitButton.isHidden = true
-            finishButton.isHidden = false
-            categoryLabel.text = "Mostrar repostas!"
+    private func sendButton() -> UIButton {
+        sendButtonRef.setTitle("Enviar", for: .normal)
+        sendButtonRef.setTitleColor(.white, for: .normal)
+        sendButtonRef.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
+        sendButtonRef.backgroundColor = .green
+        sendButtonRef.layer.cornerRadius = 8
+        sendButtonRef.clipsToBounds = true
+        sendButtonRef.addTarget(self, action: #selector(handleSendButtonTapped), for: .touchUpInside)
+        return sendButtonRef
+    }
+
+    @objc private func handleSendButtonTapped(_ sender: UIButton) {
+        let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
+        let selected = selectedAnswerIndexes
+
+        votingVM.selectedAnswerIndexes = selected
+        votingVM.sendVote()
+
+        updateAnswersGridView(with: count)
+    }
+
+
+    @objc private func handleGridTapped(_ sender: UIButton) {
+
+        let index = sender.tag
+
+        if selectedAnswerIndexes.contains(index) {
+            selectedAnswerIndexes.remove(index)
+            sender.backgroundColor = .systemBlue
         } else {
-            categoryLabel.text = viewModel.currentCategory
-            print("🖥️ Mostrando nova categoria na TV: \(viewModel.currentCategory)")
-            textField.text = ""
-        }
-    }
-
-    @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
-        viewModel.saveAnswer(textField.text ?? "")
-        viewModel.sendAnswer(textField.text ?? "")
-        updateCategory()
-    }
-
-    @objc private func handleFinishButtonTapped(_ sender: UIButton) {
-        print("Respostas do usuário:")
-        for (categoria, resposta) in viewModel.answers {
-            print("\(categoria): \(resposta)")
+            selectedAnswerIndexes.insert(index)
+            sender.backgroundColor = .systemGreen
         }
 
-        let alert = UIAlertController(title: "Concluído", message: "Respostas:\n\(viewModel.answers.map { "\($0): \($1)" }.joined(separator: "\n"))", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Fechar", style: .default))
-        present(alert, animated: true)
     }
+
 }
 
 extension VotingPhoneViewController: UITextFieldDelegate {

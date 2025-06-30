@@ -7,6 +7,14 @@
 		<string>_stoptv._tcp</string>
 		<string>_stoptv._ufp</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Chalkduster.ttf</string>
+		<string>ClashDisplay-Regular.otf</string>
+		<string>ClashDisplay-Semibold.otf</string>
+		<string>GeneralSans-Italic.otf</string>
+		<string>GeneralSans-Regular.otf</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -9,7 +9,7 @@ import UIKit
 import Combine
 
 class RoundPhoneViewController: UIViewController {
-    var viewModel: RoundViewModel
+    var roundVM: RoundViewModel
     var coordinator: AppCoordinator
     private var cancellables = Set<AnyCancellable>()
 
@@ -18,14 +18,19 @@ class RoundPhoneViewController: UIViewController {
     private let textField = UITextField()
     private let categoryLabel = UILabel()
     private let submitButton = UIButton(type: .custom)
-    private let finishButton = UIButton(type: .custom)
 
     init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
-        self.viewModel = viewModel
+        self.roundVM = viewModel
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
         textField.delegate = self
+        print(self, #function)
 
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
     }
 
     required init?(coder: NSCoder) {
@@ -38,6 +43,7 @@ class RoundPhoneViewController: UIViewController {
         view.backgroundColor = .purple
                 setupLayout()
         observeViewModel()
+
     }
 
     private func setupLayout() {
@@ -63,17 +69,6 @@ class RoundPhoneViewController: UIViewController {
         submitButton.addTarget(self, action: #selector(handleSubmitButtonTapped), for: .touchUpInside)
         view.addSubview(submitButton)
 
-        // Finish button (oculto inicialmente)
-        finishButton.setTitle("Finalizar", for: .normal)
-        finishButton.setTitleColor(.white, for: .normal)
-        finishButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        finishButton.backgroundColor = .systemBlue
-        finishButton.layer.cornerRadius = 8
-        finishButton.clipsToBounds = true
-        finishButton.translatesAutoresizingMaskIntoConstraints = false
-        finishButton.addTarget(self, action: #selector(handleFinishButtonTapped), for: .touchUpInside)
-        finishButton.isHidden = true
-        view.addSubview(finishButton)
 
         NSLayoutConstraint.activate([
             containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
@@ -88,21 +83,16 @@ class RoundPhoneViewController: UIViewController {
             submitButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
             submitButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             submitButton.widthAnchor.constraint(equalToConstant: 100),
-
-            finishButton.topAnchor.constraint(equalTo: containerView.bottomAnchor, constant: 20),
-            finishButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            finishButton.widthAnchor.constraint(equalToConstant: 140),
         ])
     }
     
     func observeViewModel() {
-        viewModel.gameService.$status
+        roundVM.gameService.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self = self else { return }
             
-                print("📱 Mudou o status do jogo no celular: \(status)")
-                guard status == .voting else { return }
+                guard status == .startVote else { return }
                 coordinator.showVoting_phone(from: self)
                 
             }
@@ -110,33 +100,21 @@ class RoundPhoneViewController: UIViewController {
     }
 
     private func updateCategory() {
-        if viewModel.isFinished {
+        if roundVM.isFinished {
             textField.isHidden = true
             submitButton.isHidden = true
-            finishButton.isHidden = false
             categoryLabel.text = "Mostrar repostas!"
         } else {
-            categoryLabel.text = viewModel.currentCategory
-            print("🖥️ Mostrando nova categoria na TV: \(viewModel.currentCategory)")
+            categoryLabel.text = roundVM.currentCategory
+            print("🖥️ Mostrando nova categoria na TV: \(roundVM.currentCategory)")
             textField.text = ""
         }
     }
 
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
-        viewModel.saveAnswer(textField.text ?? "")
-        viewModel.sendAnswer(textField.text ?? "")
-        updateCategory()
-    }
-
-    @objc private func handleFinishButtonTapped(_ sender: UIButton) {
-        print("Respostas do usuário:")
-        for (categoria, resposta) in viewModel.answers {
-            print("\(categoria): \(resposta)")
-        }
-
-        let alert = UIAlertController(title: "Concluído", message: "Respostas:\n\(viewModel.answers.map { "\($0): \($1)" }.joined(separator: "\n"))", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Fechar", style: .default))
-        present(alert, animated: true)
+        let answer = roundVM.createAnswer(text: textField.text ?? "")
+        roundVM.saveAnswer(answer)
+        roundVM.sendAnswer(answer)
     }
 }
 

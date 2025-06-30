@@ -6,29 +6,54 @@
 //
 
 import Foundation
+import StopPlay
 
-struct GameAction: Codable {
-    enum Action: Int, Codable {
-        case sendAnswer
-        case voteAnswer
-        case changeStatus
-        case setCategories
-        case changeCategory
-        case startVote
-    }
-    
-    let action: Action
-    var playerName: String? = nil
-    
-    var status: ConnectionStatus? = nil
-    var category: String? = nil
-    var answer: String? = nil
-    var isAnswerValid: Bool? = nil
-    var currentIndex: Int?
-    var nextIndex: Int?
-    var categories: [String]? = nil
+enum GameActionType: String, Codable {
+    case sendAnswer
+    case voteAnswer
+    case changeStatus
+    case changeCategory
+    case setCategories
+    case setAnswers
+}
+
+struct GameAction<Payload: Codable>: Codable {
+    let type: GameActionType
+    let payload: Payload
 
     func data() -> Data? {
         try? JSONEncoder().encode(self)
     }
+}
+
+//payloads
+struct EmptyPayload: Codable {}
+
+struct SendAnswerPayload: Codable {
+    let playerName: Player
+    let answer: Response
+}
+
+
+struct ChangeStatusPayload: Codable {
+    let status: ConnectionStatus
+}
+
+struct SetCategoriesPayload: Codable {
+    let categories: [String]
+}
+
+struct VotePayload: Codable {
+    let category: String
+    let voterName: String
+    let selectedIndexes: Set<Int>
+}
+
+struct SetAnswersPayload: Codable {
+    let answers: [String: [Response]]
+}
+
+//struct pra desembrulhar e saber o tipo de payload
+struct GameActionTypeWrapper: Codable {
+    let type: GameActionType
 }

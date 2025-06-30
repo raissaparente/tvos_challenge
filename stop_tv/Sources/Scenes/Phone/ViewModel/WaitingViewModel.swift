@@ -45,13 +45,13 @@ class WaitingViewModel: ObservableObject {
             .sink { [weak self] status in
                 guard let self = self else { return }
                 
-                switch self.waitingType {
-                case .explaining:
+//                switch self.waitingType {
+//                case .explaining:
                     if status == .category {
                         self.didFinishWaiting = true
                     }
                     // outros tipos, se existirem
-                }
+//                }
             }
             .store(in: &cancellables)
     }

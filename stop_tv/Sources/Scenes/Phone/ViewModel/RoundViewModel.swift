@@ -6,96 +6,125 @@
 //
 import Foundation
 import Combine
+import StopPlay
 
 class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
-    @Published private(set) var currentIndex = 0
-    @Published private(set) var answers: [String: [String]] = [:]
-    
+    @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
+    @Published var answers: [String: [Response]] = [:]
+    @Published var answerIndex: Int?
+
     var connectionManager: ConnectionManager
     var gameService: GameService
     var categories: [String] = []
     var currentCategory: String {
-        guard currentIndex < categories.count else { return "raissa" }
+        guard currentIndex < categories.count else { return "Categoria indefinida" }
         return categories[currentIndex]
     }
 
-     var isFinished: Bool {
+    var isFinished: Bool {
         currentIndex >= categories.count
     }
-    
+
     @Published var didAllPlayersAnswer: Bool = false
     @Published var didAllPlayersVote: Bool = false
-        
+
 
     init(connectionManager: ConnectionManager, gameService: GameService) {
         self.connectionManager = connectionManager
         self.gameService = gameService
-        
-//        self.didAllPlayersAnswer = false
-    }
-    
-    func setCurrentIndex(_ index: Int) {
-        print("🔧 setCurrentIndex chamado com valor: \(index)")
-        currentIndex = index
     }
 
+    func setCategories() {
+            let newCategories = gameService.draw5Categories()
+            print("🟢 categorias sorteadas: \(newCategories)")
+            self.categories = newCategories
 
-    func saveAnswer(_ answer: String) {
+        let payload = SetCategoriesPayload(categories: newCategories)
+        let action = GameAction(type: .setCategories, payload: payload)
+        connectionManager.send(gameAction: action)
+    }
+
+    func advanceCategory() {
+        currentIndex += 1
+    }
+
+    func saveAnswer(_ answer: Response) {
         guard !isFinished else { return }
         let category = currentCategory
-        
+
         var currentAnswers = answers[category] ?? []
         currentAnswers.append(answer)
         answers[category] = currentAnswers
     }
 
-    func sendAnswer(_ answer: String) {
-        let gameAction = GameAction(
-            action: .sendAnswer,
-            playerName: connectionManager.myPeerId.displayName,
-            category: currentCategory,
-            answer: answer,
-            isAnswerValid: nil,
-            currentIndex: currentIndex,
-            nextIndex:  currentIndex + 1
+    func setAnsers() {
+        let payload = SetAnswersPayload(answers: self.answers)
+        let action = GameAction(type: .setAnswers, payload: payload)
+        connectionManager.send(gameAction: action)
+    }
+
+    func sendAnswer(_ answer: Response) {
+        //FIXME: PLACEHOLDER DE PLAYER
+        let player = Player(name: "Player 1")
+
+
+        let payload = SendAnswerPayload(
+            playerName: player,
+            answer: answer
         )
 
-        connectionManager.send(gameAction: gameAction)
-//        currentIndex += 1
-
+        let action = GameAction(type: .sendAnswer, payload: payload)
+        connectionManager.send(gameAction: action)
     }
-    
+
     func changeCategory() {
-        let gameAction = GameAction(action: .changeCategory, nextIndex: currentIndex + 1)
-        
-        connectionManager.send(gameAction: gameAction)
-        
-        currentIndex += 1
-        
-        print("mandou msg de mudar categoria")
+        let nextIndex = currentIndex + 1
+        let action = GameAction(type: .changeCategory, payload: EmptyPayload())
+        connectionManager.send(gameAction: action)
+
+        // local
+        currentIndex = nextIndex
+        self.gameService.status = .category
     }
     
     func startVoting() {
-        let gameAction = GameAction(action: .startVote)
-        
-        connectionManager.send(gameAction: gameAction)
+        didAllPlayersAnswer = false
+        let payload = ChangeStatusPayload(status: .startVote)
+        let action = GameAction(type: .changeStatus, payload: payload)
+        connectionManager.send(gameAction: action)
     }
 
-    func setCategories() {
-        let categories = gameService.draw5Categories()
 
-        self.categories = categories
+    func changeStatus(to newStatus: ConnectionStatus) {
+        // Atualiza status local
+        gameService.status = newStatus
 
+        // Cria e envia a ação
+        let payload = ChangeStatusPayload(status: newStatus)
+        let action = GameAction(type: .changeStatus, payload: payload)
+        connectionManager.send(gameAction: action)
 
-        let gameAction = GameAction(
-            action: .setCategories,
-            categories: categories
-        )
-
-        connectionManager.send(gameAction: gameAction)
-
+        print("🔁 Status alterado e enviado: \(newStatus)")
     }
 
+    func createAnswer(text: String) -> Response {
+        let answer = Response(text: text)
+        return answer
+    }
+
+      var isLastCategory: Bool {
+        return currentIndex + 1 >= categories.count
+    }
+    
+    func reset() {
+        currentIndex = 0
+        answers = [:]
+        categories = []
+        didAllPlayersAnswer = false
+        didAllPlayersVote = false
+    }
 
 }
+
+

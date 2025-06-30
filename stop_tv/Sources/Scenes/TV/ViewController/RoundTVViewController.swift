@@ -9,6 +9,7 @@
 import UIKit
 import Combine
 import SwiftUICore
+import StopPlay
 
 class RoundTVViewController: UIViewController {
     var viewModel: RoundViewModel
@@ -68,6 +69,12 @@ class RoundTVViewController: UIViewController {
             imageViewCard.widthAnchor.constraint(equalTo: view.widthAnchor),
             imageViewCard.heightAnchor.constraint(equalTo: view.heightAnchor)
         ])
+        view.backgroundColor = .black
+
+        print("A ROUNDTV CARREGOU")
+        print("STATUS: \(viewModel.gameService.status)")
+        print("DIDALLANSWER: \(viewModel.didAllPlayersAnswer)")
+        
         setupLayout()
         // tava view.backgroundColor = .systemBackground e deu que nao funciona na tv ent eu mudei para .purple
         view.backgroundColor =  UIColor(Color("backgroundColor", bundle: .main))
@@ -77,16 +84,19 @@ class RoundTVViewController: UIViewController {
             self.categoryLabel.isHidden = false
         }
         
+        observeViewModel()        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
     }
 
     private func observeViewModel() {
         viewModel.$currentIndex
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                print("esse observe da tv funciona?")
                 self?.updateCategory()
-                print("ele passa do self opctional")
-
             }
             .store(in: &cancellables)
         
@@ -97,6 +107,8 @@ class RoundTVViewController: UIViewController {
                     guard let self else { return }
                     guard let currentAnswers = allAnswers[viewModel.currentCategory] else { return }
                     
+//                    viewModel.printAnswers()
+
                     reloadWords(currentAnswers)
                     
                     if currentAnswers.count == viewModel.connectionManager.connectedPeers.count {
@@ -113,7 +125,6 @@ class RoundTVViewController: UIViewController {
                     self.viewModel.startVoting()
                     self.coordinator.showVoting_TV(from: self)
                 }
-
             }
             .store(in: &cancellables)
     }
@@ -161,7 +172,6 @@ class RoundTVViewController: UIViewController {
             finishButton.isHidden = false
             categoryLabel.text = "Mostrar repostas!"
         } else {
-            print("deveria mostrar")
             categoryLabel.text = viewModel.currentCategory
             textField.text = ""
             print("mostrou categoria\(viewModel.currentCategory)")
@@ -170,7 +180,7 @@ class RoundTVViewController: UIViewController {
     }
     
     
-    private func reloadWords(_ words: [String]) {
+    private func reloadWords(_ words: [Response]) {
             for view in stackView.arrangedSubviews where view.tag == 100 {
                 stackView.removeArrangedSubview(view)
                 view.removeFromSuperview()
@@ -179,14 +189,13 @@ class RoundTVViewController: UIViewController {
             for word in words {
                 let label = UILabel()
                 label.tag = 100
-                label.text = word
+                label.text = word.text
                 label.textColor = .white
                 stackView.addArrangedSubview(label)
             }
      }
 
     @objc private func handleFinishButtonTapped(_ sender: UIButton) {
-        print("Respostas do usuário:")
         for (categoria, resposta) in viewModel.answers {
             print("\(categoria): \(resposta)")
         }
@@ -195,6 +204,7 @@ class RoundTVViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "Fechar", style: .default))
         present(alert, animated: true)
     }
+
 }
 
 

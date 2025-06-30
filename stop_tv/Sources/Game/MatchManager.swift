@@ -6,8 +6,44 @@
 //
 
 import Foundation
+import MultipeerConnectivity
+import StopPlay
 
 class MatchManager: ObservableObject {
-    @Published var maxRoundsCount: Int = 3
+    @Published var maxRoundsCount: Int = 2
+    @Published var currentRound: Int = 0
+    @Published var isGameFinished: Bool = false
     @Published var isRoundFinished: Bool = false
+    
+    var players: [Player] = []
+    
+    func finishRound() {
+        isRoundFinished = true
+        
+        if isLastRound {
+            finishGame()
+        } else {
+            advanceToNextRound()
+        }
+    }
+    
+    private func advanceToNextRound() {
+        currentRound += 1
+        isRoundFinished = false
+    }
+    
+    private func finishGame() {
+        isGameFinished = true
+    }
+    
+    //só no fim do jogo todo
+    func resetGame() {
+        currentRound = 1
+        isGameFinished = false
+        isRoundFinished = false
+    }
+    
+    var isLastRound: Bool {
+        return currentRound == maxRoundsCount
+    }
 }
