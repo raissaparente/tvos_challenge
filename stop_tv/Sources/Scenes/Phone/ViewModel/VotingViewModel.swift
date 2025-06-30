@@ -5,6 +5,7 @@
 //  Created by Júlia Saboya on 25/06/25.
 //
 import Foundation
+import StopPlay
 
 class VotingViewModel {
     let round: RoundViewModel
@@ -81,6 +82,7 @@ class VotingViewModel {
         checkIfAllPlayersVoted()
     }
 
+
     private func checkIfAllPlayersVoted() {
         let category = round.currentCategory
         let playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
@@ -121,12 +123,23 @@ class VotingViewModel {
     }
 
     func endVoting() {
+        let category = round.currentCategory
+
+        if let respostas = round.answers[category] {
+                print("📊 Calculando pontuação das respostas da categoria '\(category)'...")
+                for resposta in respostas {
+                    let score = round.calculateScore(for: resposta, in: category)
+                    print("✅ '\(resposta.text)': \(score) pontos")
+                }
+            } else {
+                print("⚠️ Nenhuma resposta encontrada para a categoria '\(category)'")
+            }
         let payload = ChangeStatusPayload(status: .endVote)
         let action = GameAction(type: .changeStatus, payload: payload)
         round.connectionManager.send(gameAction: action)
         round.gameService.status = .endVote
-    }
 
+    }
 
 }
 

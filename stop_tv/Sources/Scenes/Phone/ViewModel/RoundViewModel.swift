@@ -12,10 +12,10 @@ class RoundViewModel {
     private var cancellables = Set<AnyCancellable>()
     @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
     @Published var answers: [String: [Response]] = [:]
-    @Published var answerIndex: Int?
 
     var connectionManager: ConnectionManager
     var gameService: GameService
+    weak var votingViewModel: VotingViewModel?
     var categories: [String] = []
     var currentCategory: String {
         guard currentIndex < categories.count else { return "Categoria indefinida" }
@@ -124,7 +124,47 @@ class RoundViewModel {
         didAllPlayersAnswer = false
         didAllPlayersVote = false
     }
+    
 
+}
+
+extension RoundViewModel {
+    
+    func calculateScore(for answer: Response, in category: String) -> Int {
+        guard answer.isAnswerValid(letter: gameService.drawLetter()) else {
+            print("Resposta inválida pela letra.")
+            return 0
+        }
+
+        guard let answerIndex = answers[category]?.firstIndex(where: { $0.text == answer.text }) else {
+            print("Resposta não encontrada.")
+            return 0
+        }
+
+        // ta caindo nesse guard let
+        guard let votes = votingViewModel?.votesByCategory[category]?[answerIndex] else {
+            print("nao obteve votos")
+            return 0
+        }
+
+        let votesAgainst = votes.filter { $0 }.count
+        let votesFor = votes.filter { !$0 }.count
+
+        guard votesFor >= votesAgainst else {
+            print("votos falsos ganharam")
+            return 0
+        }
+
+        // Começa com 100
+        var score = 100
+
+        // Penalidade por repetição
+        if answer.isRepeated {
+            score -= 50
+        }
+
+        return score
+    }
 }
 
 

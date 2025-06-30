@@ -38,9 +38,7 @@ class RoundTVViewController: UIViewController {
         view.backgroundColor = .black
 
         print("A ROUNDTV CARREGOU")
-        print("STATUS: \(viewModel.gameService.status)")
-        print("DIDALLANSWER: \(viewModel.didAllPlayersAnswer)")
-        
+        print("STATUS: \(viewModel.gameService.status)")        
         setupLayout()
         observeViewModel()        
     }
