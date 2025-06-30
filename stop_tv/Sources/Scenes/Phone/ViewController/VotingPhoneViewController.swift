@@ -17,14 +17,13 @@ class VotingPhoneViewController: UIViewController {
 
     private let categoryIndicator = UILabel()
     private let answersGridView = UIView()
-    private var selectedAnswerIndex: Int? = nil
+    private var selectedAnswerIndexes: Set<Int> = []
     private var answerButtons: [UIButton] = []
     private let sendButtonRef = UIButton()
 
 
     init(viewModel: RoundViewModel, coordinator: AppCoordinator, votingVM: VotingViewModel) {
         self.roundVM = viewModel
-        viewModel.mockAnswers()
         self.coordinator = coordinator
         self.votingVM = votingVM
         super.init(nibName: nil, bundle: nil)
@@ -39,14 +38,16 @@ class VotingPhoneViewController: UIViewController {
         super.viewDidLoad()
         // mock
         let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
-            updateAnswersGridView(with: count)
+        updateAnswersGridView(with: count)
         view.backgroundColor = .black
-                setupLayout()
+        setupLayout()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         cancellables.removeAll()
+        votingVM.selectedAnswerIndexes.removeAll()
+
     }
 
     private func observeViewModel() {
@@ -56,6 +57,15 @@ class VotingPhoneViewController: UIViewController {
                 guard let self else { return }
                 guard status == .endVote else { return }
                 self.coordinator.showAnswer_phone(from: self)
+            }
+            .store(in: &cancellables)
+
+        roundVM.$answers
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                let count = self.roundVM.answers[self.roundVM.currentCategory]?.count ?? 0
+                self.updateAnswersGridView(with: count)
             }
             .store(in: &cancellables)
     }
@@ -71,8 +81,8 @@ class VotingPhoneViewController: UIViewController {
 
 
         NSLayoutConstraint.activate([
-//            answersGridView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            answersGridView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            //            answersGridView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            //            answersGridView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             answersGridView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             answersGridView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
 
@@ -92,8 +102,7 @@ class VotingPhoneViewController: UIViewController {
     private func updateAnswersGridView(with count: Int) {
         answersGridView.subviews.forEach { $0.removeFromSuperview() }
         answerButtons = []
-        selectedAnswerIndex = nil
-        setSendButton(isEnabled: false)
+        selectedAnswerIndexes = []
 
         let grid = UIStackView()
         grid.axis = .vertical
@@ -121,7 +130,7 @@ class VotingPhoneViewController: UIViewController {
                 button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
                 button.layer.cornerRadius = 8
                 button.tag = number - 1 // 0-based index
-                button.addTarget(self, action: #selector(handleAnswerTapped(_:)), for: .touchUpInside)
+                button.addTarget(self, action: #selector(handleGridTapped(_:)), for: .touchUpInside)
                 button.clipsToBounds = true
 
                 rowStack.addArrangedSubview(button)
@@ -147,49 +156,36 @@ class VotingPhoneViewController: UIViewController {
         sendButtonRef.setTitle("Enviar", for: .normal)
         sendButtonRef.setTitleColor(.white, for: .normal)
         sendButtonRef.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        sendButtonRef.backgroundColor = .darkGray
+        sendButtonRef.backgroundColor = .green
         sendButtonRef.layer.cornerRadius = 8
         sendButtonRef.clipsToBounds = true
         sendButtonRef.addTarget(self, action: #selector(handleSendButtonTapped), for: .touchUpInside)
-        sendButtonRef.isEnabled = false
         return sendButtonRef
     }
 
     @objc private func handleSendButtonTapped(_ sender: UIButton) {
+        let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
+        let selected = selectedAnswerIndexes
 
-        guard let selectedIndex = selectedAnswerIndex else { return }
+        votingVM.selectedAnswerIndexes = selected
+        votingVM.sendVote()
 
-            roundVM.answerIndex = selectedIndex
-            votingVM.appendPlayerVote(for: selectedIndex)
-
-            // opcional: desabilitar botão após envio
-            setSendButton(isEnabled: false)
-
-            // Atualiza grid com possíveis mudanças visuais (opcional)
-            let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
-            updateAnswersGridView(with: count)
+        updateAnswersGridView(with: count)
     }
 
 
-    @objc private func handleAnswerTapped(_ sender: UIButton) {
-        // Atualiza estado de seleção
-        selectedAnswerIndex = sender.tag
+    @objc private func handleGridTapped(_ sender: UIButton) {
 
-        for button in answerButtons {
-            if button == sender {
-                button.backgroundColor = .systemGreen
-            } else {
-                button.backgroundColor = .systemBlue
-            }
+        let index = sender.tag
+
+        if selectedAnswerIndexes.contains(index) {
+            selectedAnswerIndexes.remove(index)
+            sender.backgroundColor = .systemBlue
+        } else {
+            selectedAnswerIndexes.insert(index)
+            sender.backgroundColor = .systemGreen
         }
 
-        setSendButton(isEnabled: true)
-    }
-
-    private func setSendButton(isEnabled: Bool) {
-        sendButtonRef.isEnabled = isEnabled
-        sendButtonRef.backgroundColor = isEnabled ? .systemGreen : .darkGray
-        
     }
 
 }

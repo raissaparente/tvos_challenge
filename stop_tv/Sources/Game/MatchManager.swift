@@ -10,8 +10,8 @@ import MultipeerConnectivity
 import StopPlay
 
 class MatchManager: ObservableObject {
-    @Published var maxRoundsCount: Int = 3
-    @Published var currentRound: Int = 1
+    @Published var maxRoundsCount: Int = 2
+    @Published var currentRound: Int = 0
     @Published var isGameFinished: Bool = false
     @Published var isRoundFinished: Bool = false
     

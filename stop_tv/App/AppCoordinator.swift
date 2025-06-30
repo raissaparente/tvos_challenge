@@ -19,7 +19,7 @@ class AppCoordinator {
         self.window = window
         self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
-        self.votingVM = VotingViewModel(connectionManager: connectionManager, gameService: gameService)
+        self.votingVM = VotingViewModel(round: roundVM)
     }
     
     func start() {
@@ -31,7 +31,8 @@ class AppCoordinator {
                 connectionManager: connectionManager,
                 gameService: gameService,
                 roundViewModel: roundVM,
-                matchManager: matchManager
+                matchManager: matchManager,
+                votingViewModel: votingVM
             )
             let vc = HostLobbyViewController(viewModel: vm, coordinator: self)
 
@@ -40,7 +41,8 @@ class AppCoordinator {
             let vm = PlayerLobbyViewModel(
                 connectionManager: connectionManager,
                 gameService: gameService,
-                roundViewModel: roundVM
+                roundViewModel: roundVM,
+                votingViewModel: votingVM
             )
             let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
 //            let vc = VotingPhoneViewController(viewModel: roundVM, coordinator: self)
@@ -58,7 +60,8 @@ class AppCoordinator {
             connectionManager: connectionManager,
             gameService: gameService,
             roundViewModel: roundVM,
-            matchManager: matchManager
+            matchManager: matchManager,
+            votingViewModel: votingVM
         )
         let lobbyVC = HostLobbyViewController(viewModel: vm, coordinator: self)
         currentVC.navigationController?.pushViewController(lobbyVC, animated: true)
@@ -69,7 +72,8 @@ class AppCoordinator {
             connectionManager: connectionManager,
             gameService: gameService,
             roundViewModel: roundVM,
-            matchManager: matchManager
+            matchManager: matchManager,
+            votingViewModel: votingVM
         )
         
         let instructionVC = GameInstructionViewController(viewModel: vm, coordinator: self)
