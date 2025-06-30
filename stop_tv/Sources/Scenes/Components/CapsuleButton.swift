@@ -9,9 +9,9 @@ import UIKit
 
 class CapsuleButton: UIButton {
 
-    private let normalColor = UIColor.customYellow
-    private let highlightedColor = UIColor.systemPink
-    private let borderColor = UIColor.black
+    var normalColor = UIColor.customYellow
+    var highlightedColor = UIColor.systemPink
+    var borderColor = UIColor.black
     private let shadowColor = UIColor.black
 
     override init(frame: CGRect) {
@@ -35,7 +35,7 @@ class CapsuleButton: UIButton {
     }
     override func layoutSubviews() {
             super.layoutSubviews()
-            layer.cornerRadius = bounds.height / 2
+            layer.cornerRadius = bounds.height / 8
         }
     
     override var isHighlighted: Bool {
@@ -45,7 +45,7 @@ class CapsuleButton: UIButton {
     }
 
     //função auxiliar para criar o botão com texto
-    static func create(withTitle title: String, target: Any?, action: Selector) -> CapsuleButton {
+    static func createForTV(withTitle title: String, target: Any?, action: Selector) -> CapsuleButton {
             let button = CapsuleButton(type: .system)
             button.setTitle(title, for: .normal)
         button.titleLabel?.font = UIFont(name: "ClashDisplay-Semibold", size: 28)
@@ -53,4 +53,13 @@ class CapsuleButton: UIButton {
         button.addTarget(target, action: action, for: .primaryActionTriggered)
             return button
         }
+    
+    static func createForPhone(withTitle title: String) -> CapsuleButton {
+        let button = CapsuleButton(type: .system)
+        button.setTitle(title, for: .normal)
+        button.titleLabel?.font = UIFont(name: "ClashDisplay-Semibold", size: 20)
+        button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
+        
+        return button
+    }
 }

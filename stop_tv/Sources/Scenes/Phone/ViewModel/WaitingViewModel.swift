@@ -9,13 +9,6 @@ import Combine
 
 enum WaitingType {
     case explaining
-    
-    var text: String {
-        switch self {
-        case .explaining:
-            "Explicando o jogo"
-        }
-    }
 }
 
 class WaitingViewModel: ObservableObject {
@@ -33,9 +26,7 @@ class WaitingViewModel: ObservableObject {
         self.connectionManager = connectionManager
         self.gameService = gameService
         self.waitingType = type
-        
-        waitingText = waitingType.text
-        
+                
         observeGameStatus()
     }
     
