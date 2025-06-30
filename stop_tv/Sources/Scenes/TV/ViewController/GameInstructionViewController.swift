@@ -62,6 +62,6 @@ class GameInstructionViewController: UIViewController {
     }
     
     @objc private func continueTapped() {
-        coordinator.showLetterDraw_TV(from: self)
+        viewModel.startGame()
     }
 }

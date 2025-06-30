@@ -95,7 +95,8 @@ class WaitingViewController: UIViewController {
         case .explaining:
             coordinator.showAnswer_phone(from: self)
             
-            // outros tipos de espera, se forem adicionados no futuro
+        case .waitingForAnswers:
+            coordinator.showVoting_phone(from: self)
         }
     }
 }

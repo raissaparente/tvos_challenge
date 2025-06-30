@@ -43,18 +43,7 @@ class HostLobbyViewModel: ObservableObject {
                 guard let self = self else { return }
                 guard !selectedPeers.isEmpty else { return }
                 if Set(connected) == Set(self.selectedPeers) {
-                    // payload com o novo status
-                    let payload = ChangeStatusPayload(status: .startGame)
-
-                    let action = GameAction(type: .changeStatus, payload: payload)
-                    
-                    // envia para os peers
-                    self.connectionManager.send(gameAction: action)
-                    
-                    //guarda os jogadores
-                    let players = gameService.makePlayers(from: selectedPeers)
-                    matchManager.players = players                    
-                    self.gameService.status = .startGame
+                    startGame()
                 }
             }
             .store(in: &cancellables)
@@ -95,5 +84,20 @@ class HostLobbyViewModel: ObservableObject {
         } else {
             selectedPeers.append(peer)
         }
+    }
+    
+    func startGame() {
+        // payload com o novo status
+        let payload = ChangeStatusPayload(status: .startGame)
+
+        let action = GameAction(type: .changeStatus, payload: payload)
+        
+        // envia para os peers
+        self.connectionManager.send(gameAction: action)
+        
+        //guarda os jogadores
+        let players = gameService.makePlayers(from: selectedPeers)
+        matchManager.players = players
+        self.gameService.status = .startGame
     }
 }

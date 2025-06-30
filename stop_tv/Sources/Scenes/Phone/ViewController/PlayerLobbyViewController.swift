@@ -91,7 +91,6 @@ class PlayerLobbyViewController: UIViewController {
    }
     
     @objc func acceptInvite() {
-        print("func accept")
         viewModel.acceptInvite()
     }
     

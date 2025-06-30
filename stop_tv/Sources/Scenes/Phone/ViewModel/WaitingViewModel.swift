@@ -9,6 +9,7 @@ import Combine
 
 enum WaitingType {
     case explaining
+    case waitingForAnswers
 }
 
 class WaitingViewModel: ObservableObject {
@@ -36,13 +37,16 @@ class WaitingViewModel: ObservableObject {
             .sink { [weak self] status in
                 guard let self = self else { return }
                 
-//                switch self.waitingType {
-//                case .explaining:
+                switch self.waitingType {
+                case .explaining:
                     if status == .category {
                         self.didFinishWaiting = true
                     }
-                    // outros tipos, se existirem
-//                }
+                case .waitingForAnswers:
+                    if status == .startVote {
+                        self.didFinishWaiting = true
+                    }
+                }
             }
             .store(in: &cancellables)
     }
