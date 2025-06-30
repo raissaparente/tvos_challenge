@@ -29,7 +29,7 @@ class LetterDrawViewModel {
             let action = GameAction(action: .changeStatus, playerName: self.connectionManager.myPeerId.displayName, status: .category)
             self.connectionManager.send(gameAction: action)
             
-            self.canGoToCategory = true
+//             self.canGoToCategory = true
         }
     }
 

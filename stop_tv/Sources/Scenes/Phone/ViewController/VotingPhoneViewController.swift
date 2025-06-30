@@ -33,7 +33,8 @@ class VotingPhoneViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-                view.backgroundColor = .systemBackground
+        // tava view.backgroundColor = .systemBackground e deu que nao funciona na tv ent eu mudei para .purple
+        view.backgroundColor = .purple
                 setupLayout()
                 updateCategory()
     }

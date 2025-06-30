@@ -4,15 +4,42 @@
 //
 //  Created by Júlia Saboya on 13/06/25.
 //
+//categorias
 
 import UIKit
 import Combine
+import SwiftUICore
 
 class RoundTVViewController: UIViewController {
     var viewModel: RoundViewModel
     var coordinator: AppCoordinator
+    var animator: AnimationManager!
+    let drawLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
-
+    private let letter: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 100, weight: .black)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    private let imagesCard: [UIImage] = [
+          UIImage(named: "Card1")!,
+          UIImage(named: "Card2")!,
+          UIImage(named: "Card3")!,
+          UIImage(named: "Card4")!
+      ]
+    let imageViewCard: UIImageView = {
+        let iv = UIImageView()
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFit
+        iv.isHidden = true
+        return iv
+    }()
+    var categoriesAnimate: [String] {
+        viewModel.categories
+    }
     // UI...
     private let containerView = UIView()
     private let textField = UITextField()
@@ -34,9 +61,22 @@ class RoundTVViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.addSubview(imageViewCard)
+        NSLayoutConstraint.activate([
+            imageViewCard.topAnchor.constraint(equalTo: view.topAnchor),
+            imageViewCard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageViewCard.widthAnchor.constraint(equalTo: view.widthAnchor),
+            imageViewCard.heightAnchor.constraint(equalTo: view.heightAnchor)
+        ])
         setupLayout()
-        observeViewModel()
+        // tava view.backgroundColor = .systemBackground e deu que nao funciona na tv ent eu mudei para .purple
+        view.backgroundColor =  UIColor(Color("backgroundColor", bundle: .main))
+                observeViewModel()
+        animator = AnimationManager(label: categoryLabel, imageViewPaper: imageViewCard)
+        animator.startPaperAnimation(images: imagesCard) {
+            self.categoryLabel.isHidden = false
+        }
+        
     }
 
     private func observeViewModel() {
@@ -79,37 +119,37 @@ class RoundTVViewController: UIViewController {
     }
 
     private func setupLayout() {
-        
-        // Container setup
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = .lightGray
-        containerView.layer.cornerRadius = 12
-        view.addSubview(containerView)
+        //add letra
+        view.addSubview(letter)
+        //aqui eu coloco a letra que foi sorteada pegando da viewmodel
+//        letter.text = viewModel.matchManager.currentLetter
+        //add palavra rodada
+        drawLabel.text = "Rodada"
+        drawLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(drawLabel)
 
         // Category label
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
         categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
-        containerView.addSubview(categoryLabel)
+        categoryLabel.textColor = .darkGray
+        categoryLabel.layer.zPosition = 3
+        view.addSubview(categoryLabel)
+        categoryLabel.isHidden = true
         
         // Words
         stackView.axis = .vertical
-                stackView.spacing = 12
-                stackView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addSubview(stackView)
+        stackView.spacing = 12
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(stackView)
         
-        
-
         NSLayoutConstraint.activate([
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
-            containerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/3),
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-
-            categoryLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
-            categoryLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            
-            stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 20),
-            stackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            letter.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -16),
+            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+            stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 190),
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            categoryLabel.centerXAnchor.constraint(equalTo: imageViewCard.centerXAnchor),
+            categoryLabel.centerYAnchor.constraint(equalTo: imageViewCard.centerYAnchor, constant: -210)
 
         ])
     }
@@ -125,6 +165,7 @@ class RoundTVViewController: UIViewController {
             categoryLabel.text = viewModel.currentCategory
             textField.text = ""
             print("mostrou categoria\(viewModel.currentCategory)")
+            animator.animate(letter: viewModel.currentCategory)
         }
     }
     

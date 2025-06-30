@@ -22,9 +22,11 @@ class AppCoordinator {
     func start() {
         let nav = UINavigationController()
         let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .pad {
-
-            let vc = ConnectionInstructionViewController(coordinator: self)
+        // so para simular
+        if idiom == .tv {
+            //colocar a view que eu quero aq so para testar
+          //  let vc = ConnectionInstructionViewController(coordinator: self)
+            let vc =  LetterDrawViewController(viewModel: LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService), coordinator: self,roundVM: roundVM)
             nav.viewControllers = [vc]
         } else {
             let vm = PlayerLobbyViewModel(
@@ -59,7 +61,9 @@ class AppCoordinator {
     func showLetterDraw_TV(from currentVC: UIViewController) {
         let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
 
-        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService, roundVM: roundVM)
+//    old:    let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService, roundVM: roundVM)
+        //new:
+        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, roundVM: roundVM)
         currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
     }
 
