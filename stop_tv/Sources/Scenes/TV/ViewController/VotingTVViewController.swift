@@ -136,24 +136,20 @@ class VotingTVViewController: UIViewController {
         view.addSubview(submitButton)
         
         NSLayoutConstraint.activate([
-            // Letras e rodada
             letterLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             letterLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
 
             rodadaLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             rodadaLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
 
-            // Categoria centralizada abaixo
             categoryLabel.topAnchor.constraint(equalTo: letterLabel.bottomAnchor, constant: 24),
             categoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            // hStack com respostas
             hStack.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 32),
             hStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
             hStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
             hStack.bottomAnchor.constraint(equalTo: submitButton.topAnchor, constant: -32),
 
-            // Botão continuar
             submitButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
             submitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             submitButton.heightAnchor.constraint(equalToConstant: 60),
