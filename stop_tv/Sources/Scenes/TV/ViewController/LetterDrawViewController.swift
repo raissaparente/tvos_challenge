@@ -47,7 +47,11 @@ class LetterDrawViewController: UIViewController {
         setupUI()
         observeViewModel()
         roundVM.setCategories()
-
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
     }
     
     func setupUI() {

@@ -45,11 +45,23 @@ class WaitingViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        print("DEINIT: WaitingViewController")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI()
         observeViewModel()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
+        viewModel.cancelObservers()
+        
+        print("viewwilldisappear da waiting")
     }
     
     func setupUI() {
@@ -82,6 +94,20 @@ class WaitingViewController: UIViewController {
     
     //navega
     private func observeViewModel() {
+        viewModel.gameService.$status
+                .removeDuplicates()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] status in
+                    guard let self else { return }
+                    
+                    if status == viewModel.expectedStatus {
+                        print("status chegou no vc: \(status)")
+                        viewModel.didFinishWaiting = true
+                    }
+                }
+                .store(in: &cancellables)
+        
+        
         viewModel.$didFinishWaiting
             .filter { $0 }
             .sink { [weak self] _ in
@@ -91,12 +117,17 @@ class WaitingViewController: UIViewController {
     }
 
     private func handleWaitingCompleted() {
+        print("to na waiting. status: \(viewModel.gameService.status)")
+        
         switch viewModel.waitingType {
         case .explaining:
             coordinator.showAnswer_phone(from: self)
             
         case .waitingForAnswers:
             coordinator.showVoting_phone(from: self)
+            
+        case .waitingForEndVote:
+            coordinator.showAnswer_phone(from: self)
         }
     }
 }

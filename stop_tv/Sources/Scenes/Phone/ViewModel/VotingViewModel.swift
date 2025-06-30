@@ -127,6 +127,5 @@ class VotingViewModel {
         round.gameService.status = .endVote
     }
 
-
 }
 

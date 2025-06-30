@@ -46,6 +46,10 @@ class PlayerLobbyViewController: UIViewController {
         observeViewModel()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
+    }
     
     func setupUI() {
         view.addBackgroundView(StarsBackgroundView())

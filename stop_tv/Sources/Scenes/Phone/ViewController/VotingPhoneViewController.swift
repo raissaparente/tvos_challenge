@@ -48,7 +48,7 @@ class VotingPhoneViewController: UIViewController {
         self.coordinator = coordinator
         self.votingVM = votingVM
         super.init(nibName: nil, bundle: nil)
-//        observeViewModel()
+        observeViewModel()
     }
 
     required init?(coder: NSCoder) {
@@ -58,7 +58,7 @@ class VotingPhoneViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // mock
-        let count = roundVM.answers[roundVM.currentCategory]?.count ?? 7
+        let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
         updateAnswersGridView(with: count)
         view.backgroundColor = .black
         setupLayout()
@@ -68,18 +68,17 @@ class VotingPhoneViewController: UIViewController {
         super.viewWillDisappear(animated)
         cancellables.removeAll()
         votingVM.selectedAnswerIndexes.removeAll()
-
     }
 
     private func observeViewModel() {
-        roundVM.gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self else { return }
-                guard status == .endVote else { return }
-                self.coordinator.showAnswer_phone(from: self)
-            }
-            .store(in: &cancellables)
+//        roundVM.gameService.$status
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] status in
+//                guard let self else { return }
+//                guard status == .endVote else { return }
+//                self.coordinator.showAnswer_phone(from: self)
+//            }
+//            .store(in: &cancellables)
 
         roundVM.$answers
             .receive(on: DispatchQueue.main)
@@ -206,6 +205,8 @@ class VotingPhoneViewController: UIViewController {
         votingVM.sendVote()
 
         updateAnswersGridView(with: count)
+        
+        exitLocalVoting()
     }
 
 
@@ -220,7 +221,10 @@ class VotingPhoneViewController: UIViewController {
             selectedAnswerIndexes.insert(index)
             sender.backgroundColor = .systemGreen
         }
-
+    }
+    
+    private func exitLocalVoting() {
+        coordinator.showWaitingMessage_phone(from: self, type: .waitingForEndVote)
     }
 
 }
