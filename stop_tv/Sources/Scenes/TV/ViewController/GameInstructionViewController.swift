@@ -50,13 +50,18 @@ class GameInstructionViewController: UIViewController {
             }
             .store(in: &cancellables)
         
+
         viewModel.$shouldStartGame
             .receive(on: DispatchQueue.main)
             .sink { [weak self] shouldStart in
+                print("chamou observer vc1")
+
                 guard let self = self else { return }
                 
                 if shouldStart {
-                    coordinator.showLetterDraw_TV(from: self)                }
+                    print("chamou observer vc2")
+                    coordinator.showLetterDraw_TV(from: self)
+                }
             }
             .store(in: &cancellables)
     }

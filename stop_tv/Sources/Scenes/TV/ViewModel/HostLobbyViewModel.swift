@@ -55,6 +55,8 @@ class HostLobbyViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 if status == .startGame {
+                    print("VM \(self) alterando shouldStartGame para true")
+
                     self?.shouldStartGame = true
                 }
             }
@@ -98,6 +100,8 @@ class HostLobbyViewModel: ObservableObject {
         //guarda os jogadores
         let players = gameService.makePlayers(from: selectedPeers)
         matchManager.players = players
+        
+        //troca localmente
         self.gameService.status = .startGame
     }
 }

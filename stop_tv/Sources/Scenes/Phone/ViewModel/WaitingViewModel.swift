@@ -39,7 +39,7 @@ class WaitingViewModel: ObservableObject {
                 
                 switch self.waitingType {
                 case .explaining:
-                    if status == .category {
+                    if status == .startGame {
                         self.didFinishWaiting = true
                     }
                 case .waitingForAnswers:

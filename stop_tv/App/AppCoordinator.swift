@@ -14,12 +14,20 @@ class AppCoordinator {
     let matchManager = MatchManager()
     let roundVM: RoundViewModel!
     let votingVM: VotingViewModel!
+    let hostLobbyVM: HostLobbyViewModel!
 
     init(window: UIWindow, username: String) {
         self.window = window
         self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
         self.votingVM = VotingViewModel(round: roundVM)
+        self.hostLobbyVM = HostLobbyViewModel(
+            connectionManager: connectionManager,
+            gameService: gameService,
+            roundViewModel: roundVM,
+            matchManager: matchManager,
+            votingViewModel: votingVM
+        )
     }
     
     func start() {
@@ -27,14 +35,7 @@ class AppCoordinator {
         let idiom = UIDevice.current.userInterfaceIdiom
         if idiom == .pad {
             
-            let vm = HostLobbyViewModel(
-                connectionManager: connectionManager,
-                gameService: gameService,
-                roundViewModel: roundVM,
-                matchManager: matchManager,
-                votingViewModel: votingVM
-            )
-            let vc = HostLobbyViewController(viewModel: vm, coordinator: self)
+            let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
 
             nav.viewControllers = [vc]
         } else {
@@ -45,7 +46,7 @@ class AppCoordinator {
                 votingViewModel: votingVM
             )
             let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
-//            let vc = VotingPhoneViewController(viewModel: roundVM, coordinator: self)
+//            let vc = VotingPhoneViewController(viewModel: roundVM, coordinator: self, votingVM: votingVM)
 
             nav.viewControllers = [vc]
         }
@@ -56,27 +57,15 @@ class AppCoordinator {
     
     //TV
     func showLobbyScreen_TV(from currentVC: UIViewController) {
-        let vm = HostLobbyViewModel(
-            connectionManager: connectionManager,
-            gameService: gameService,
-            roundViewModel: roundVM,
-            matchManager: matchManager,
-            votingViewModel: votingVM
-        )
-        let lobbyVC = HostLobbyViewController(viewModel: vm, coordinator: self)
+
+        let lobbyVC = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
         currentVC.navigationController?.pushViewController(lobbyVC, animated: true)
     }
     
     func showGameInstruction_TV(from currentVC: UIViewController) {
-        let vm = HostLobbyViewModel(
-            connectionManager: connectionManager,
-            gameService: gameService,
-            roundViewModel: roundVM,
-            matchManager: matchManager,
-            votingViewModel: votingVM
-        )
+
         
-        let instructionVC = GameInstructionViewController(viewModel: vm, coordinator: self)
+        let instructionVC = GameInstructionViewController(viewModel: hostLobbyVM, coordinator: self)
         currentVC.navigationController?.pushViewController(instructionVC, animated: true)
     }
     
