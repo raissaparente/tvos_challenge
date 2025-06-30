@@ -29,7 +29,8 @@ class AppCoordinator {
         if idiom == .tv {
             //colocar a view que eu quero aq so para testar
           //  let vc = ConnectionInstructionViewController(coordinator: self)
-            let vc =  LetterDrawViewController(viewModel: LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService), coordinator: self,roundVM: roundVM)
+            let vc = VotingTVViewController(viewModel: roundVM, coordinator: self, matchManager: matchManager, votingVM: votingVM)
+//            let vc =  LetterDrawViewController(viewModel: LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService), coordinator: self, matchManager: matchManager, gameService: gameService, roundVM: roundVM)
             nav.viewControllers = [vc]
         } else {
             let vm = PlayerLobbyViewModel(
@@ -77,7 +78,7 @@ class AppCoordinator {
     func showLetterDraw_TV(from currentVC: UIViewController) {
         let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
         
-        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService, roundVM: roundVM)
+        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, matchManager: matchManager, gameService: gameService, roundVM: roundVM)
         currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
     }
     
@@ -87,7 +88,7 @@ class AppCoordinator {
     }
     
     func showVoting_TV(from currentVC: UIViewController) {
-        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self, votingVM: votingVM)
+        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self, matchManager: matchManager, votingVM: votingVM)
         currentVC.navigationController?.pushViewController(votingTVVC, animated: true)
     }
     

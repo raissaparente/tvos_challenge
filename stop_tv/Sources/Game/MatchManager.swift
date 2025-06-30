@@ -15,7 +15,16 @@ class MatchManager: ObservableObject {
     @Published var isGameFinished: Bool = false
     @Published var isRoundFinished: Bool = false
     
+    var letters: [String] = []
     var players: [Player] = []
+    
+    var currentLetter: String? {
+        if !letters.isEmpty {
+            return letters[currentRound]
+        } else {
+            return nil
+        }
+    }
     
     func finishRound() {
         isRoundFinished = true

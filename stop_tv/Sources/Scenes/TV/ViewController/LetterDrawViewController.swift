@@ -7,13 +7,11 @@
 import UIKit
 import Combine
 import SwiftUI
-// resolver animação com as imagens das letras
-// rodada tem que sair do canto esquerdo começar no meio e ir pra direita -- ok
-// animação ta bugada
-// ver se ele muda de tela rapido demais
 // letra
 class LetterDrawViewController: UIViewController {
     // melhorar essse nomes
+    
+  
     let textPaperUp = UILabel()
     let textPaperDown = UILabel()
     let imageViewLetter: UIImageView = {
@@ -49,10 +47,11 @@ class LetterDrawViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private let viewModel: LetterDrawViewModel
     private let coordinator: AppCoordinator
-//    var gameService: GameService
+    var matchManager: MatchManager
+    var gameService: GameService
     var roundVM: RoundViewModel
 
-
+ 
     private let letter: UILabel = {
         let label = UILabel()
         label.textColor = .white
@@ -62,11 +61,16 @@ class LetterDrawViewController: UIViewController {
         return label
     }()
     
-    init(viewModel: LetterDrawViewModel, coordinator: AppCoordinator,roundVM: RoundViewModel) {
+    init(viewModel: LetterDrawViewModel, coordinator: AppCoordinator, matchManager: MatchManager, gameService: GameService, roundVM: RoundViewModel) {
         self.viewModel = viewModel
         self.coordinator = coordinator
+        self.matchManager = matchManager
+        self.gameService = gameService
         self.roundVM = roundVM
-        self.letter.text = roundVM.gameService.drawLetter()
+        
+        let letter = roundVM.gameService.drawLetter()
+        self.letter.text = letter
+        self.matchManager.letters.append(letter)
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -78,7 +82,7 @@ class LetterDrawViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        let round: Int = (matchManager.currentRound + 1)
         self.setupUI()
         
         view.addSubview(textPaperUp)
@@ -112,9 +116,8 @@ class LetterDrawViewController: UIViewController {
                textPaperDown.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
         ])
-        
         drawLabel.translatesAutoresizingMaskIntoConstraints = false
-        drawLabel.text = "Rodada"
+        drawLabel.text = "\(round)Rodada"
         view.addSubview(drawLabel)
         
         let startX = drawLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -128,7 +131,7 @@ class LetterDrawViewController: UIViewController {
         animator = AnimationManager(label: letter, imageViewLetter: imageViewLetter, imageViewPaper: imageViewPaper)
         animator.animateRodada(label: drawLabel,
                                in: view,
-                               originalText: "Rodada",
+                               originalText: "\(round) Rodada",
                                startConstraints: (x: startX, y: startY),
                                endConstraints: (x: endX, y: endY)) {
             self.animator.startPaperAnimation(images: self.imagesPaper, interval: 0.5) {
@@ -166,8 +169,6 @@ class LetterDrawViewController: UIViewController {
         textPaperDown.textAlignment = .center
         backgroundImageView.layer.zPosition = 0
         view.backgroundColor =  UIColor(Color("backgroundColor", bundle: .main))
-        drawLabel.text = "Rodada"
-        drawLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(drawLabel)
         letter.layer.zPosition = 3
     }
@@ -187,11 +188,11 @@ class LetterDrawViewController: UIViewController {
     }
 }
 
-#Preview {
-    let connectionManager = ConnectionManager(username: "julia")
-    let gameService = GameService()
-    let roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
-    let cordinator = AppCoordinator(window: UIWindow(), username: "julia")
-    let viewModel = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
-    LetterDrawViewController(viewModel: viewModel,coordinator: cordinator,roundVM: roundVM)
-}
+//#Preview {
+//    let connectionManager = ConnectionManager(username: "julia")
+//    let gameService = GameService()
+//    let roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
+//    let cordinator = AppCoordinator(window: UIWindow(), username: "julia")
+//    let viewModel = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
+//    LetterDrawViewController(viewModel: viewModel,coordinator: cordinator, gameService: Game,roundVM: roundVM)
+//}
