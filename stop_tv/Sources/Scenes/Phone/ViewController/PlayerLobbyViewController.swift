@@ -47,7 +47,6 @@ class PlayerLobbyViewController: UIViewController {
     }
     
     
-    
     func setupUI() {
         view.addBackgroundView(StarsBackgroundView())
 
@@ -92,6 +91,7 @@ class PlayerLobbyViewController: UIViewController {
    }
     
     @objc func acceptInvite() {
+        print("func accept")
         viewModel.acceptInvite()
     }
     
@@ -109,7 +109,7 @@ class PlayerLobbyViewController: UIViewController {
             postitView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
         
-        postitView.acceptButton.addTarget(self, action: #selector(acceptInvite), for: .primaryActionTriggered)
-        postitView.refuseButton.addTarget(self, action: #selector(rejectInvite), for: .primaryActionTriggered)
+        postitView.acceptButton.addTarget(self, action: #selector(acceptInvite), for: .touchUpInside)
+        postitView.refuseButton.addTarget(self, action: #selector(rejectInvite), for: .touchUpInside)
     }
 }

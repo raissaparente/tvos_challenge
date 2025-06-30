@@ -53,9 +53,8 @@ final class PostitAlertView: UIView {
         return stack
     }()
     
-    let acceptButton = CapsuleButton.createForPhone(withTitle: "Aceitar", target: nil, action: #selector(acceptDummy))
-    
-    let refuseButton = CapsuleButton.createForPhone(withTitle: "Recusar", target: nil, action: #selector(refuseDummy))
+    let acceptButton = CapsuleButton.createForPhone(withTitle: "Aceitar")
+    let refuseButton = CapsuleButton.createForPhone(withTitle: "Recusar")
     
     init() {
         super.init(frame: .zero)
@@ -88,15 +87,18 @@ final class PostitAlertView: UIView {
 
             imageView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             imageView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            imageView.widthAnchor.constraint(equalTo: container.widthAnchor),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1.0),
             
-            titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            titleLabel.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             titleLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor, constant: -40),
-            
-            subtitleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+
+            subtitleLabel.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-            
-            buttonStack.centerXAnchor.constraint(equalTo: centerXAnchor),
-            buttonStack.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 20)
+
+            buttonStack.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            buttonStack.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 20),
+            buttonStack.bottomAnchor.constraint(equalTo: container.bottomAnchor)
         ])
         
         let bg = UIImageView(image: UIImage(named: "paperTexture"))
@@ -121,8 +123,8 @@ final class PostitAlertView: UIView {
         buttonStack.addArrangedSubview(acceptButton)
     }
     
-    @objc private func acceptDummy() {}
-    
-    @objc private func refuseDummy() {}
+//    @objc private func acceptDummy() {}
+//    
+//    @objc private func refuseDummy() {}
 
 }

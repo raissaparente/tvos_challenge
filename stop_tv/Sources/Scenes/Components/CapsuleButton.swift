@@ -54,13 +54,12 @@ class CapsuleButton: UIButton {
             return button
         }
     
-    static func createForPhone(withTitle title: String, target: Any?, action: Selector) -> CapsuleButton {
-            let button = CapsuleButton(type: .system)
-            button.setTitle(title, for: .normal)
+    static func createForPhone(withTitle title: String) -> CapsuleButton {
+        let button = CapsuleButton(type: .system)
+        button.setTitle(title, for: .normal)
         button.titleLabel?.font = UIFont(name: "ClashDisplay-Semibold", size: 20)
         button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
-
-        button.addTarget(target, action: action, for: .primaryActionTriggered)
-            return button
-        }
+        
+        return button
+    }
 }

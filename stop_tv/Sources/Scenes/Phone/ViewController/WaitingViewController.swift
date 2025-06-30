@@ -16,7 +16,8 @@ class WaitingViewController: UIViewController {
     private let coordinator: AppCoordinator
     
     private let image: UIImageView = {
-        let image = UIImageView(image: UIImage(systemName: "sparkles.tv"))
+        let configuration = UIImage.SymbolConfiguration(pointSize: 100)
+        let image = UIImageView(image: UIImage(systemName: "sparkles.tv", withConfiguration: configuration))
         image.tintColor = .systemYellow
         image.contentMode = .scaleAspectFit
         image.translatesAutoresizingMaskIntoConstraints = false
@@ -60,10 +61,9 @@ class WaitingViewController: UIViewController {
         NSLayoutConstraint.activate([
             image.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             image.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            image.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.7),
             
             statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            statusLabel.topAnchor.constraint(equalTo: image.topAnchor)
+            statusLabel.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 20)
         ])
         
         
