@@ -19,13 +19,15 @@ class HostLobbyViewModel: ObservableObject {
     let gameService: GameService
     let roundViewModel: RoundViewModel
     let matchManager: MatchManager
+    let votingViewModel: VotingViewModel
+
     
-    
-    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel, matchManager: MatchManager) {
+    init(connectionManager: ConnectionManager, gameService: GameService, roundViewModel: RoundViewModel, matchManager: MatchManager, votingViewModel: VotingViewModel) {
         self.connectionManager = connectionManager
         self.gameService = gameService
         self.roundViewModel = roundViewModel
         self.matchManager = matchManager
+        self.votingViewModel = votingViewModel
     }
     
     func observeConnection() {
@@ -71,7 +73,7 @@ class HostLobbyViewModel: ObservableObject {
     }
     
     func browseForPeers() {
-        connectionManager.setup(game: gameService, round: roundViewModel)
+        connectionManager.setup(game: gameService, round: roundViewModel, votingVM: votingViewModel)
         connectionManager.startBrowsing()
     }
     

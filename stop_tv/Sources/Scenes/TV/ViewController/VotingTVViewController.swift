@@ -126,7 +126,7 @@ class VotingTVViewController: UIViewController {
      }
 }
 
-
-#Preview {
-    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""), votingVM: VotingViewModel(connectionManager: ConnectionManager(username: "julia"), gameService: GameService()))
-}
+//
+//#Preview {
+//    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""), votingVM: VotingViewModel(round: RoundViewModel()))
+//}
