@@ -4,7 +4,10 @@
 //
 //  Created by Raissa Bruna Parente on 12/06/25.
 //
-
+// escrever letra na voting,
+// o componente bar tem que ser sempre do mesmo tamanho, cor amarela em vez de preta
+// fontes
+// nao ta aparecendo a rodada na votting
 import UIKit
 
 class AppCoordinator {

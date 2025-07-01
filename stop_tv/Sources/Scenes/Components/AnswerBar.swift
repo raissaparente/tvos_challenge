@@ -19,7 +19,11 @@ class FatiaView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        NSLayoutConstraint.activate([
+            self.heightAnchor.constraint(equalToConstant: 60)
+        ])
     }
+
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -31,7 +35,6 @@ class FatiaView: UIView {
     }
 
     private func setupUI() {
-        self.backgroundColor = .clear
         self.layer.cornerRadius = 16
         self.layer.masksToBounds = true
         self.backgroundColor = UIColor.customBege
@@ -51,11 +54,12 @@ class FatiaView: UIView {
         addSubview(divisoriaView)
 
         textoView.translatesAutoresizingMaskIntoConstraints = false
-        textoView.backgroundColor = UIColor.black
+        textoView.backgroundColor = UIColor.customBege
         addSubview(textoView)
 
         textoLabel.translatesAutoresizingMaskIntoConstraints = false
         textoLabel.numberOfLines = 0
+        textoLabel.textColor = .black
         textoLabel.font = .systemFont(ofSize: 18, weight: .medium)
         textoView.addSubview(textoLabel)
 

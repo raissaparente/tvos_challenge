@@ -74,13 +74,10 @@ class RoundTVViewController: UIViewController {
         ])
         view.backgroundColor = .black
 
-        print("A ROUNDTV CARREGOU")
-        print("STATUS: \(viewModel.gameService.status)")
-        print("DIDALLANSWER: \(viewModel.didAllPlayersAnswer)")
+
         
         setupLayout()
         view.backgroundColor =  UIColor(Color("backgroundColor", bundle: .main))
-                observeViewModel()
         animator = AnimationManager(label: categoryLabel, imageViewPaper: imageViewCard)
         animator.startPaperAnimation(images: imagesCard) {
             self.categoryLabel.isHidden = false
@@ -135,19 +132,19 @@ class RoundTVViewController: UIViewController {
         //add letra
         view.addSubview(letter)
         //aqui eu coloco a letra que foi sorteada pegando da viewmodel
-        letter.text = matchManager.currentLetter
-        letter.font =  UIFont(name: "ClashDisplay-Regular.otf", size: 28)
+        letter.text = "Letra \(matchManager.currentLetter ?? "")"
+        letter.font =  UIFont(name: "ClashDisplay-Regular", size: 28)
         letter.translatesAutoresizingMaskIntoConstraints = false
         
         //add palavra rodada
         drawLabel.text = "\(matchManager.currentRound + 1)ª Rodada"
-        drawLabel.font =  UIFont(name: "ClashDisplay-Regular.otf", size: 28)
+        drawLabel.font =  UIFont(name: "ClashDisplay-Regular", size: 28)
         drawLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(drawLabel)
 
         // Category label
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        categoryLabel.font =  UIFont(name: "ClashDisplay-Regular.otf", size: 28)
+        categoryLabel.font =  UIFont(name: "AnonymousPro-Bold", size: 38)
         categoryLabel.textColor = .darkGray
         categoryLabel.layer.zPosition = 3
         view.addSubview(categoryLabel)
@@ -160,14 +157,14 @@ class RoundTVViewController: UIViewController {
         view.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            letter.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -28),
-            letter.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
-            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
-            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            letter.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: +40),
+            letter.topAnchor.constraint(equalTo: view.topAnchor, constant: 40),
+            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
+            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 40),
             stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 190),
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             categoryLabel.centerXAnchor.constraint(equalTo: imageViewCard.centerXAnchor),
-            categoryLabel.centerYAnchor.constraint(equalTo: imageViewCard.centerYAnchor, constant: -210)
+            categoryLabel.centerYAnchor.constraint(equalTo: imageViewCard.centerYAnchor, constant: -170)
 
         ])
     }

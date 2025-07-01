@@ -118,8 +118,10 @@ class LetterDrawViewController: UIViewController {
             drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28)
             
         ])
+        
         drawLabel.translatesAutoresizingMaskIntoConstraints = false
         drawLabel.text = "\(round)ª Rodada"
+        drawLabel.font = UIFont(name: "ClashDisplay-Regular", size:32)
         view.addSubview(drawLabel)
         
         let startX = drawLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -158,14 +160,14 @@ class LetterDrawViewController: UIViewController {
     func setupUI() {
         // vou codar aqui a ui
         textPaperUp.text = "Sua criatividade agora\n depende da letra..."
-        textPaperUp.font =  UIFont(name: "Chalkduster.ttf", size:32)
+        textPaperUp.font =  UIFont(name: "Chalkduster", size:32)
         textPaperUp.layer.zPosition = 3
         textPaperUp.textColor = .black
         textPaperUp.numberOfLines = 0
         textPaperUp.textAlignment = .center
         textPaperDown.text = "mas relaxa,qualquer coisa você inventa e\n reza pra ninguem contestar"
         textPaperDown.layer.zPosition = 3
-        textPaperDown.font =  UIFont(name: "ClashDisplay-Regular.otf", size:28)
+        textPaperDown.font =  UIFont(name: "ClashDisplay-Regular", size:24)
         textPaperDown.textColor = .darkGray
         textPaperDown.numberOfLines = 0
         textPaperDown.textAlignment = .center
