@@ -38,6 +38,7 @@ class GameInstructionViewController: UIViewController {
         interfaceView.bottomPanel.inviteButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
         
         observeVM()
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {

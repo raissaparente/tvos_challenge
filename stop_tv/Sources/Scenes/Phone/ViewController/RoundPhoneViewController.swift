@@ -114,6 +114,8 @@ class RoundPhoneViewController: UIViewController {
             skipButton.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor),
         ])
         
+        self.hideBackButtonIfAvailable()
+
     }
     
     
