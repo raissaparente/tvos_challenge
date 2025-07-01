@@ -102,19 +102,21 @@ class VotingTVViewController: UIViewController {
         
         //label letra
         letterLabel.text = matchManager.currentLetter ?? ""
+        letterLabel.font =  UIFont(name: "ClashDisplay-Regular.otf", size: 28)
         letterLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(letterLabel)
         
         
         //label rodada
-        rodadaLabel.text = "\(matchManager.currentRound + 1)Rodada"
+        rodadaLabel.text = "\(matchManager.currentRound + 1)ª Rodada"
+        rodadaLabel.font =  UIFont(name: "ClashDisplay-Regular.otf", size: 28)
         letterLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(rodadaLabel)
         
         
-        
         // Category label
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
+        categoryLabel.font =  UIFont(name: "ClashDisplay-Semibold.otf", size:32)
         categoryLabel.text = roundVM.currentCategory
         categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
         view.addSubview(categoryLabel)
@@ -136,11 +138,11 @@ class VotingTVViewController: UIViewController {
         view.addSubview(submitButton)
         
         NSLayoutConstraint.activate([
-            letterLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            letterLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            letterLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            letterLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
 
-            rodadaLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            rodadaLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            rodadaLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            rodadaLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
 
             categoryLabel.topAnchor.constraint(equalTo: letterLabel.bottomAnchor, constant: 24),
             categoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),

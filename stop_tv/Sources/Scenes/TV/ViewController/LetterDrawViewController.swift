@@ -113,11 +113,13 @@ class LetterDrawViewController: UIViewController {
             textPaperUp.topAnchor.constraint(equalTo: view.topAnchor, constant: 250),
             textPaperDown.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -250),
             textPaperUp.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-               textPaperDown.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            textPaperDown.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28)
             
         ])
         drawLabel.translatesAutoresizingMaskIntoConstraints = false
-        drawLabel.text = "\(round)Rodada"
+        drawLabel.text = "\(round)ª Rodada"
         view.addSubview(drawLabel)
         
         let startX = drawLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -141,7 +143,7 @@ class LetterDrawViewController: UIViewController {
                 self.textPaperUp.isHidden = false
                 self.animator.animate(letter: self.letter.text!) {
                     
-                    Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { timer in
+                    Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { timer in
                         self.viewModel.canGoToCategory = true
                     }
               
@@ -156,14 +158,14 @@ class LetterDrawViewController: UIViewController {
     func setupUI() {
         // vou codar aqui a ui
         textPaperUp.text = "Sua criatividade agora\n depende da letra..."
-        textPaperUp.font = .systemFont(ofSize: 20)
+        textPaperUp.font =  UIFont(name: "Chalkduster.ttf", size:32)
         textPaperUp.layer.zPosition = 3
         textPaperUp.textColor = .black
         textPaperUp.numberOfLines = 0
         textPaperUp.textAlignment = .center
         textPaperDown.text = "mas relaxa,qualquer coisa você inventa e\n reza pra ninguem contestar"
         textPaperDown.layer.zPosition = 3
-        textPaperDown.font = .systemFont(ofSize: 20)
+        textPaperDown.font =  UIFont(name: "ClashDisplay-Regular.otf", size:28)
         textPaperDown.textColor = .darkGray
         textPaperDown.numberOfLines = 0
         textPaperDown.textAlignment = .center

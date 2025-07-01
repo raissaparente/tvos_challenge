@@ -124,7 +124,7 @@ class AnimationManager {
                 }) { _ in
                     self.finishAnimation()
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                         completion?()
                     }
                 }

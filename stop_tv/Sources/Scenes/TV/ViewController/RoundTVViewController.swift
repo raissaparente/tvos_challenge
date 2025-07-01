@@ -13,8 +13,10 @@ import StopPlay
 
 class RoundTVViewController: UIViewController {
     var viewModel: RoundViewModel
+    var matchManager: MatchManager
     var coordinator: AppCoordinator
     var animator: AnimationManager!
+    var letterLabel = UILabel()
     let drawLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
     private let letter: UILabel = {
@@ -50,8 +52,9 @@ class RoundTVViewController: UIViewController {
     private let stackView = UIStackView()
 
 
-    init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
+    init(viewModel: RoundViewModel,matchManager:MatchManager, coordinator: AppCoordinator) {
         self.viewModel = viewModel
+        self.matchManager = matchManager
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
@@ -76,7 +79,6 @@ class RoundTVViewController: UIViewController {
         print("DIDALLANSWER: \(viewModel.didAllPlayersAnswer)")
         
         setupLayout()
-        // tava view.backgroundColor = .systemBackground e deu que nao funciona na tv ent eu mudei para .purple
         view.backgroundColor =  UIColor(Color("backgroundColor", bundle: .main))
                 observeViewModel()
         animator = AnimationManager(label: categoryLabel, imageViewPaper: imageViewCard)
@@ -133,15 +135,19 @@ class RoundTVViewController: UIViewController {
         //add letra
         view.addSubview(letter)
         //aqui eu coloco a letra que foi sorteada pegando da viewmodel
-//        letter.text = viewModel.matchManager.currentLetter
+        letter.text = matchManager.currentLetter
+        letter.font =  UIFont(name: "ClashDisplay-Regular.otf", size: 28)
+        letter.translatesAutoresizingMaskIntoConstraints = false
+        
         //add palavra rodada
-        drawLabel.text = "Rodada"
+        drawLabel.text = "\(matchManager.currentRound + 1)ª Rodada"
+        drawLabel.font =  UIFont(name: "ClashDisplay-Regular.otf", size: 28)
         drawLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(drawLabel)
 
         // Category label
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
+        categoryLabel.font =  UIFont(name: "ClashDisplay-Regular.otf", size: 28)
         categoryLabel.textColor = .darkGray
         categoryLabel.layer.zPosition = 3
         view.addSubview(categoryLabel)
@@ -154,9 +160,10 @@ class RoundTVViewController: UIViewController {
         view.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            letter.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -16),
-            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+            letter.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -28),
+            letter.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
+            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
             stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 190),
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             categoryLabel.centerXAnchor.constraint(equalTo: imageViewCard.centerXAnchor),
@@ -208,6 +215,6 @@ class RoundTVViewController: UIViewController {
 }
 
 
-#Preview {
-    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: "newion"))
-}
+//#Preview {
+//    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: "newion"))
+//}
