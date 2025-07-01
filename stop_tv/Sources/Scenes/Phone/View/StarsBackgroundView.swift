@@ -53,7 +53,6 @@ final class StarsBackgroundView: UIView {
             topStar.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1),
             bottomStar.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1),
 
-            
             topStar.topAnchor.constraint(equalTo: topAnchor, constant: -topStar.frame.height*0.4),
             topStar.trailingAnchor.constraint(equalTo: trailingAnchor, constant: topStar.frame.height*0.5),
             

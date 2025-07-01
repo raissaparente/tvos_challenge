@@ -89,7 +89,7 @@ class HostLobbyViewController: UIViewController {
                 underline.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 2),
                 underline.leadingAnchor.constraint(equalTo: container.leadingAnchor),
                 underline.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-                underline.heightAnchor.constraint(equalToConstant: 5),
+                underline.heightAnchor.constraint(equalToConstant: 2),
                 underline.bottomAnchor.constraint(equalTo: container.bottomAnchor)
             ])
             

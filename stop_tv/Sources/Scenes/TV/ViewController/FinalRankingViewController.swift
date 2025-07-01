@@ -13,8 +13,8 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
     
     let mockplayers = [Player(name: "Raissa", points: 50),
                    Player(name: "Plutarco", points: 100),
-//                   Player(name: "Julia", points: 20),
-//                   Player(name: "Bey", points: 150)
+                   Player(name: "Julia", points: 20),
+                   Player(name: "Bey", points: 150)
     ]
     
     var coordinator: AppCoordinator
@@ -24,7 +24,7 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
     private let titleLabel1: UILabel = {
         let label = UILabel()
         label.text = "Ranking"
-        label.font = UIFont(name: "ClashDisplay-Semibold", size: 50)
+        label.font = UIFont(name: "ClashDisplay-Semibold", size: 70)
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -33,7 +33,7 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
     private let titleLabel2: UILabel = {
         let label = UILabel()
         label.text = "Final"
-        label.font = UIFont(name: "ClashDisplay-Semibold", size: 80)
+        label.font = UIFont(name: "ClashDisplay-Semibold", size: 140)
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -51,17 +51,7 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
     }()
     
     private let tableView = UITableView()
-    
-    private let continueButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Jogar de Novo", for: .normal)
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        button.backgroundColor = UIColor.systemBlue
-        button.tintColor = .white
-        button.layer.cornerRadius = 10
-        return button
-    }()
-    
+     
     
     init(coordinator: AppCoordinator, viewModel: RoundViewModel, matchManager: MatchManager) {
         self.coordinator = coordinator
@@ -85,31 +75,33 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
     
     private func setupLayout() {
         view.backgroundColor = .black
-        view.addBackgroundView(StarsBackgroundView())
+        view.addBackgroundView(StarsBackgroundTVView())
+        
+        tableView.translatesAutoresizingMaskIntoConstraints = false
 
         let titleContainer = setupTitle()
         setupPodium()
+        setupTable()
         let buttonContainer = createYesNoContainer(target: self, yesAction: #selector(yesAction), noAction: #selector(noAction))
         
         view.addSubview(titleContainer)
         view.addSubview(podiumStack)
         view.addSubview(buttonContainer)
-//        view.addSubview(tableView)
-//        view.addSubview(continueButton)
+        view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
-            titleContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            titleContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
+            titleContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            titleContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             
-            podiumStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            podiumStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             podiumStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-//            tableView.topAnchor.constraint(equalTo: podiumStack.bottomAnchor, constant: 12),
-//            tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            tableView.topAnchor.constraint(equalTo: podiumStack.bottomAnchor, constant: 12),
+            tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
             
-            buttonContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
-            buttonContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -32),
+            buttonContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            buttonContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             buttonContainer.heightAnchor.constraint(equalToConstant: 200)
         ])
     }
@@ -163,6 +155,10 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
                    podiumView.widthAnchor.constraint(equalToConstant: 200)
                ])
            }
+    }
+    
+    func setupTable() {
+        
     }
     
     func createYesNoContainer(target: Any?, yesAction: Selector, noAction: Selector) -> UIView {
@@ -246,15 +242,25 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
     // MARK: - UITableViewDataSource
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return matchManager.players.count
+        if mockplayers.count > 3 {
+            return (mockplayers.count) - 3
+        } else {
+            return 0
+        }
+        
+//        return matchManager.players.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let players = viewModel.gameService.makeRanking(from: matchManager.players)
+//        let rankedPlayers = viewModel.gameService.makeRanking(from: matchManager.players)
         
-        let player =  players[indexPath.row]
+        let rankedPlayers = viewModel.gameService.makeRanking(from: mockplayers)
+        let remainingPlayers = Array(rankedPlayers.dropFirst(3))
+
+        let player = remainingPlayers[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         cell.textLabel?.text = player.name
+        cell.textLabel?.textColor = .white
         return cell
     }
 }
