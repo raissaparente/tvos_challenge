@@ -129,21 +129,14 @@ class RoundViewModel {
 }
 
 extension RoundViewModel {
-    
     func calculateScore(for answer: Response, in category: String) -> Int {
         guard answer.isAnswerValid(letter: gameService.drawLetter()) else {
             print("Resposta inválida pela letra.")
             return 0
         }
 
-        guard let answerIndex = answers[category]?.firstIndex(where: { $0.text == answer.text }) else {
-            print("Resposta não encontrada.")
-            return 0
-        }
-
-        // ta caindo nesse guard let
-        guard let votes = votingViewModel?.votesByCategory[category]?[answerIndex] else {
-            print("nao obteve votos")
+        guard let votes = votingViewModel?.votesByCategory[category]?[answer.id] else {
+            print("⚠️ Votos não encontrados para a resposta \(answer.text)")
             return 0
         }
 
@@ -155,10 +148,7 @@ extension RoundViewModel {
             return 0
         }
 
-        // Começa com 100
         var score = 100
-
-        // Penalidade por repetição
         if answer.isRepeated {
             score -= 50
         }

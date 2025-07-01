@@ -9,7 +9,7 @@ import StopPlay
 
 class VotingViewModel {
     let round: RoundViewModel
-    @Published var votesByCategory: [String: [Int: [Bool]]] = [:]
+    @Published var votesByCategory: [String: [UUID: [Bool]]] = [:]
     @Published var playersWhoVotedByCategory: [String: Set<String>] = [:]
     @Published var selectedAnswerIndexes: Set<Int> = []
 
@@ -42,19 +42,19 @@ class VotingViewModel {
     }
 
     func appendRemotePlayerVote(voterName: String, selectedIndexes: Set<Int>, category: String) {
+        guard let answers = round.answers[category] else { return }
+
         var votesForCategory = votesByCategory[category] ?? [:]
         var playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
         playersWhoVoted.insert(voterName)
         playersWhoVotedByCategory[category] = playersWhoVoted
 
-        let totalAnswers = round.answers[category]?.count ?? 0
-
-        for index in 0..<totalAnswers {
+        for (index, answer) in answers.enumerated() {
             let isSelected = selectedIndexes.contains(index)
             let vote = !isSelected
-            var currentVotes = votesForCategory[index] ?? []
+            var currentVotes = votesForCategory[answer.id] ?? []
             currentVotes.append(vote)
-            votesForCategory[index] = currentVotes
+            votesForCategory[answer.id] = currentVotes
         }
 
         votesByCategory[category] = votesForCategory
@@ -63,19 +63,20 @@ class VotingViewModel {
 
     func appendPlayerVote(selectedIndexes: Set<Int>, totalAnswers: Int) {
         let category = round.currentCategory
+        guard let answers = round.answers[category] else { return }
         let playerName = round.connectionManager.myPeerId.displayName
-        var votesForCategory = votesByCategory[category] ?? [:]
 
+        var votesForCategory = votesByCategory[category] ?? [:]
         var playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
         playersWhoVoted.insert(playerName)
         playersWhoVotedByCategory[category] = playersWhoVoted
 
-        for index in 0..<totalAnswers {
+        for (index, answer) in answers.enumerated() {
             let isSelected = selectedIndexes.contains(index)
-            let vote = !isSelected // false se selecionado, true se não (penalidade)
-            var currentVotes = votesForCategory[index] ?? []
+            let vote = !isSelected
+            var currentVotes = votesForCategory[answer.id] ?? []
             currentVotes.append(vote)
-            votesForCategory[index] = currentVotes
+            votesForCategory[answer.id] = currentVotes
         }
 
         votesByCategory[category] = votesForCategory
@@ -100,25 +101,24 @@ class VotingViewModel {
 
     func finalizeVotes() {
         let category = round.currentCategory
-        guard let answerList = round.answers[category] else {
-            return
-        }
+        guard let answers = round.answers[category] else { return }
 
         var votesForCategory = votesByCategory[category] ?? [:]
 
-        for index in 0..<answerList.count {
-            var current = votesForCategory[index] ?? []
+        for answer in answers {
+            var current = votesForCategory[answer.id] ?? []
             let missing = totalPlayers - current.count
             if missing > 0 {
                 current.append(contentsOf: Array(repeating: true, count: missing))
             }
-            votesForCategory[index] = current
+            votesForCategory[answer.id] = current
         }
 
         votesByCategory[category] = votesForCategory
 
-        for (index, votos) in votesForCategory.sorted(by: { $0.key < $1.key }) {
-            print("📊 [\(category)] Resposta \(index): \(votos)")
+        for (index, answer) in answers.enumerated() {
+            let votes = votesForCategory[answer.id] ?? []
+            print("📊 [\(category)] Resposta \(index): \(votes)")
         }
     }
 

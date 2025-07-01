@@ -15,11 +15,13 @@ class AppCoordinator {
     let roundVM: RoundViewModel!
     let votingVM: VotingViewModel!
 
+
     init(window: UIWindow, username: String) {
         self.window = window
         self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
         self.votingVM = VotingViewModel(round: roundVM)
+        roundVM.votingViewModel = votingVM // isso é pra resolver
     }
     
     func start() {
