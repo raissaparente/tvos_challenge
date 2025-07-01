@@ -57,6 +57,8 @@ class HostLobbyViewController: UIViewController {
                 self?.reloadPlayers(from: peers)
             }
             .store(in: &cancellables)
+        
+        
     }
     
     private func reloadPlayers(from peers: [MCPeerID]) {

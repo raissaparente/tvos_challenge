@@ -27,6 +27,8 @@ class PlayerLobbyViewModel: ObservableObject {
         self.roundViewModel = roundViewModel
         self.votingViewModel = votingViewModel
 
+        gameService.status = .connecting
+        
         observeConnection()
         observeGame()
         
@@ -51,7 +53,7 @@ class PlayerLobbyViewModel: ObservableObject {
         gameService.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
-                if status == .startGame {
+                if status == .awaiting {
                     self?.shouldNavigateToGame = true
                 }
             }
@@ -60,6 +62,8 @@ class PlayerLobbyViewModel: ObservableObject {
 
     func acceptInvite() {
         connectionManager.invitationHandler?(true, connectionManager.session)
+        
+        gameService.status = .awaiting
     }
 
     func declineInvite() {

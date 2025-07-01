@@ -5,11 +5,9 @@
 //  Created by Júlia Saboya on 13/06/25.
 //
 import Foundation
-import Combine
 import StopPlay
 
 class RoundViewModel {
-    private var cancellables = Set<AnyCancellable>()
     @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
     @Published var answers: [String: [Response]] = [:]
     @Published var answerIndex: Int?

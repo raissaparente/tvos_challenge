@@ -14,7 +14,7 @@ class GameInstructionViewController: UIViewController {
     
     private let interfaceView = GameInstructionPostitView()
     private var cancellables = Set<AnyCancellable>()
-
+    
     private let viewModel: HostLobbyViewModel
     private let coordinator: AppCoordinator
     
@@ -29,8 +29,8 @@ class GameInstructionViewController: UIViewController {
     }
     
     override func loadView() {
-            self.view = interfaceView
-        }
+        self.view = interfaceView
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,6 +38,11 @@ class GameInstructionViewController: UIViewController {
         interfaceView.bottomPanel.inviteButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
         
         observeVM()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        cancellables.removeAll()
     }
     
     private func observeVM() {
@@ -50,18 +55,23 @@ class GameInstructionViewController: UIViewController {
             }
             .store(in: &cancellables)
         
+        
         viewModel.$shouldStartGame
             .receive(on: DispatchQueue.main)
             .sink { [weak self] shouldStart in
+                print("chamou observer vc1")
+                
                 guard let self = self else { return }
                 
                 if shouldStart {
-                    coordinator.showLetterDraw_TV(from: self)                }
+                    print("chamou observer vc2")
+                    coordinator.showLetterDraw_TV(from: self)
+                }
             }
             .store(in: &cancellables)
     }
     
     @objc private func continueTapped() {
-        coordinator.showLetterDraw_TV(from: self)
+        viewModel.startGame()
     }
 }
