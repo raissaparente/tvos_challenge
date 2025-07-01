@@ -9,13 +9,15 @@ import Combine
 
 enum WaitingType {
     case explaining
+    case waitingForAnswers
+    case waitingForEndVote
 }
 
 class WaitingViewModel: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     private let connectionManager: ConnectionManager
-    private let gameService: GameService
+    let gameService: GameService
     
     var waitingType: WaitingType
     var waitingText = "Waiting"
@@ -27,23 +29,19 @@ class WaitingViewModel: ObservableObject {
         self.gameService = gameService
         self.waitingType = type
                 
-        observeGameStatus()
     }
     
-    private func observeGameStatus() {
-        gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self = self else { return }
-                
-//                switch self.waitingType {
-//                case .explaining:
-                    if status == .category {
-                        self.didFinishWaiting = true
-                    }
-                    // outros tipos, se existirem
-//                }
-            }
-            .store(in: &cancellables)
+    var expectedStatus: ConnectionStatus {
+         switch waitingType {
+         case .explaining:
+             return .startGame
+         case .waitingForAnswers:
+             return .startVote
+         case .waitingForEndVote:
+             return .endVote
+         }
+     }
+    func cancelObservers() {
+        cancellables.removeAll()
     }
 }

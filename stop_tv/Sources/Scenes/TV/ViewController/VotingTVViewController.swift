@@ -47,15 +47,12 @@ class VotingTVViewController: UIViewController {
     }
 
     private func observeViewModel() {
-        
         roundVM.gameService.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self else { return }
                 
                 if status == .endVote {
-
-                    print("VOTINGTV terminou votação -> chama changeCat e troca tela")
                     
                     if roundVM.isLastCategory {
                         coordinator.showPartialRanking_TV(from: self)

@@ -20,7 +20,28 @@ class VotingPhoneViewController: UIViewController {
     private var selectedAnswerIndexes: Set<Int> = []
     private var answerButtons: [UIButton] = []
     private let sendButtonRef = UIButton()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Palavras em jogo"
+        label.font = UIFont(name: "ClashDisplay-Semibold", size: 32)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Número tocado = palavra invalida"
+        label.font = UIFont(name: "GeneralSans-Italic", size: 20)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
     init(viewModel: RoundViewModel, coordinator: AppCoordinator, votingVM: VotingViewModel) {
         self.roundVM = viewModel
@@ -47,18 +68,17 @@ class VotingPhoneViewController: UIViewController {
         super.viewWillDisappear(animated)
         cancellables.removeAll()
         votingVM.selectedAnswerIndexes.removeAll()
-
     }
 
     private func observeViewModel() {
-        roundVM.gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self else { return }
-                guard status == .endVote else { return }
-                self.coordinator.showAnswer_phone(from: self)
-            }
-            .store(in: &cancellables)
+//        roundVM.gameService.$status
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] status in
+//                guard let self else { return }
+//                guard status == .endVote else { return }
+//                self.coordinator.showAnswer_phone(from: self)
+//            }
+//            .store(in: &cancellables)
 
         roundVM.$answers
             .receive(on: DispatchQueue.main)
@@ -71,32 +91,45 @@ class VotingPhoneViewController: UIViewController {
     }
 
     private func setupLayout() {
-        let sendButton = sendButton()
+        let sendButton = CapsuleButton.createForPhone(withTitle: "Avaliar")
+        sendButton.addTarget(self, action: #selector(handleSendButtonTapped), for: .touchUpInside)
+        sendButton.contentEdgeInsets = UIEdgeInsets(top: 12, left: 10, bottom: 12, right: 10)
+        
+        let contentStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, answersGridView, sendButton])
+        contentStack.axis = .vertical
+        contentStack.spacing = 60
+        contentStack.alignment = .center
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        contentStack.setCustomSpacing(4, after: titleLabel)
+        view.addSubview(contentStack)
+        
 
-        // Send button
-        view.addSubview(sendButton)
-        view.addSubview(answersGridView)
         answersGridView.translatesAutoresizingMaskIntoConstraints = false
         sendButton.translatesAutoresizingMaskIntoConstraints = false
 
 
         NSLayoutConstraint.activate([
-            //            answersGridView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            //            answersGridView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            answersGridView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            answersGridView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            contentStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            contentStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
 
-            answersGridView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 2/3),
-            answersGridView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 2/3),
+            answersGridView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+            answersGridView.heightAnchor.constraint(lessThanOrEqualTo: view.heightAnchor, multiplier: 0.5),
 
-
-            sendButton.topAnchor.constraint(equalTo: answersGridView.bottomAnchor, constant: 24),
-            sendButton.centerXAnchor.constraint(equalTo: answersGridView.centerXAnchor),
-            sendButton.widthAnchor.constraint(equalToConstant: 100),
-
+            titleLabel.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
+            subtitleLabel.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
+            sendButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.85),
         ])
-
-        answersGridView.layer.borderColor = UIColor.cyan.cgColor
+        
+        let bg = UIImageView(image: UIImage(named: "paperTexture"))
+        bg.contentMode = .scaleAspectFill
+        bg.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(bg, at: 0)
+        NSLayoutConstraint.activate([
+            bg.topAnchor.constraint(equalTo: view.topAnchor),
+            bg.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bg.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bg.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
     }
 
     private func updateAnswersGridView(with count: Int) {
@@ -110,36 +143,48 @@ class VotingPhoneViewController: UIViewController {
         grid.distribution = .fillEqually
         grid.translatesAutoresizingMaskIntoConstraints = false
 
-        let columns = 2
+        let columns = 3
         let rows = Int(ceil(Double(count) / Double(columns)))
         var number = 1
 
-        for _ in 0..<rows {
+        for row in 0..<rows {
             let rowStack = UIStackView()
             rowStack.axis = .horizontal
-            rowStack.spacing = 8
-            rowStack.distribution = .fillEqually
+            rowStack.spacing = 16
+                rowStack.alignment = .center
+                rowStack.distribution = .fillProportionally
+            rowStack.translatesAutoresizingMaskIntoConstraints = false
 
-            for _ in 0..<columns {
-                if number > count { break }
+                let remaining = count - number + 1
+                let itemsInThisRow = min(columns, remaining)
+            
+            let centeringContainer = UIView()
+            centeringContainer.translatesAutoresizingMaskIntoConstraints = false
+            centeringContainer.addSubview(rowStack)
 
-                let button = UIButton(type: .system)
-                button.setTitle("\(number)", for: .normal)
-                button.setTitleColor(.white, for: .normal)
-                button.backgroundColor = .systemBlue
-                button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
-                button.layer.cornerRadius = 8
-                button.tag = number - 1 // 0-based index
-                button.addTarget(self, action: #selector(handleGridTapped(_:)), for: .touchUpInside)
-                button.clipsToBounds = true
+            NSLayoutConstraint.activate([
+                rowStack.centerXAnchor.constraint(equalTo: centeringContainer.centerXAnchor),
+                rowStack.topAnchor.constraint(equalTo: centeringContainer.topAnchor),
+                rowStack.bottomAnchor.constraint(equalTo: centeringContainer.bottomAnchor)
+            ])
 
-                rowStack.addArrangedSubview(button)
-                answerButtons.append(button)
+                for _ in 0..<itemsInThisRow {
+                    let button = CircleButton.create(withTitle: "\(number)")
+                    button.tag = number - 1
+                    button.addTarget(self, action: #selector(handleGridTapped(_:)), for: .touchUpInside)
 
-                number += 1
-            }
+                    button.translatesAutoresizingMaskIntoConstraints = false
+                    NSLayoutConstraint.activate([
+                        button.widthAnchor.constraint(equalToConstant: 80),
+                        button.heightAnchor.constraint(equalTo: button.widthAnchor)
+                    ])
 
-            grid.addArrangedSubview(rowStack)
+                    rowStack.addArrangedSubview(button)
+                    answerButtons.append(button)
+                    number += 1
+                }
+
+            grid.addArrangedSubview(centeringContainer)
         }
 
         answersGridView.addSubview(grid)
@@ -152,17 +197,6 @@ class VotingPhoneViewController: UIViewController {
         ])
     }
 
-    private func sendButton() -> UIButton {
-        sendButtonRef.setTitle("Enviar", for: .normal)
-        sendButtonRef.setTitleColor(.white, for: .normal)
-        sendButtonRef.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        sendButtonRef.backgroundColor = .green
-        sendButtonRef.layer.cornerRadius = 8
-        sendButtonRef.clipsToBounds = true
-        sendButtonRef.addTarget(self, action: #selector(handleSendButtonTapped), for: .touchUpInside)
-        return sendButtonRef
-    }
-
     @objc private func handleSendButtonTapped(_ sender: UIButton) {
         let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
         let selected = selectedAnswerIndexes
@@ -171,6 +205,8 @@ class VotingPhoneViewController: UIViewController {
         votingVM.sendVote()
 
         updateAnswersGridView(with: count)
+        
+        exitLocalVoting()
     }
 
 
@@ -180,12 +216,15 @@ class VotingPhoneViewController: UIViewController {
 
         if selectedAnswerIndexes.contains(index) {
             selectedAnswerIndexes.remove(index)
-            sender.backgroundColor = .systemBlue
+            sender.backgroundColor = .customPink
         } else {
             selectedAnswerIndexes.insert(index)
             sender.backgroundColor = .systemGreen
         }
-
+    }
+    
+    private func exitLocalVoting() {
+        coordinator.showWaitingMessage_phone(from: self, type: .waitingForEndVote)
     }
 
 }

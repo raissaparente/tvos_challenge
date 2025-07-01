@@ -122,9 +122,5 @@ final class PostitAlertView: UIView {
         buttonStack.addArrangedSubview(refuseButton)
         buttonStack.addArrangedSubview(acceptButton)
     }
-    
-//    @objc private func acceptDummy() {}
-//    
-//    @objc private func refuseDummy() {}
 
 }
