@@ -45,13 +45,12 @@ class CapsuleButton: UIButton {
     }
 
     //função auxiliar para criar o botão com texto
-    static func createForTV(withTitle title: String, target: Any?, action: Selector) -> CapsuleButton {
+    static func createForTV(withTitle title: String) -> CapsuleButton {
             let button = CapsuleButton(type: .system)
             button.setTitle(title, for: .normal)
         button.titleLabel?.font = UIFont(name: "ClashDisplay-Semibold", size: 28)
-
-        button.addTarget(target, action: action, for: .primaryActionTriggered)
-            return button
+    
+        return button
         }
     
     static func createForPhone(withTitle title: String) -> CapsuleButton {

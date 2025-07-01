@@ -76,11 +76,11 @@ class RoundPhoneViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
         setupUI()
     }
     
     func setupUI() {
+        view.backgroundColor = .black
         view.addBackgroundView(StarsBackgroundView())
         
         submitButton.translatesAutoresizingMaskIntoConstraints = false
