@@ -19,6 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         let idiom = UIDevice.current.userInterfaceIdiom
+        //so para simular
         if idiom == .pad {
             let coordinator = AppCoordinator(window: window, username: "tvHost")
             self.coordinator = coordinator

@@ -4,7 +4,10 @@
 //
 //  Created by Raissa Bruna Parente on 12/06/25.
 //
-
+// escrever letra na voting,
+// o componente bar tem que ser sempre do mesmo tamanho, cor amarela em vez de preta
+// fontes
+// nao ta aparecendo a rodada na votting
 import UIKit
 
 class AppCoordinator {
@@ -73,17 +76,17 @@ class AppCoordinator {
     func showLetterDraw_TV(from currentVC: UIViewController) {
         let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
         
-        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService, roundVM: roundVM)
+        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, matchManager: matchManager, gameService: gameService, roundVM: roundVM)
         currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
     }
     
     func showCategory_TV(from currentVC: UIViewController) {
-        let roundTVVC = RoundTVViewController(viewModel: roundVM, coordinator: self)
+        let roundTVVC = RoundTVViewController(viewModel: roundVM, matchManager: matchManager, coordinator: self)
         currentVC.navigationController?.pushViewController(roundTVVC, animated: true)
     }
     
     func showVoting_TV(from currentVC: UIViewController) {
-        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self, votingVM: votingVM)
+        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self, matchManager: matchManager, votingVM: votingVM)
         currentVC.navigationController?.pushViewController(votingTVVC, animated: true)
     }
     
