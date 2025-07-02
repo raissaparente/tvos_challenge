@@ -73,11 +73,11 @@ class HostLobbyViewModel: ObservableObject {
     }
     
     func inviteAvailablePeers() {
-        selectedPeers = availablePeers
-        
-        for peer in availablePeers {
-            connectionManager.invite(peer: peer)
-        }
+            selectedPeers = availablePeers
+
+            for peer in availablePeers {
+                connectionManager.invite(peer: peer)
+            }
     }
     
     func toggleSelection(for peer: MCPeerID) {
