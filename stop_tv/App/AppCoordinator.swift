@@ -20,11 +20,13 @@ class AppCoordinator {
     let hostLobbyVM: HostLobbyViewModel!
     
 
+
     init(window: UIWindow, username: String) {
         self.window = window
         self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
         self.votingVM = VotingViewModel(round: roundVM)
+        roundVM.votingViewModel = votingVM // isso é pra resolver
         self.hostLobbyVM = HostLobbyViewModel(
             connectionManager: connectionManager,
             gameService: gameService,
@@ -37,8 +39,8 @@ class AppCoordinator {
     func start() {
         let nav = UINavigationController()
         let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .tv {
-            
+        if idiom == .pad {
+
             let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
 
 //            let viewModel = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)

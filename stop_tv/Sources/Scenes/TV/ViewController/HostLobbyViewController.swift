@@ -35,7 +35,7 @@ class HostLobbyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         interfaceView.rightPanel.inviteButton.addTarget(self, action: #selector(inviteTapped), for: .primaryActionTriggered)
-        
+
         
         viewModel.browseForPeers()
         viewModel.observeConnection()
@@ -115,12 +115,28 @@ class HostLobbyViewController: UIViewController {
         return container
     }
 
-    
-    @objc private func inviteTapped() {
-        viewModel.inviteAvailablePeers()
-        coordinator.showGameInstruction_TV(from: self)
+    private func emptyListAlert() -> UIAlertController {
+        let alertController = UIAlertController(
+            title: "Sem Jogadores Disponíveis",
+            message: "O dispositivo precisa encontrar pelo menos um joagador para convidar!",
+            preferredStyle: .alert
+        )
+
+        let okAction = UIAlertAction(title: "Entendi!", style: .default)
+        alertController.addAction(okAction)
+
+        return alertController
     }
-    
+
+    @objc private func inviteTapped(_ sender: UIButton) {
+        if viewModel.availablePeers.isEmpty {
+            present(emptyListAlert(), animated: true, completion: nil)
+        } else {
+            viewModel.inviteAvailablePeers()
+            coordinator.showGameInstruction_TV(from: self)
+        }
+    }
+
     func addBackgroundImage(named imageName: String, to containerView: UIView) {
         let backgroundImageView = UIImageView(image: UIImage(named: imageName))
         backgroundImageView.contentMode = .scaleAspectFill

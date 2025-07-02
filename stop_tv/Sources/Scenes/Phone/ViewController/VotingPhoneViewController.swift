@@ -68,6 +68,7 @@ class VotingPhoneViewController: UIViewController {
     }
 
     private func observeViewModel() {
+
         roundVM.$answers
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in

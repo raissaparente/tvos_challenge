@@ -63,7 +63,6 @@ class WaitingViewController: UIViewController {
         cancellables.removeAll()
         viewModel.cancelObservers()
         
-        print("viewwilldisappear da waiting")
     }
     
     func setupUI() {

@@ -68,8 +68,15 @@ class RoundTVViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("VDL ROUND TV")
+        view.addSubview(imageViewCard)
+        NSLayoutConstraint.activate([
+            imageViewCard.topAnchor.constraint(equalTo: view.topAnchor),
+            imageViewCard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageViewCard.widthAnchor.constraint(equalTo: view.widthAnchor),
+            imageViewCard.heightAnchor.constraint(equalTo: view.heightAnchor)
+        ])
         view.backgroundColor = .black
-        
         setupLayout()
         
         animator = AnimationManager(label: categoryLabel, imageViewPaper: imageViewCard)
@@ -206,7 +213,3 @@ class RoundTVViewController: UIViewController {
     
 }
 
-
-//#Preview {
-//    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: "newion"))
-//}
