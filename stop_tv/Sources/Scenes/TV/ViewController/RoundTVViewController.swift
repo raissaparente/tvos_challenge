@@ -67,6 +67,7 @@ class RoundTVViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("VDL ROUND TV")
         view.addSubview(imageViewCard)
         NSLayoutConstraint.activate([
             imageViewCard.topAnchor.constraint(equalTo: view.topAnchor),
