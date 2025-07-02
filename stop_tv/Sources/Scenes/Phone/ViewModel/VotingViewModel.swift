@@ -70,6 +70,7 @@ class VotingViewModel {
         var playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
         playersWhoVoted.insert(playerName)
         playersWhoVotedByCategory[category] = playersWhoVoted
+        print(playersWhoVoted)
 
         for (index, answer) in answers.enumerated() {
             let isSelected = selectedIndexes.contains(index)
@@ -90,6 +91,7 @@ class VotingViewModel {
         let totalVoted = playersWhoVoted.count
 
         if totalVoted >= totalPlayers {
+            print("all players voted")
             guard !round.isFinished else {
                 return
             }
@@ -114,11 +116,12 @@ class VotingViewModel {
             votesForCategory[answer.id] = current
         }
 
+
         votesByCategory[category] = votesForCategory
 
         for (index, answer) in answers.enumerated() {
             let votes = votesForCategory[answer.id] ?? []
-            print("📊 [\(category)] Resposta \(index): \(votes)")
+            print("📊 [\(category)]: \(votes)")
         }
     }
 
@@ -126,7 +129,6 @@ class VotingViewModel {
         let category = round.currentCategory
 
         if let respostas = round.answers[category] {
-                print("📊 Calculando pontuação das respostas da categoria '\(category)'...")
                 for resposta in respostas {
                     let score = round.calculateScore(for: resposta, in: category)
                     print("✅ '\(resposta.text)': \(score) pontos")

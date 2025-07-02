@@ -14,7 +14,6 @@ public class GameService: ObservableObject {
 
     func draw5Categories() -> [String] {
         let categories: [String] = gameManager.randomCategories(categories: self.categories)
-        print(categories)
         return categories
     }
 
