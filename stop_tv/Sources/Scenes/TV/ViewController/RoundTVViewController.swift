@@ -67,6 +67,7 @@ class RoundTVViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("VDL ROUND TV")
         view.addSubview(imageViewCard)
         NSLayoutConstraint.activate([
             imageViewCard.topAnchor.constraint(equalTo: view.topAnchor),
@@ -180,7 +181,6 @@ class RoundTVViewController: UIViewController {
         } else {
             categoryLabel.text = viewModel.currentCategory
             textField.text = ""
-            print("mostrou categoria\(viewModel.currentCategory)")
             animator.animate(letter: viewModel.currentCategory)
         }
     }
@@ -198,7 +198,3 @@ class RoundTVViewController: UIViewController {
 
 }
 
-
-//#Preview {
-//    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: "newion"))
-//}

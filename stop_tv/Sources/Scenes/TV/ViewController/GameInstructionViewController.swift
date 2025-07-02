@@ -60,19 +60,35 @@ class GameInstructionViewController: UIViewController {
         viewModel.$shouldStartGame
             .receive(on: DispatchQueue.main)
             .sink { [weak self] shouldStart in
-                print("chamou observer vc1")
-                
                 guard let self = self else { return }
                 
                 if shouldStart {
-                    print("chamou observer vc2")
                     coordinator.showLetterDraw_TV(from: self)
                 }
             }
             .store(in: &cancellables)
     }
-    
+
+    private func emptyListAlert() -> UIAlertController {
+        let alertController = UIAlertController(
+            title: "Sem Jogadores Conectados",
+            message: "Pelo menos um jogador deve aceitar o convite para iniciar o jogo!",
+            preferredStyle: .alert
+        )
+
+        let okAction = UIAlertAction(title: "Entendi!", style: .default)
+        alertController.addAction(okAction)
+
+        return alertController
+    }
+
     @objc private func continueTapped() {
-        viewModel.startGame()
+        if viewModel.connectionManager.connectedPeers.isEmpty {
+            present(emptyListAlert(), animated: true, completion: nil)
+
+
+        } else {
+            viewModel.startGame()
+        }
     }
 }

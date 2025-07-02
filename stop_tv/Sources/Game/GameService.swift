@@ -13,8 +13,8 @@ public class GameService: ObservableObject {
     var gameManager = GameManager()
 
     func draw5Categories() -> [String] {
-        print(gameManager.randomCategories(categories: self.categories))
-        return gameManager.randomCategories(categories: self.categories)
+        let categories: [String] = gameManager.randomCategories(categories: self.categories)
+        return categories
     }
 
     func drawLetter() -> String {

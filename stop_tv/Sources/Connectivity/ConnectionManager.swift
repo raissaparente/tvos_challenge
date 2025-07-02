@@ -130,8 +130,6 @@ extension ConnectionManager: MCSessionDelegate {
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         DispatchQueue.main.async {
             self.connectedPeers = session.connectedPeers
-            print("Peer \(peerID.displayName) changed state to \(state.rawValue)")
-            print("Connected: \(self.connectedPeers)")
         }
     }
     

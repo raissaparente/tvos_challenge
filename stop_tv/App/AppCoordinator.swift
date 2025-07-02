@@ -39,8 +39,8 @@ class AppCoordinator {
     func start() {
         let nav = UINavigationController()
         let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .tv {
-            
+        if idiom == .pad {
+
             let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
             
 //            let vc = FinalRankingViewController(coordinator: self, viewModel: roundVM, matchManager: matchManager)

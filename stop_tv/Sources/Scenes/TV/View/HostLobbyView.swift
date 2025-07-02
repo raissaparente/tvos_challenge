@@ -116,7 +116,7 @@ final class LobbyLeftPanelView: UIView {
 final class LobbyRightPanelView: UIView {
 
     let nameList = UIStackView()
-    let inviteButton = CapsuleButton.createForTV(withTitle: "Continuar")
+    let inviteButton = CapsuleButton.createForTV(withTitle: "Convidar")
 
     override init(frame: CGRect) {
         super.init(frame: frame)

@@ -35,6 +35,7 @@ class RoundViewModel {
     }
 
     func setCategories() {
+
             let newCategories = gameService.draw5Categories()
             print("🟢 categorias sorteadas: \(newCategories)")
             self.categories = newCategories

@@ -71,20 +71,13 @@ class VotingPhoneViewController: UIViewController {
     }
 
     private func observeViewModel() {
-//        roundVM.gameService.$status
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] status in
-//                guard let self else { return }
-//                guard status == .endVote else { return }
-//                self.coordinator.showAnswer_phone(from: self)
-//            }
-//            .store(in: &cancellables)
 
         roundVM.$answers
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
                 let count = self.roundVM.answers[self.roundVM.currentCategory]?.count ?? 0
+                print("quantidade de respostas: \(count)")
                 self.updateAnswersGridView(with: count)
             }
             .store(in: &cancellables)
