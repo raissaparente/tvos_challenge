@@ -49,6 +49,7 @@ class VotingTVViewController: UIViewController {
     }
 
     private func observeViewModel() {
+        
         roundVM.gameService.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
@@ -68,13 +69,13 @@ class VotingTVViewController: UIViewController {
 
     private func setupLayout() {
         letterLabel.text = "Letra \(matchManager.currentLetter ?? "")"
-        letterLabel.font = UIFont(name: "ClashDisplay-Regular", size: 28)
+        letterLabel.font =  UIFont(name: "ClashDisplay-Semibold", size: 40)
 
-        rodadaLabel.text = "\(matchManager.currentRound + 1)ª Rodada"
-        rodadaLabel.font = UIFont(name: "ClashDisplay-Regular", size: 28)
+        rodadaLabel.text = "\(matchManager.currentRound + 1)ª RODADA"
+        rodadaLabel.font =  UIFont(name: "ClashDisplay-Semibold", size: 40)
 
         categoryLabel.text = roundVM.currentCategory
-        categoryLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 32)
+        categoryLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 50)
         categoryLabel.textAlignment = .center
 
         hStack.axis = .horizontal
@@ -130,7 +131,7 @@ class VotingTVViewController: UIViewController {
             contentStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
             contentStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
 
-            hStack.heightAnchor.constraint(greaterThanOrEqualToConstant: 300),
+            hStack.heightAnchor.constraint(lessThanOrEqualToConstant: 300),
 
             submitButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
             submitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
@@ -145,18 +146,20 @@ class VotingTVViewController: UIViewController {
         vStackLeft.arrangedSubviews.forEach { $0.removeFromSuperview() }
         vStackRight.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
-        let words = [
-            Response(text: "Lâmpada que muda de cor conforme o humor"),
-            Response(text: "Luz acesa o mês todo"),
-            Response(text: "Louis Vuitton"),
-            Response(text: "Lhama de estimação com pedigree"),
-            Response(text: "Lote em bairro nobre"),
-            Response(text: "Lente de contato com realidade aumentada"),
-            Response(text: "Lamborghini"),
-            Response(text: "Laje aquecida com controle remoto")
-        ]
+//        let words = [
+//            Response(text: "Lâmpada que muda de cor conforme o humor"),
+//            Response(text: "Luz acesa o mês todo"),
+//            Response(text: "Louis Vuitton"),
+//            Response(text: "Lhama de estimação com pedigree"),
+//            Response(text: "Lote em bairro nobre"),
+//            Response(text: "Lente de contato com realidade aumentada"),
+//            Response(text: "Lamborghini"),
+//            Response(text: "Laje aquecida com controle remoto")
+//        ]
+        
+        let words = roundVM.answers[roundVM.currentCategory]
 
-        for (index, word) in words.enumerated() {
+        for (index, word) in words!.enumerated() {
             let fatia = FatiaView()
             fatia.configure(numero: index + 1, texto: word.text)
 

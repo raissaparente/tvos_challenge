@@ -45,7 +45,7 @@ class FatiaView: UIView {
 
         numeroLabel.translatesAutoresizingMaskIntoConstraints = false
         numeroLabel.textColor = .white
-        numeroLabel.font = .boldSystemFont(ofSize: 24)
+        numeroLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 40)
         numeroLabel.textAlignment = .center
         fatiaView.addSubview(numeroLabel)
 
@@ -84,8 +84,8 @@ class FatiaView: UIView {
 
             textoLabel.leadingAnchor.constraint(equalTo: textoView.leadingAnchor, constant: 8),
             textoLabel.trailingAnchor.constraint(equalTo: textoView.trailingAnchor, constant: -8),
-            textoLabel.centerYAnchor.constraint(equalTo: textoView.centerYAnchor),
-        ])
+            textoLabel.topAnchor.constraint(equalTo: textoView.topAnchor, constant: 8),
+            textoLabel.bottomAnchor.constraint(equalTo: textoView.bottomAnchor, constant: -8),        ])
     }
 }
 

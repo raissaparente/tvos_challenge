@@ -161,11 +161,21 @@ final class LobbyRightPanelView: UIView {
         stack.translatesAutoresizingMaskIntoConstraints = false
 
         addSubview(stack)
+        
+        let redLine = UIView()
+        redLine.backgroundColor = .red
+        redLine.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(redLine)
 
         NSLayoutConstraint.activate([
             stack.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 40),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32)
+            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
+            
+            redLine.widthAnchor.constraint(equalToConstant: 2),
+            redLine.topAnchor.constraint(equalTo: topAnchor),
+            redLine.bottomAnchor.constraint(equalTo: bottomAnchor),
+            redLine.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 60)
         ])
 
         let bg = UIImageView(image: UIImage(named: "notebookPaper"))

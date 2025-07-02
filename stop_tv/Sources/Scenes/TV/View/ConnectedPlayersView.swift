@@ -8,7 +8,7 @@ import UIKit
 
 final class ConnectedPlayersView: UIView {
     
-    let testNames = ["Raissa", "Beyanca", "Julia Saboya", "Plutarco"]
+    let testNames: [String] = []
 
     let postitStack = UIStackView()
     let inviteButton = CapsuleButton.createForTV(withTitle: "Continuar")

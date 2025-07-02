@@ -62,40 +62,59 @@ class HostLobbyViewController: UIViewController {
     }
     
     private func reloadPlayers(from peers: [MCPeerID]) {
-        let nameList = interfaceView.rightPanel.nameList
-        nameList.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        
-        for nome in peers {
-            let container = UIView()
-            container.translatesAutoresizingMaskIntoConstraints = false
+            let nameList = interfaceView.rightPanel.nameList
+            nameList.arrangedSubviews.forEach { $0.removeFromSuperview() }
             
-            let label = UILabel()
-            label.text = nome.displayName
-            label.font = UIFont(name: "ClashDisplay-Regular", size: 30)
-            label.textColor = .black
-            label.translatesAutoresizingMaskIntoConstraints = false
+            let maxSlots = 9
             
-            let underline = UIView()
-            underline.backgroundColor = UIColor.systemBlue
-            underline.translatesAutoresizingMaskIntoConstraints = false
-            
-            container.addSubview(label)
-            container.addSubview(underline)
-            
-            NSLayoutConstraint.activate([
-                label.topAnchor.constraint(equalTo: container.topAnchor),
-                label.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-                
-                underline.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 2),
-                underline.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-                underline.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-                underline.heightAnchor.constraint(equalToConstant: 2),
-                underline.bottomAnchor.constraint(equalTo: container.bottomAnchor)
-            ])
-            
-            nameList.addArrangedSubview(container)
+            for nome in peers {
+                let container = createNameLine(with: nome.displayName)
+                nameList.addArrangedSubview(container)
+            }
+
+            // Adiciona linhas vazias se tiverem faltando jogadores
+            let placeholdersToAdd = maxSlots - peers.count
+            for _ in 0..<placeholdersToAdd {
+                let container = createNameLine(with: nil)
+                nameList.addArrangedSubview(container)
+            }
         }
+    
+    private func createNameLine(with name: String?) -> UIView {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+
+        let label = UILabel()
+        label.text = name
+        label.font = UIFont(name: "ClashDisplay-Regular", size: 40)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        let underline = UIView()
+        underline.backgroundColor = UIColor.systemBlue
+        underline.translatesAutoresizingMaskIntoConstraints = false
+
+        container.addSubview(label)
+        container.addSubview(underline)
+
+        let underlineTopAnchor = name == nil
+            ? container.topAnchor
+            : label.bottomAnchor
+
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: container.topAnchor),
+            label.leadingAnchor.constraint(lessThanOrEqualTo: container.leadingAnchor, constant: 70),
+
+            underline.topAnchor.constraint(equalTo: underlineTopAnchor, constant: name == nil ? 50 : 4),
+            underline.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            underline.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            underline.heightAnchor.constraint(equalToConstant: 2),
+            underline.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+
+        return container
     }
+
     
     @objc private func inviteTapped() {
         viewModel.inviteAvailablePeers()
