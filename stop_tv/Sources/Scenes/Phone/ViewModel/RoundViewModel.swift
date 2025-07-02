@@ -140,8 +140,8 @@ extension RoundViewModel {
             return 0
         }
 
-        let votesAgainst = votes.filter { $0 }.count
-        let votesFor = votes.filter { !$0 }.count
+        let votesAgainst = votes.filter { !$0 }.count // true
+        let votesFor = votes.filter { $0 }.count // false
 
         guard votesFor >= votesAgainst else {
             print("votos falsos ganharam")
