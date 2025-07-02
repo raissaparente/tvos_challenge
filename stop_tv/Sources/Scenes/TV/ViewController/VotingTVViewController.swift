@@ -46,6 +46,7 @@ class VotingTVViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         cancellables.removeAll()
+        votingVM.hasHandledEndVote = false
     }
 
     private func observeViewModel() {
@@ -54,8 +55,12 @@ class VotingTVViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self else { return }
+                
+                print("MUDOU O GAME STATUS NA VOTING: \(status)")
 
-                if status == .endVote {
+                if status == .endVote, !votingVM.hasHandledEndVote {
+                    votingVM.hasHandledEndVote = true
+
                     if roundVM.isLastCategory {
                         coordinator.showPartialRanking_TV(from: self)
                     } else {
@@ -151,20 +156,20 @@ class VotingTVViewController: UIViewController {
         vStackLeft.arrangedSubviews.forEach { $0.removeFromSuperview() }
         vStackRight.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
-        let words = [
-            Response(text: "Lâmpada que muda de cor conforme o humor"),
-            Response(text: "Luz acesa o mês todo"),
-            Response(text: "Louis Vuitton"),
-//            Response(text: "Lhama de estimação com pedigree"),
-//            Response(text: "Lote em bairro nobre"),
-//            Response(text: "Lente de contato com realidade aumentada"),
-//            Response(text: "Lamborghini"),
-//            Response(text: "Laje aquecida com controle remoto")
-        ]
+//        let words = [
+//            Response(text: "Lâmpada que muda de cor conforme o humor"),
+//            Response(text: "Luz acesa o mês todo"),
+//            Response(text: "Louis Vuitton"),
+////            Response(text: "Lhama de estimação com pedigree"),
+////            Response(text: "Lote em bairro nobre"),
+////            Response(text: "Lente de contato com realidade aumentada"),
+////            Response(text: "Lamborghini"),
+////            Response(text: "Laje aquecida com controle remoto")
+//        ]
         
-//        let words = roundVM.answers[roundVM.currentCategory]
+        let words = roundVM.answers[roundVM.currentCategory]
 
-        for (index, word) in words.enumerated() {
+        for (index, word) in words!.enumerated() {
             let fatia = FatiaView()
             fatia.configure(numero: index + 1, texto: word.text)
 

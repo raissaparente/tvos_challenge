@@ -40,7 +40,7 @@ class AnimationManager {
     func animateRodadaSlotStyle(word: String, in container: UIView, completion: (() -> Void)? = nil) {
            let stackView = UIStackView()
            stackView.axis = .horizontal
-           stackView.spacing = 2
+           stackView.spacing = -4
            stackView.alignment = .center
            stackView.distribution = .equalSpacing
            stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -57,7 +57,7 @@ class AnimationManager {
                let container = UIView()
                container.clipsToBounds = true
                container.translatesAutoresizingMaskIntoConstraints = false
-               container.widthAnchor.constraint(equalToConstant: 80).isActive = true
+               container.widthAnchor.constraint(equalToConstant: 60).isActive = true
                container.heightAnchor.constraint(equalToConstant: 100).isActive = true
 
                let label = UILabel()
@@ -78,10 +78,10 @@ class AnimationManager {
         for (i, char) in word.enumerated() {
             let direction: CGFloat = i % 2 == 0 ? -1 : 1
 
-            self.animateFixedLetterSlot(in: letterContainers[i], letter: char, direction: direction, iterations: 6) {
+            self.animateFixedLetterSlot(in: letterContainers[i], letter: char, direction: direction, iterations: 5) {
                 completedCount += 1
                 if completedCount == totalLetters {
-                           DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+                           DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
                                stackView.isHidden = true
                                completion?()
                            }
@@ -90,44 +90,52 @@ class AnimationManager {
                }
        }
 
-       private func animateFixedLetterSlot(
-           in container: UIView,
-           letter: Character,
-           direction: CGFloat,
-           iterations: Int,
-           completion: @escaping () -> Void
-       ) {
-           guard iterations > 0 else {
-               if let label = container.subviews.first as? UILabel {
-                   label.text = String(letter)
-                   label.frame.origin.y = 0
-               }
-               completion()
-               return
-           }
+    private func animateFixedLetterSlot(
+        in container: UIView,
+        letter: Character,
+        direction: CGFloat,
+        iterations: Int,
+        completion: @escaping () -> Void
+    ) {
+        guard iterations > 0 else {
+            if let label = container.subviews.first as? UILabel {
+                label.text = String(letter)
+                label.frame.origin.y = 0
+            }
+            completion()
+            return
+        }
 
-           let height: CGFloat = 100
-           let currentLabel = container.subviews.first as? UILabel
-           currentLabel?.frame.origin.y = 0
+        let height: CGFloat = 80
+        let currentLabel = container.subviews.first as? UILabel
+        currentLabel?.frame.origin.y = 0
 
-           let nextLabel = UILabel()
-           nextLabel.text = String(letter)
-           nextLabel.textAlignment = .center
-           nextLabel.font = currentLabel?.font
-           nextLabel.textColor = currentLabel?.textColor
-           nextLabel.frame = CGRect(x: 0, y: direction * height, width: 80, height: height)
+        let nextLabel = UILabel()
+        nextLabel.text = String(letter)
+        nextLabel.textAlignment = .center
+        nextLabel.font = currentLabel?.font
+        nextLabel.textColor = currentLabel?.textColor
+        nextLabel.frame = CGRect(x: 0, y: direction * height, width: 60, height: height)
 
-           container.addSubview(nextLabel)
+        container.addSubview(nextLabel)
 
-           UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseInOut], animations: {
-               currentLabel?.frame.origin.y -= direction * height
-               nextLabel.frame.origin.y -= direction * height
-           }, completion: { _ in
-               currentLabel?.removeFromSuperview()
-               self.animateFixedLetterSlot(in: container, letter: letter, direction: direction, iterations: iterations - 1, completion: completion)
-           })
-       }
-    
+        let duration = iterations == 1 ? 1.5 : 0.4
+
+        UIView.animate(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
+            currentLabel?.frame.origin.y -= direction * height
+            nextLabel.frame.origin.y -= direction * height
+        }, completion: { _ in
+            currentLabel?.removeFromSuperview()
+            self.animateFixedLetterSlot(
+                in: container,
+                letter: letter,
+                direction: direction,
+                iterations: iterations - 1,
+                completion: completion
+            )
+        })
+    }
+
     func animate(
         letter: String,
         duration: TimeInterval = 2.5,
@@ -164,7 +172,7 @@ class AnimationManager {
                 }) { _ in
                     self.finishAnimation()
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         completion?()
                     }
                 }

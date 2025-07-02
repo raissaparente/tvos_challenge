@@ -9,8 +9,6 @@ import Combine
 import SwiftUI
 // letra
 class LetterDrawViewController: UIViewController {
-    // melhorar essse nomes
-    
   
     let textPaperUp = UILabel()
     let textPaperDown = UILabel()
@@ -22,10 +20,10 @@ class LetterDrawViewController: UIViewController {
         return iv
     }()
     private let imagesPaper: [UIImage] = [
-          UIImage(named: "Paper1")!,
-          UIImage(named: "Paper2")!,
-          UIImage(named: "Paper3")!,
-          UIImage(named: "Paper4")!
+          UIImage(named: "Papel1")!,
+          UIImage(named: "Papel2")!,
+          UIImage(named: "Papel3")!,
+          UIImage(named: "Papel4")!
       ]
     let imageViewPaper: UIImageView = {
         let iv = UIImageView()
@@ -34,14 +32,7 @@ class LetterDrawViewController: UIViewController {
         iv.isHidden = true
         return iv
     }()
-    let backgroundImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.alpha = 0.3
-        return imageView
-        
-    }()
+
     var animator: AnimationManager!
     let drawLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
@@ -82,94 +73,111 @@ class LetterDrawViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let round: Int = (matchManager.currentRound + 1)
         self.setupUI()
         
-        view.addSubview(textPaperUp)
-        view.addSubview(textPaperDown)
-        textPaperUp.translatesAutoresizingMaskIntoConstraints = false
-        textPaperDown.translatesAutoresizingMaskIntoConstraints = false
-        textPaperDown.isHidden = true
-        textPaperUp.isHidden = true
-        view.addSubview(imageViewLetter)
-        view.addSubview(backgroundImageView)
-        view.sendSubviewToBack(backgroundImageView)
-        view.addSubview(imageViewPaper)
-        imageViewPaper.layer.zPosition = 2
-        imageViewLetter.layer.zPosition = 3
-        NSLayoutConstraint.activate([
-            backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
-            backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            imageViewLetter.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageViewLetter.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            imageViewLetter.widthAnchor.constraint(equalToConstant: 200),
-            imageViewLetter.heightAnchor.constraint(equalToConstant: 200),
-            imageViewPaper.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageViewPaper.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            imageViewPaper.widthAnchor.constraint(equalToConstant: 500),
-            imageViewPaper.heightAnchor.constraint(equalToConstant: 700),
-            textPaperUp.topAnchor.constraint(equalTo: view.topAnchor, constant: 250),
-            textPaperDown.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -250),
-            textPaperUp.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            textPaperDown.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
-            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28)
-            
-        ])
-        
-        drawLabel.translatesAutoresizingMaskIntoConstraints = false
-        drawLabel.text = "\(round)ª RODADA"
-        drawLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 70)
-        view.addSubview(drawLabel)
-        
-        let startX = drawLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        let startY = drawLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        
-        
-        let endX = drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
-        let endY = drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 16)
-        
-        
-        animator = AnimationManager(label: letter, imageViewLetter: imageViewLetter, imageViewPaper: imageViewPaper)
-        animator.animateRodadaSlotStyle(word: "\(round) RODADA", in: self.view) {
-            self.animator.startPaperAnimation(images: self.imagesPaper, interval: 0.5) {
-                self.letter.isHidden = true
-                self.imageViewLetter.isHidden = false
-                self.textPaperDown.isHidden = false
-                self.textPaperUp.isHidden = false
-                self.animator.animate(letter: self.letter.text!) {
-                    
-                    Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { timer in
-                        self.viewModel.canGoToCategory = true
-                    }
-              
-                }
-                
-            }
-        }
+        self.animate()
+
         self.observeViewModel()
         self.roundVM.setCategories()
     }
 
     func setupUI() {
+        let currentRound: Int = (matchManager.currentRound + 1)
+
         textPaperUp.text = "Sua criatividade agora\n depende da letra..."
         textPaperUp.font =  UIFont(name: "Chalkduster", size:32)
         textPaperUp.layer.zPosition = 3
         textPaperUp.textColor = .black
         textPaperUp.numberOfLines = 0
         textPaperUp.textAlignment = .center
-        textPaperDown.text = "mas relaxa,qualquer coisa você inventa e\n reza pra ninguem contestar"
+        textPaperUp.translatesAutoresizingMaskIntoConstraints = false
+        textPaperUp.isHidden = true
+        
+        textPaperDown.text = "mas relaxa, qualquer coisa você inventa e\n reza pra ninguem contestar"
         textPaperDown.layer.zPosition = 3
         textPaperDown.font =  UIFont(name: "ClashDisplay-Regular", size:24)
         textPaperDown.textColor = .darkGray
         textPaperDown.numberOfLines = 0
         textPaperDown.textAlignment = .center
-        backgroundImageView.layer.zPosition = 0
-        view.backgroundColor =  UIColor(Color("backgroundColor", bundle: .main))
+        textPaperDown.translatesAutoresizingMaskIntoConstraints = false
+        textPaperDown.isHidden = true
+        
+        view.backgroundColor =  .black
         view.addSubview(drawLabel)
         letter.layer.zPosition = 3
+        
+        view.addSubview(textPaperUp)
+        view.addSubview(textPaperDown)
+        view.addSubview(imageViewLetter)
+        view.addSubview(imageViewPaper)
+        
+        imageViewPaper.layer.zPosition = 2
+        imageViewLetter.layer.zPosition = 3
+        
+        NSLayoutConstraint.activate([
+            imageViewLetter.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageViewLetter.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            imageViewLetter.widthAnchor.constraint(equalToConstant: 250),
+            imageViewLetter.heightAnchor.constraint(equalToConstant: 250),
+            
+            imageViewPaper.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageViewPaper.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            imageViewPaper.widthAnchor.constraint(equalToConstant: 600),
+            imageViewPaper.heightAnchor.constraint(equalToConstant: 700),
+            
+            textPaperUp.bottomAnchor.constraint(equalTo: imageViewLetter.topAnchor, constant: 20),
+            textPaperUp.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            textPaperDown.topAnchor.constraint(equalTo: imageViewLetter.bottomAnchor, constant: -20),
+            textPaperDown.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
+            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 40),
+        ])
+        
+        drawLabel.translatesAutoresizingMaskIntoConstraints = false
+        drawLabel.isHidden = true
+        drawLabel.text = "\(currentRound)ª RODADA"
+        drawLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 40)
+        view.addSubview(drawLabel)
+        
+        //Background
+        let bg = UIImageView(image: UIImage(named: "paperTexture"))
+        bg.contentMode = .scaleAspectFill
+        bg.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(bg, at: 0)
+        NSLayoutConstraint.activate([
+            bg.topAnchor.constraint(equalTo: view.topAnchor),
+            bg.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bg.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bg.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    func animate() {
+        let currentRound: Int = (matchManager.currentRound + 1)
+        
+        animator = AnimationManager(label: letter, imageViewLetter: imageViewLetter, imageViewPaper: imageViewPaper)
+        
+        //ANIMACAO DA PALAVRA RODADA
+        animator.animateRodadaSlotStyle(word: "\(currentRound) RODADA", in: self.view) {
+            
+            //ANIMACAO DO PAPEL ABRINDO
+            self.animator.startPaperAnimation(images: self.imagesPaper, interval: 0.5) {
+                self.letter.isHidden = true
+                self.drawLabel.isHidden = false
+                self.imageViewLetter.isHidden = false
+                self.textPaperDown.isHidden = false
+                self.textPaperUp.isHidden = false
+                
+                //ANIMACAO DAS LETRAS DO ALFABETO
+                self.animator.animate(letter: self.letter.text!) {
+                    
+                    //PASSA PRA VIEW DA CATEGORIA
+                    self.viewModel.canGoToCategory = true
+                }
+            }
+        }
     }
     
     

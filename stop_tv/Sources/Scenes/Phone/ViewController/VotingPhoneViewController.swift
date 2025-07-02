@@ -57,9 +57,6 @@ class VotingPhoneViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // mock
-        let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
-        updateAnswersGridView(with: count)
         view.backgroundColor = .black
         setupLayout()
     }
@@ -71,20 +68,12 @@ class VotingPhoneViewController: UIViewController {
     }
 
     private func observeViewModel() {
-//        roundVM.gameService.$status
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] status in
-//                guard let self else { return }
-//                guard status == .endVote else { return }
-//                self.coordinator.showAnswer_phone(from: self)
-//            }
-//            .store(in: &cancellables)
-
         roundVM.$answers
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
                 let count = self.roundVM.answers[self.roundVM.currentCategory]?.count ?? 0
+                print(roundVM.answers)
                 self.updateAnswersGridView(with: count)
             }
             .store(in: &cancellables)

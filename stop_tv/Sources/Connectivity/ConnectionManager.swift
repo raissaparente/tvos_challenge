@@ -151,7 +151,9 @@ extension ConnectionManager: MCSessionDelegate {
                 if let action = try? JSONDecoder().decode(GameAction<SendAnswerPayload>.self, from: data) {
                     let answer = action.payload.answer
                     let player = action.payload.playerName
+                    
                     self.round?.saveAnswer(answer)
+                    self.round?.playersWhoAnswered.append(player.name)
                 }
                 
             case .voteAnswer:
@@ -181,8 +183,8 @@ extension ConnectionManager: MCSessionDelegate {
             case .changeCategory:
                 if let action = try? JSONDecoder().decode(GameAction<EmptyPayload>.self, from: data) {
                     self.round?.advanceCategory()
-                    
                 }
+                
             case .setCategories:
                 if let action = try? JSONDecoder().decode(GameAction<SetCategoriesPayload>.self, from: data) {
                     let categories = action.payload.categories

@@ -11,6 +11,9 @@ class VotingViewModel {
     @Published var votesByCategory: [String: [Int: [Bool]]] = [:]
     @Published var playersWhoVotedByCategory: [String: Set<String>] = [:]
     @Published var selectedAnswerIndexes: Set<Int> = []
+    
+     var hasHandledEndVote = false
+
 
     init(round: RoundViewModel) {
         self.round = round

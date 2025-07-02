@@ -18,7 +18,7 @@ class WaitingViewController: UIViewController {
     private let image: UIImageView = {
         let configuration = UIImage.SymbolConfiguration(pointSize: 100)
         let image = UIImageView(image: UIImage(systemName: "sparkles.tv", withConfiguration: configuration))
-        image.tintColor = .systemYellow
+        image.tintColor = .customYellow
         image.contentMode = .scaleAspectFit
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
@@ -54,6 +54,8 @@ class WaitingViewController: UIViewController {
         
         setupUI()
         observeViewModel()
+        
+        print("ENTROU NA WAITING COM TIPO \(viewModel.waitingType)")
     }
     
     override func viewWillDisappear(_ animated: Bool) {
