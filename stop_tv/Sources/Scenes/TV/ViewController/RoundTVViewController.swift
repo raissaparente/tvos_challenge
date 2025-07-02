@@ -75,7 +75,6 @@ class RoundTVViewController: UIViewController {
             imageViewCard.heightAnchor.constraint(equalTo: view.heightAnchor)
         ])
         view.backgroundColor = .black
-        
         setupLayout()
         view.backgroundColor =  UIColor(Color("backgroundColor", bundle: .main))
         animator = AnimationManager(label: categoryLabel, imageViewPaper: imageViewCard)

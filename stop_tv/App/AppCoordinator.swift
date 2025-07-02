@@ -20,11 +20,13 @@ class AppCoordinator {
     let hostLobbyVM: HostLobbyViewModel!
     
 
+
     init(window: UIWindow, username: String) {
         self.window = window
         self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
         self.votingVM = VotingViewModel(round: roundVM)
+        roundVM.votingViewModel = votingVM // isso é pra resolver
         self.hostLobbyVM = HostLobbyViewModel(
             connectionManager: connectionManager,
             gameService: gameService,

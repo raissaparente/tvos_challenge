@@ -11,10 +11,10 @@ import StopPlay
 class RoundViewModel {
     @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
     @Published var answers: [String: [Response]] = [:]
-    @Published var answerIndex: Int?
 
     var connectionManager: ConnectionManager
     var gameService: GameService
+    weak var votingViewModel: VotingViewModel?
     var categories: [String] = []
     var currentCategory: String {
         guard currentIndex < categories.count else { return "Categoria indefinida" }
@@ -123,7 +123,37 @@ class RoundViewModel {
         didAllPlayersAnswer = false
         didAllPlayersVote = false
     }
+    
 
+}
+
+extension RoundViewModel {
+    func calculateScore(for answer: Response, in category: String) -> Int {
+        guard answer.isAnswerValid(letter: gameService.drawLetter()) else {
+            print("Resposta inválida pela letra.")
+            return 0
+        }
+
+        guard let votes = votingViewModel?.votesByCategory[category]?[answer.id] else {
+            print("⚠️ Votos não encontrados para a resposta \(answer.text)")
+            return 0
+        }
+
+        let votesAgainst = votes.filter { !$0 }.count // true
+        let votesFor = votes.filter { $0 }.count // false
+
+        guard votesFor >= votesAgainst else {
+            print("votos falsos ganharam")
+            return 0
+        }
+
+        var score = 100
+        if answer.isRepeated {
+            score -= 50
+        }
+
+        return score
+    }
 }
 
 
