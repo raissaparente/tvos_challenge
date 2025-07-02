@@ -171,6 +171,18 @@ class RoundTVViewController: UIViewController {
             playersView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             playersView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
+        
+        //Background
+        let bg = UIImageView(image: UIImage(named: "paperTexture"))
+        bg.contentMode = .scaleAspectFill
+        bg.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(bg, at: 0)
+        NSLayoutConstraint.activate([
+            bg.topAnchor.constraint(equalTo: view.topAnchor),
+            bg.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bg.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bg.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
     }
 
     private func updateCategory() {

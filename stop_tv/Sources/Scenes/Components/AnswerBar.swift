@@ -20,7 +20,7 @@ class FatiaView: UIView {
         super.init(frame: frame)
         setupUI()
         NSLayoutConstraint.activate([
-            self.heightAnchor.constraint(equalToConstant: 60)
+            self.heightAnchor.constraint(equalToConstant: 90)
         ])
     }
 
@@ -30,7 +30,7 @@ class FatiaView: UIView {
         setupUI()
     }
     func configure(numero: Int, texto: String) {
-        numeroLabel.text = "\(numero)"
+        numeroLabel.text = "0\(numero)"
         textoLabel.text = texto
     }
 
@@ -44,13 +44,13 @@ class FatiaView: UIView {
         addSubview(fatiaView)
 
         numeroLabel.translatesAutoresizingMaskIntoConstraints = false
-        numeroLabel.textColor = .white
-        numeroLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 40)
+        numeroLabel.textColor = .black
+        numeroLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 45)
         numeroLabel.textAlignment = .center
         fatiaView.addSubview(numeroLabel)
 
         divisoriaView.translatesAutoresizingMaskIntoConstraints = false
-        divisoriaView.backgroundColor = .darkGray
+        divisoriaView.backgroundColor = .black
         addSubview(divisoriaView)
 
         textoView.translatesAutoresizingMaskIntoConstraints = false
@@ -60,7 +60,8 @@ class FatiaView: UIView {
         textoLabel.translatesAutoresizingMaskIntoConstraints = false
         textoLabel.numberOfLines = 0
         textoLabel.textColor = .black
-        textoLabel.font = .systemFont(ofSize: 18, weight: .medium)
+        textoLabel.font = UIFont(name: "ClashDisplay-Medium", size: 25)
+
         textoView.addSubview(textoLabel)
 
         NSLayoutConstraint.activate([
@@ -75,7 +76,7 @@ class FatiaView: UIView {
             divisoriaView.leadingAnchor.constraint(equalTo: fatiaView.trailingAnchor),
             divisoriaView.topAnchor.constraint(equalTo: topAnchor),
             divisoriaView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            divisoriaView.widthAnchor.constraint(equalToConstant: 1),
+            divisoriaView.widthAnchor.constraint(equalToConstant: 2),
 
             textoView.leadingAnchor.constraint(equalTo: divisoriaView.trailingAnchor),
             textoView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -85,7 +86,8 @@ class FatiaView: UIView {
             textoLabel.leadingAnchor.constraint(equalTo: textoView.leadingAnchor, constant: 8),
             textoLabel.trailingAnchor.constraint(equalTo: textoView.trailingAnchor, constant: -8),
             textoLabel.topAnchor.constraint(equalTo: textoView.topAnchor, constant: 8),
-            textoLabel.bottomAnchor.constraint(equalTo: textoView.bottomAnchor, constant: -8),        ])
+            textoLabel.bottomAnchor.constraint(equalTo: textoView.bottomAnchor, constant: -8),
+        ])
     }
 }
 

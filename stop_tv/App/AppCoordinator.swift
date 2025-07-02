@@ -39,7 +39,8 @@ class AppCoordinator {
         let idiom = UIDevice.current.userInterfaceIdiom
         if idiom == .tv {
             
-            let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
+//            let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
+            let vc = VotingTVViewController(viewModel: roundVM, coordinator: self, matchManager: matchManager, votingVM: votingVM)
             
 //            let vc = FinalRankingViewController(coordinator: self, viewModel: roundVM, matchManager: matchManager)
 

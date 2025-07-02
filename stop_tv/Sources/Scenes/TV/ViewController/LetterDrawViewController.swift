@@ -158,7 +158,6 @@ class LetterDrawViewController: UIViewController {
     }
 
     func setupUI() {
-        // vou codar aqui a ui
         textPaperUp.text = "Sua criatividade agora\n depende da letra..."
         textPaperUp.font =  UIFont(name: "Chalkduster", size:32)
         textPaperUp.layer.zPosition = 3
