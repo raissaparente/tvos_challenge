@@ -120,8 +120,8 @@ class LetterDrawViewController: UIViewController {
         ])
         
         drawLabel.translatesAutoresizingMaskIntoConstraints = false
-        drawLabel.text = "\(round)ª Rodada"
-        drawLabel.font = UIFont(name: "ClashDisplay-Regular", size:32)
+        drawLabel.text = "\(round)ª RODADA"
+        drawLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 40)
         view.addSubview(drawLabel)
         
         let startX = drawLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)

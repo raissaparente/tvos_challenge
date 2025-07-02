@@ -150,6 +150,7 @@ extension ConnectionManager: MCSessionDelegate {
             case .sendAnswer:
                 if let action = try? JSONDecoder().decode(GameAction<SendAnswerPayload>.self, from: data) {
                     let answer = action.payload.answer
+                    let player = action.payload.playerName
                     self.round?.saveAnswer(answer)
                 }
                 

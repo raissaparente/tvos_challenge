@@ -7,6 +7,7 @@
 import Foundation
 import StopPlay
 
+
 class RoundViewModel {
     @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
     @Published var answers: [String: [Response]] = [:]

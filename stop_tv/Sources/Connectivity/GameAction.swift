@@ -34,7 +34,6 @@ struct SendAnswerPayload: Codable {
     let answer: Response
 }
 
-
 struct ChangeStatusPayload: Codable {
     let status: ConnectionStatus
 }

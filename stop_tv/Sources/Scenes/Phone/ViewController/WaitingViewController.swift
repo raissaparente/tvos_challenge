@@ -90,6 +90,8 @@ class WaitingViewController: UIViewController {
             bg.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bg.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+        
+        self.hideBackButtonIfAvailable()
     }
     
     //navega

@@ -60,6 +60,8 @@ class PlayerLobbyViewController: UIViewController {
             descriptionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             descriptionLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+        
+        self.hideBackButtonIfAvailable()
     }
     
     private func observeViewModel() {

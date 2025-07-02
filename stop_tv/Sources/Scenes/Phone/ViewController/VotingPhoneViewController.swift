@@ -130,6 +130,9 @@ class VotingPhoneViewController: UIViewController {
             bg.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bg.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+        
+        self.hideBackButtonIfAvailable()
+
     }
 
     private func updateAnswersGridView(with count: Int) {
