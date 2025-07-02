@@ -4,27 +4,59 @@
 //
 //  Created by Júlia Saboya on 13/06/25.
 //
+//categorias
 
 import UIKit
 import Combine
+import SwiftUICore
 import StopPlay
 
 class RoundTVViewController: UIViewController {
     var viewModel: RoundViewModel
+    var matchManager: MatchManager
     var coordinator: AppCoordinator
+    var animator: AnimationManager!
+    var letterLabel = UILabel()
+    let drawLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
+    
+    let playersView = ConnectedPlayersView()
 
+    private let letter: UILabel = {
+        let label = UILabel()
+        label.textColor = .white
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 100, weight: .black)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    private let imagesCard: [UIImage] = [
+          UIImage(named: "Card1")!,
+          UIImage(named: "Card2")!,
+          UIImage(named: "Card3")!,
+          UIImage(named: "Card4")!
+      ]
+    let imageViewCard: UIImageView = {
+        let iv = UIImageView()
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFit
+        iv.isHidden = true
+        return iv
+    }()
+    var categoriesAnimate: [String] {
+        viewModel.categories
+    }
     // UI...
     private let containerView = UIView()
     private let textField = UITextField()
     private let categoryLabel = UILabel()
-//    private let submitButton = UIButton(type: .custom)
     private let finishButton = UIButton(type: .custom)
     private let stackView = UIStackView()
 
 
-    init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
+    init(viewModel: RoundViewModel,matchManager:MatchManager, coordinator: AppCoordinator) {
         self.viewModel = viewModel
+        self.matchManager = matchManager
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
@@ -35,11 +67,21 @@ class RoundTVViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.addSubview(imageViewCard)
+        NSLayoutConstraint.activate([
+            imageViewCard.topAnchor.constraint(equalTo: view.topAnchor),
+            imageViewCard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageViewCard.widthAnchor.constraint(equalTo: view.widthAnchor),
+            imageViewCard.heightAnchor.constraint(equalTo: view.heightAnchor)
+        ])
         view.backgroundColor = .black
-
-        print("A ROUNDTV CARREGOU")
-        print("STATUS: \(viewModel.gameService.status)")        
         setupLayout()
+        view.backgroundColor =  UIColor(Color("backgroundColor", bundle: .main))
+        animator = AnimationManager(label: categoryLabel, imageViewPaper: imageViewCard)
+        animator.startPaperAnimation(images: imagesCard) {
+            self.categoryLabel.isHidden = false
+        }
+        
         observeViewModel()        
     }
     
@@ -63,9 +105,12 @@ class RoundTVViewController: UIViewController {
                     guard let self else { return }
                     guard let currentAnswers = allAnswers[viewModel.currentCategory] else { return }
                     
-//                    viewModel.printAnswers()
-
-                    reloadWords(currentAnswers)
+                    let playersWhoAnswered = currentAnswers.enumerated().map { index, _ in
+                        String(format: "Jogador %02d", index + 1)
+                    }
+                    
+//                    let playersWhoAnswered = currentAnswers.map(\.name)
+                    playersView.reloadPlayers(from: playersWhoAnswered)
                     
                     if currentAnswers.count == viewModel.connectionManager.connectedPeers.count {
                         viewModel.didAllPlayersAnswer = true
@@ -86,68 +131,60 @@ class RoundTVViewController: UIViewController {
     }
 
     private func setupLayout() {
+        //add letra
+        view.addSubview(letter)
+        //aqui eu coloco a letra que foi sorteada pegando da viewmodel
+        letter.text = "Letra \(matchManager.currentLetter ?? "")"
+        letter.font =  UIFont(name: "ClashDisplay-Semibold", size: 40)
+        letter.translatesAutoresizingMaskIntoConstraints = false
         
-        // Container setup
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = .lightGray
-        containerView.layer.cornerRadius = 12
-        view.addSubview(containerView)
+        //add palavra rodada
+        drawLabel.text = "\(matchManager.currentRound + 1)ª RODADA"
+        drawLabel.font =  UIFont(name: "ClashDisplay-Semibold", size: 40)
+        drawLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(drawLabel)
 
         // Category label
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
-        containerView.addSubview(categoryLabel)
+        categoryLabel.font =  UIFont(name: "AnonymousPro-Bold", size: 50)
+        categoryLabel.textColor = .black
+        categoryLabel.numberOfLines = 0
+        categoryLabel.layer.zPosition = 3
+        view.addSubview(categoryLabel)
+        categoryLabel.isHidden = true
         
-        // Words
-        stackView.axis = .vertical
-                stackView.spacing = 12
-                stackView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addSubview(stackView)
+        //Players who answered
+        playersView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(playersView)
         
-        
-
         NSLayoutConstraint.activate([
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
-            containerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/3),
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-
-            categoryLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
-            categoryLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            letter.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
+            letter.topAnchor.constraint(equalTo: view.topAnchor, constant: 40),
             
-            stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 20),
-            stackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            drawLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
+            drawLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 40),
 
+            categoryLabel.centerXAnchor.constraint(equalTo: imageViewCard.centerXAnchor),
+            categoryLabel.centerYAnchor.constraint(equalTo: imageViewCard.centerYAnchor, constant: -170),
+            
+            playersView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            playersView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
     }
 
     private func updateCategory() {
         if viewModel.isFinished {
-            print("view model is finished")
             textField.isHidden = true
             finishButton.isHidden = false
             categoryLabel.text = "Mostrar repostas!"
         } else {
             categoryLabel.text = viewModel.currentCategory
             textField.text = ""
+            print("mostrou categoria\(viewModel.currentCategory)")
+            animator.animate(letter: viewModel.currentCategory)
         }
     }
     
-    
-    private func reloadWords(_ words: [Response]) {
-            for view in stackView.arrangedSubviews where view.tag == 100 {
-                stackView.removeArrangedSubview(view)
-                view.removeFromSuperview()
-            }
-            
-            for word in words {
-                let label = UILabel()
-                label.tag = 100
-                label.text = word.text
-                label.textColor = .white
-                stackView.addArrangedSubview(label)
-            }
-     }
 
     @objc private func handleFinishButtonTapped(_ sender: UIButton) {
         for (categoria, resposta) in viewModel.answers {
@@ -162,6 +199,6 @@ class RoundTVViewController: UIViewController {
 }
 
 
-#Preview {
-    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: "newion"))
-}
+//#Preview {
+//    RoundTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: "newion"))
+//}

@@ -1,30 +1,32 @@
-//
-//  VotingViewController.swift
-//  stop_tv
-//
-//  Created by Raissa Bruna Parente on 17/06/25.
-//
-
 import UIKit
 import Combine
+import StopPlay
 
 class VotingTVViewController: UIViewController {
     var roundVM: RoundViewModel
     var coordinator: AppCoordinator
     var votingVM: VotingViewModel
+    var matchManager: MatchManager
 
     private var cancellables = Set<AnyCancellable>()
 
-    // UI...
-    private let containerView = UIView()
+    private let letterLabel = UILabel()
+    private let rodadaLabel = UILabel()
     private let categoryLabel = UILabel()
-    private let finishButton = UIButton(type: .custom)
+    private let submitButton = UIButton(type: .custom)
 
-    private let stackView = UIStackView()
+    private let hStack = UIStackView()
+    private let vStackLeft = UIStackView()
+    private let vStackRight = UIStackView()
+    private let contentStack = UIStackView()
 
-    init(viewModel: RoundViewModel, coordinator: AppCoordinator, votingVM: VotingViewModel) {
+    init(viewModel: RoundViewModel,
+         coordinator: AppCoordinator,
+         matchManager: MatchManager,
+         votingVM: VotingViewModel) {
         self.roundVM = viewModel
         self.coordinator = coordinator
+        self.matchManager = matchManager
         self.votingVM = votingVM
         super.init(nibName: nil, bundle: nil)
     }
@@ -35,12 +37,12 @@ class VotingTVViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
+        view.backgroundColor = .background
         setupLayout()
         observeViewModel()
         reloadWords()
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         cancellables.removeAll()
@@ -52,14 +54,10 @@ class VotingTVViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self else { return }
-                
-                if status == .endVote {
 
-                    print("VOTINGTV terminou votação -> chama changeCat e troca tela")
-                    
+                if status == .endVote {
                     if roundVM.isLastCategory {
                         coordinator.showPartialRanking_TV(from: self)
-                        //TODO: AVISAR PRO CELULAR IR PRA UMA TELA DE ESPERA
                     } else {
                         self.roundVM.changeCategory()
                         coordinator.showCategory_TV(from: self)
@@ -70,63 +68,110 @@ class VotingTVViewController: UIViewController {
     }
 
     private func setupLayout() {
-        
-        // Container setup
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = .lightGray
-        containerView.layer.cornerRadius = 12
-        view.addSubview(containerView)
+        letterLabel.text = "Letra \(matchManager.currentLetter ?? "")"
+        letterLabel.font =  UIFont(name: "ClashDisplay-Semibold", size: 40)
 
-        // Category label
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
+        rodadaLabel.text = "\(matchManager.currentRound + 1)ª RODADA"
+        rodadaLabel.font =  UIFont(name: "ClashDisplay-Semibold", size: 40)
+
         categoryLabel.text = roundVM.currentCategory
-        categoryLabel.font = UIFont.boldSystemFont(ofSize: 24)
-        containerView.addSubview(categoryLabel)
-        
-        // Words
-        stackView.axis = .vertical
-                stackView.spacing = 12
-                stackView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addSubview(stackView)
+        categoryLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 50)
+        categoryLabel.textAlignment = .center
 
+        hStack.axis = .horizontal
+        hStack.distribution = .fillEqually
+        hStack.spacing = 32
+
+        [vStackLeft, vStackRight].forEach {
+            $0.axis = .vertical
+            $0.spacing = 16
+            $0.distribution = .fillEqually
+            hStack.addArrangedSubview($0)
+        }
+
+        contentStack.axis = .vertical
+        contentStack.spacing = 8
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(contentStack)
+
+        let topRow = UIStackView()
+        topRow.axis = .horizontal
+        topRow.distribution = .equalSpacing
+        topRow.translatesAutoresizingMaskIntoConstraints = false
+        topRow.addArrangedSubview(letterLabel)
+        topRow.addArrangedSubview(rodadaLabel)
+        contentStack.addArrangedSubview(topRow)
+
+        let categorySpacer = UIView()
+        categorySpacer.heightAnchor.constraint(equalToConstant: 32).isActive = true
+        contentStack.addArrangedSubview(categorySpacer)
+
+        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentStack.addArrangedSubview(categoryLabel)
+
+        let responseSpacer = UIView()
+        responseSpacer.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        contentStack.addArrangedSubview(responseSpacer)
+
+        hStack.translatesAutoresizingMaskIntoConstraints = false
+        contentStack.addArrangedSubview(hStack)
+
+        submitButton.setTitle("Continuar", for: .normal)
+        submitButton.setTitleColor(.black, for: .normal)
+        submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
+        submitButton.backgroundColor = .customYellow
+        submitButton.layer.cornerRadius = 8
+        submitButton.clipsToBounds = true
+        submitButton.translatesAutoresizingMaskIntoConstraints = false
+        submitButton.addTarget(self, action: #selector(handleEndVotingButtonTapped), for: .primaryActionTriggered)
+        view.addSubview(submitButton)
 
         NSLayoutConstraint.activate([
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
-            containerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/3),
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            contentStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            contentStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
+            contentStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
 
-            categoryLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
-            categoryLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            
-            stackView.topAnchor.constraint(equalTo: categoryLabel.safeAreaLayoutGuide.topAnchor, constant: 20),
-            stackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            hStack.heightAnchor.constraint(lessThanOrEqualToConstant: 300),
 
+            submitButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
+            submitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            submitButton.heightAnchor.constraint(equalToConstant: 60),
+            submitButton.widthAnchor.constraint(equalToConstant: 200),
 
+            contentStack.bottomAnchor.constraint(lessThanOrEqualTo: submitButton.topAnchor, constant: -24)
         ])
     }
 
-    
-    
     private func reloadWords() {
-            for view in stackView.arrangedSubviews where view.tag == 100 {
-                stackView.removeArrangedSubview(view)
-                view.removeFromSuperview()
-            }
-        
-        guard let words = roundVM.answers[roundVM.currentCategory] else { return }
-            
-            for word in words {
-                let label = UILabel()
-                label.tag = 100
-                label.text = word.text
-                label.textColor = .white
-                stackView.addArrangedSubview(label)
-            }
-     }
-}
+        vStackLeft.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        vStackRight.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
-//
-//#Preview {
-//    VotingTVViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "julia"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""), votingVM: VotingViewModel(round: RoundViewModel()))
-//}
+//        let words = [
+//            Response(text: "Lâmpada que muda de cor conforme o humor"),
+//            Response(text: "Luz acesa o mês todo"),
+//            Response(text: "Louis Vuitton"),
+//            Response(text: "Lhama de estimação com pedigree"),
+//            Response(text: "Lote em bairro nobre"),
+//            Response(text: "Lente de contato com realidade aumentada"),
+//            Response(text: "Lamborghini"),
+//            Response(text: "Laje aquecida com controle remoto")
+//        ]
+        
+        let words = roundVM.answers[roundVM.currentCategory]
+
+        for (index, word) in words!.enumerated() {
+            let fatia = FatiaView()
+            fatia.configure(numero: index + 1, texto: word.text)
+
+            if index % 2 == 0 {
+                vStackLeft.addArrangedSubview(fatia)
+            } else {
+                vStackRight.addArrangedSubview(fatia)
+            }
+        }
+    }
+
+    @objc private func handleEndVotingButtonTapped(_ sender: UIButton) {
+        // ação do botão
+    }
+}

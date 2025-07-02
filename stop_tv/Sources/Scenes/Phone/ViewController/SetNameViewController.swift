@@ -14,33 +14,28 @@ class SetNameViewController: UIViewController {
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "Escolha um nome para você"
+        label.text = "Como você quer ser chamado?"
+        label.font = UIFont(name: "Clash Display", size: 20)
+        label.textColor = .white
         label.numberOfLines = 0
         label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let nameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Seu nome"
+        textField.placeholder = "Digite aqui"
         textField.text = ""
         textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
 
-    private let setButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Confirmar", for: .normal)
-        button.isEnabled = false
-        button.backgroundColor = .systemBlue
-        button.tintColor = .white
-        button.layer.cornerRadius = 8
-        return button
-    }()
+    private let setButton = SquareSendButton(type: .system)
     
     private var viewModel = SetNameViewModel()
-    
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -56,26 +51,30 @@ class SetNameViewController: UIViewController {
     }
     
     func setupUI() {
-        view.backgroundColor = .white
+        view.addBackgroundView(StarsBackgroundView())
+        
+        setButton.translatesAutoresizingMaskIntoConstraints = false
 
-        [descriptionLabel, nameTextField, setButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
-        }
+        view.addSubview(descriptionLabel)
+        view.addSubview(nameTextField)
+        view.addSubview(setButton)
         
         NSLayoutConstraint.activate([
-            descriptionLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            descriptionLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            nameTextField.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 20),
+            nameTextField.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 10),
             nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            setButton.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 20),
-            setButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            setButton.widthAnchor.constraint(equalToConstant: 100)
+            setButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 10),
+            setButton.leadingAnchor.constraint(equalTo: nameTextField.trailingAnchor, constant: 20),
+            setButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            setButton.widthAnchor.constraint(equalToConstant: 35),
+            setButton.heightAnchor.constraint(equalToConstant: 35),
+
         ])
+        
     }
     
     private func setupBindings() {
@@ -98,14 +97,15 @@ class SetNameViewController: UIViewController {
         nameTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
         setButton.addTarget(self, action: #selector(confirmButtonTapped), for: .touchUpInside)
     }
+    
     @objc private func textFieldChanged(_ sender: UITextField) {
             let text = sender.text ?? ""
             viewModel.userName = text
             setButton.isEnabled = !text.trimmingCharacters(in: .whitespaces).isEmpty
         }
 
-        @objc private func confirmButtonTapped() {
-            viewModel.saveName()
-            // vá para próxima tela
-        }
+    @objc private func confirmButtonTapped() {
+        viewModel.saveName()
+        // vá para próxima tela
+    }
 }

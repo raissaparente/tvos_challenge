@@ -4,7 +4,10 @@
 //
 //  Created by Raissa Bruna Parente on 12/06/25.
 //
-
+// escrever letra na voting,
+// o componente bar tem que ser sempre do mesmo tamanho, cor amarela em vez de preta
+// fontes
+// nao ta aparecendo a rodada na votting
 import UIKit
 
 class AppCoordinator {
@@ -14,6 +17,8 @@ class AppCoordinator {
     let matchManager = MatchManager()
     let roundVM: RoundViewModel!
     let votingVM: VotingViewModel!
+    let hostLobbyVM: HostLobbyViewModel!
+    
 
 
     init(window: UIWindow, username: String) {
@@ -22,21 +27,23 @@ class AppCoordinator {
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
         self.votingVM = VotingViewModel(round: roundVM)
         roundVM.votingViewModel = votingVM // isso é pra resolver
+        self.hostLobbyVM = HostLobbyViewModel(
+            connectionManager: connectionManager,
+            gameService: gameService,
+            roundViewModel: roundVM,
+            matchManager: matchManager,
+            votingViewModel: votingVM
+        )
     }
     
     func start() {
         let nav = UINavigationController()
         let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .pad {
+        if idiom == .tv {
             
-            let vm = HostLobbyViewModel(
-                connectionManager: connectionManager,
-                gameService: gameService,
-                roundViewModel: roundVM,
-                matchManager: matchManager,
-                votingViewModel: votingVM
-            )
-            let vc = HostLobbyViewController(viewModel: vm, coordinator: self)
+            let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
+            
+//            let vc = FinalRankingViewController(coordinator: self, viewModel: roundVM, matchManager: matchManager)
 
             nav.viewControllers = [vc]
         } else {
@@ -47,7 +54,7 @@ class AppCoordinator {
                 votingViewModel: votingVM
             )
             let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
-//            let vc = VotingPhoneViewController(viewModel: roundVM, coordinator: self)
+//            let vc = VotingPhoneViewController(viewModel: roundVM, coordinator: self, votingVM: votingVM)
 
             nav.viewControllers = [vc]
         }
@@ -58,44 +65,32 @@ class AppCoordinator {
     
     //TV
     func showLobbyScreen_TV(from currentVC: UIViewController) {
-        let vm = HostLobbyViewModel(
-            connectionManager: connectionManager,
-            gameService: gameService,
-            roundViewModel: roundVM,
-            matchManager: matchManager,
-            votingViewModel: votingVM
-        )
-        let lobbyVC = HostLobbyViewController(viewModel: vm, coordinator: self)
+
+        let lobbyVC = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
         currentVC.navigationController?.pushViewController(lobbyVC, animated: true)
     }
     
     func showGameInstruction_TV(from currentVC: UIViewController) {
-        let vm = HostLobbyViewModel(
-            connectionManager: connectionManager,
-            gameService: gameService,
-            roundViewModel: roundVM,
-            matchManager: matchManager,
-            votingViewModel: votingVM
-        )
+
         
-        let instructionVC = GameInstructionViewController(viewModel: vm, coordinator: self)
+        let instructionVC = GameInstructionViewController(viewModel: hostLobbyVM, coordinator: self)
         currentVC.navigationController?.pushViewController(instructionVC, animated: true)
     }
     
     func showLetterDraw_TV(from currentVC: UIViewController) {
         let vm = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
         
-        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, gameService: gameService, roundVM: roundVM)
+        let letterDrawVC = LetterDrawViewController(viewModel: vm, coordinator: self, matchManager: matchManager, gameService: gameService, roundVM: roundVM)
         currentVC.navigationController?.pushViewController(letterDrawVC, animated: true)
     }
     
     func showCategory_TV(from currentVC: UIViewController) {
-        let roundTVVC = RoundTVViewController(viewModel: roundVM, coordinator: self)
+        let roundTVVC = RoundTVViewController(viewModel: roundVM, matchManager: matchManager, coordinator: self)
         currentVC.navigationController?.pushViewController(roundTVVC, animated: true)
     }
     
     func showVoting_TV(from currentVC: UIViewController) {
-        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self, votingVM: votingVM)
+        let votingTVVC = VotingTVViewController(viewModel: roundVM, coordinator: self, matchManager: matchManager, votingVM: votingVM)
         currentVC.navigationController?.pushViewController(votingTVVC, animated: true)
     }
     

@@ -33,7 +33,7 @@ class LetterDrawViewModel {
             // envia para os peers
             self.connectionManager.send(gameAction: action)
             
-            self.canGoToCategory = true
+//             self.canGoToCategory = true
         }
     }
     

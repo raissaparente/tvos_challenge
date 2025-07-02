@@ -12,108 +12,128 @@ class RoundPhoneViewController: UIViewController {
     var roundVM: RoundViewModel
     var coordinator: AppCoordinator
     private var cancellables = Set<AnyCancellable>()
-
-
-    private let containerView = UIView()
-    private let textField = UITextField()
-    private let categoryLabel = UILabel()
-    private let submitButton = UIButton(type: .custom)
-
+    
+    
+    private let descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Categoria + letra = sua palavra"
+        label.font = UIFont(name: "Clash Display", size: 20)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let textfield: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Digite aqui"
+        textField.text = ""
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private let submitButton = SquareSendButton(type: .system)
+    
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Deu branco?"
+        label.font = UIFont(name: "Clash Display", size: 15)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let skipButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Pular a vez", for: .normal)
+        button.titleLabel?.font = UIFont(name: "Clash Display", size: 17)!
+        button.setTitleColor(.white, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     init(viewModel: RoundViewModel, coordinator: AppCoordinator) {
         self.roundVM = viewModel
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
-        textField.delegate = self
+        textfield.delegate = self
         print(self, #function)
-
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         cancellables.removeAll()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-                view.backgroundColor = .black
-                setupLayout()
-        observeViewModel()
-
-    }
-
-    private func setupLayout() {
-        // Container setup
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = .lightGray
-        containerView.layer.cornerRadius = 12
-        view.addSubview(containerView)
-
-        // TextField
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.borderStyle = .roundedRect
-        containerView.addSubview(textField)
-
-        // Submit button
-        submitButton.setTitle("Submit", for: .normal)
-        submitButton.setTitleColor(.white, for: .normal)
-        submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        submitButton.backgroundColor = .darkGray
-        submitButton.layer.cornerRadius = 8
-        submitButton.clipsToBounds = true
-        submitButton.translatesAutoresizingMaskIntoConstraints = false
-        submitButton.addTarget(self, action: #selector(handleSubmitButtonTapped), for: .touchUpInside)
-        view.addSubview(submitButton)
-
-
-        NSLayoutConstraint.activate([
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 3/4),
-            containerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1/3),
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-
-            textField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            textField.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-
-            submitButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
-            submitButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            submitButton.widthAnchor.constraint(equalToConstant: 100),
-        ])
+        setupUI()
     }
     
-    func observeViewModel() {
-        roundVM.gameService.$status
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                guard let self = self else { return }
+    func setupUI() {
+        view.backgroundColor = .black
+        view.addBackgroundView(StarsBackgroundView())
+        
+        submitButton.translatesAutoresizingMaskIntoConstraints = false
+        submitButton.addTarget(self, action: #selector(handleSubmitButtonTapped), for: .touchUpInside)
+        skipButton.addTarget(self, action: #selector(handleSkipButtonTapped), for: .touchUpInside)
+        
+        view.addSubview(descriptionLabel)
+        view.addSubview(textfield)
+        view.addSubview(submitButton)
+        view.addSubview(subtitleLabel)
+        view.addSubview(skipButton)
+    
+        NSLayoutConstraint.activate([
+            descriptionLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
+            descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-                guard status == .startVote else { return }
-                coordinator.showVoting_phone(from: self)
-                
-            }
-            .store(in: &cancellables)
-    }
+            textfield.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 10),
+            textfield.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            
+            submitButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 10),
+            submitButton.leadingAnchor.constraint(equalTo: textfield.trailingAnchor, constant: 20),
+            submitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            submitButton.widthAnchor.constraint(equalToConstant: 35),
+            submitButton.heightAnchor.constraint(equalToConstant: 35),
+            
+            subtitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            subtitleLabel.topAnchor.constraint(equalTo: textfield.bottomAnchor, constant: 20),
+            
+            skipButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            skipButton.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor),
+        ])
+        
+        self.hideBackButtonIfAvailable()
 
-    private func updateCategory() {
-        if roundVM.isFinished {
-            textField.isHidden = true
-            submitButton.isHidden = true
-            categoryLabel.text = "Mostrar repostas!"
-        } else {
-            categoryLabel.text = roundVM.currentCategory
-            print("🖥️ Mostrando nova categoria na TV: \(roundVM.currentCategory)")
-            textField.text = ""
-        }
     }
-
+    
+    
     @objc private func handleSubmitButtonTapped(_ sender: UIButton) {
-        let answer = roundVM.createAnswer(text: textField.text ?? "")
+        let answer = roundVM.createAnswer(text: textfield.text ?? "")
         roundVM.saveAnswer(answer)
         roundVM.sendAnswer(answer)
+        
+        coordinator.showWaitingMessage_phone(from: self, type: .waitingForAnswers)
+    }
+    
+    @objc private func handleSkipButtonTapped(_ sender: UIButton) {
+        let answer = roundVM.createAnswer(text: "")
+        roundVM.saveAnswer(answer)
+        roundVM.sendAnswer(answer)
+        
+        coordinator.showWaitingMessage_phone(from: self, type: .waitingForAnswers)
+
     }
 }
 
