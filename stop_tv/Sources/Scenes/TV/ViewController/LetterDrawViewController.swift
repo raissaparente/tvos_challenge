@@ -121,7 +121,7 @@ class LetterDrawViewController: UIViewController {
         
         drawLabel.translatesAutoresizingMaskIntoConstraints = false
         drawLabel.text = "\(round)ª RODADA"
-        drawLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 40)
+        drawLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 70)
         view.addSubview(drawLabel)
         
         let startX = drawLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -133,11 +133,7 @@ class LetterDrawViewController: UIViewController {
         
         
         animator = AnimationManager(label: letter, imageViewLetter: imageViewLetter, imageViewPaper: imageViewPaper)
-        animator.animateRodada(label: drawLabel,
-                               in: view,
-                               originalText: "\(round) Rodada",
-                               startConstraints: (x: startX, y: startY),
-                               endConstraints: (x: endX, y: endY)) {
+        animator.animateRodadaSlotStyle(word: "\(round) RODADA", in: self.view) {
             self.animator.startPaperAnimation(images: self.imagesPaper, interval: 0.5) {
                 self.letter.isHidden = true
                 self.imageViewLetter.isHidden = false

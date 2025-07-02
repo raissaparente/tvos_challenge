@@ -36,58 +36,98 @@ class AnimationManager {
         self.imageViewLetter = imageViewLetter
         self.imageViewPaper = imageViewPaper
     }
-    func animateRodada(
-        label: UILabel,
-        in view: UIView,
-        originalText: String,
-        startConstraints: (x: NSLayoutConstraint, y: NSLayoutConstraint),
-        endConstraints: (x: NSLayoutConstraint, y: NSLayoutConstraint),
-        completion: (() -> Void)? = nil
-    ) {
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = originalText
-        label.alpha = 0
-        view.addSubview(label)
+    
+    func animateRodadaSlotStyle(word: String, in container: UIView, completion: (() -> Void)? = nil) {
+           let stackView = UIStackView()
+           stackView.axis = .horizontal
+           stackView.spacing = 2
+           stackView.alignment = .center
+           stackView.distribution = .equalSpacing
+           stackView.translatesAutoresizingMaskIntoConstraints = false
+           container.addSubview(stackView)
 
-        NSLayoutConstraint.activate([startConstraints.x, startConstraints.y])
-        view.layoutIfNeeded() 
+           NSLayoutConstraint.activate([
+               stackView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+               stackView.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+           ])
 
-        UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseOut], animations: {
-            label.alpha = 1
-            view.layoutIfNeeded()
-        }) { _ in
-            var shuffleCount = 0
-            let maxShuffles = 10
-            let shuffleInterval = 0.05
+           var letterContainers: [UIView] = []
 
-            Timer.scheduledTimer(withTimeInterval: shuffleInterval, repeats: true) { timer in
-                shuffleCount += 1
-                label.text = String(originalText.shuffled())
+           for _ in word {
+               let container = UIView()
+               container.clipsToBounds = true
+               container.translatesAutoresizingMaskIntoConstraints = false
+               container.widthAnchor.constraint(equalToConstant: 80).isActive = true
+               container.heightAnchor.constraint(equalToConstant: 100).isActive = true
 
-                if shuffleCount >= maxShuffles {
-                    timer.invalidate()
-                    label.text = originalText
+               let label = UILabel()
+               label.text = ""
+               label.textAlignment = .center
+               label.font = UIFont(name: "ClashDisplay-Bold", size: 80) ?? UIFont.systemFont(ofSize: 80, weight: .bold)
+               label.textColor = .white
+               label.frame = CGRect(x: 0, y: 0, width: 80, height: 100)
 
-                    NSLayoutConstraint.deactivate([startConstraints.x, startConstraints.y])
-                    NSLayoutConstraint.activate([endConstraints.x, endConstraints.y])
+               container.addSubview(label)
+               stackView.addArrangedSubview(container)
+               letterContainers.append(container)
+           }
 
-                    UIView.animate(withDuration: 0.8,
-                                   delay: 0,
-                                   usingSpringWithDamping: 0.7,
-                                   initialSpringVelocity: 0.8,
-                                   options: [.curveEaseInOut],
-                                   animations: {
-                        label.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-                        label.alpha = 0.9
-                        view.layoutIfNeeded()
-                    }, completion: { _ in
-                        completion?()
-                    })
-                }
-            }
-        }
-    }
+        let totalLetters = word.count
+        var completedCount = 0
 
+        for (i, char) in word.enumerated() {
+            let direction: CGFloat = i % 2 == 0 ? -1 : 1
+
+            self.animateFixedLetterSlot(in: letterContainers[i], letter: char, direction: direction, iterations: 6) {
+                completedCount += 1
+                if completedCount == totalLetters {
+                           DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+                               stackView.isHidden = true
+                               completion?()
+                           }
+                       }
+                   }
+               }
+       }
+
+       private func animateFixedLetterSlot(
+           in container: UIView,
+           letter: Character,
+           direction: CGFloat,
+           iterations: Int,
+           completion: @escaping () -> Void
+       ) {
+           guard iterations > 0 else {
+               if let label = container.subviews.first as? UILabel {
+                   label.text = String(letter)
+                   label.frame.origin.y = 0
+               }
+               completion()
+               return
+           }
+
+           let height: CGFloat = 100
+           let currentLabel = container.subviews.first as? UILabel
+           currentLabel?.frame.origin.y = 0
+
+           let nextLabel = UILabel()
+           nextLabel.text = String(letter)
+           nextLabel.textAlignment = .center
+           nextLabel.font = currentLabel?.font
+           nextLabel.textColor = currentLabel?.textColor
+           nextLabel.frame = CGRect(x: 0, y: direction * height, width: 80, height: height)
+
+           container.addSubview(nextLabel)
+
+           UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseInOut], animations: {
+               currentLabel?.frame.origin.y -= direction * height
+               nextLabel.frame.origin.y -= direction * height
+           }, completion: { _ in
+               currentLabel?.removeFromSuperview()
+               self.animateFixedLetterSlot(in: container, letter: letter, direction: direction, iterations: iterations - 1, completion: completion)
+           })
+       }
+    
     func animate(
         letter: String,
         duration: TimeInterval = 2.5,

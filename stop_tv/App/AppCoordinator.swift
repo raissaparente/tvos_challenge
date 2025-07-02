@@ -40,7 +40,9 @@ class AppCoordinator {
         if idiom == .tv {
             
 //            let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
-            let vc = VotingTVViewController(viewModel: roundVM, coordinator: self, matchManager: matchManager, votingVM: votingVM)
+
+            let viewModel = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
+            let vc = LetterDrawViewController(viewModel: viewModel, coordinator: self, matchManager: matchManager, gameService: gameService ,roundVM: roundVM)
             
 //            let vc = FinalRankingViewController(coordinator: self, viewModel: roundVM, matchManager: matchManager)
 
