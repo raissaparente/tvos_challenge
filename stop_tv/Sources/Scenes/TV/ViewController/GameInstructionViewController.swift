@@ -71,8 +71,27 @@ class GameInstructionViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
+
+    private func emptyListAlert() -> UIAlertController {
+        let alertController = UIAlertController(
+            title: "Sem Jogadores Conectados",
+            message: "Pelo menos um jogador deve aceitar o convite para iniciar o jogo!",
+            preferredStyle: .alert
+        )
+
+        let okAction = UIAlertAction(title: "Entendi!", style: .default)
+        alertController.addAction(okAction)
+
+        return alertController
+    }
+
     @objc private func continueTapped() {
-        viewModel.startGame()
+        if viewModel.connectionManager.connectedPeers.isEmpty {
+            present(emptyListAlert(), animated: true, completion: nil)
+
+
+        } else {
+            viewModel.startGame()
+        }
     }
 }
