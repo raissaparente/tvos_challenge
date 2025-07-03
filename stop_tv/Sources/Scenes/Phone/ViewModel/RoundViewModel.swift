@@ -11,7 +11,9 @@ import StopPlay
 class RoundViewModel {
     @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
     @Published var answers: [String: [Response]] = [:]
-
+    @Published var answerIndex: Int?
+    @Published var playersWhoAnswered: [String] = []
+    
     var connectionManager: ConnectionManager
     var gameService: GameService
     weak var votingViewModel: VotingViewModel?
@@ -65,9 +67,7 @@ class RoundViewModel {
     }
 
     func sendAnswer(_ answer: Response) {
-        //FIXME: PLACEHOLDER DE PLAYER
-        let player = Player(name: "Player 1")
-
+        let player = Player(name: connectionManager.myPeerId.displayName)
 
         let payload = SendAnswerPayload(
             playerName: player,
@@ -115,6 +115,10 @@ class RoundViewModel {
 
       var isLastCategory: Bool {
         return currentIndex + 1 >= categories.count
+    }
+    
+    func resetCategory() {
+        playersWhoAnswered.removeAll()
     }
     
     func reset() {

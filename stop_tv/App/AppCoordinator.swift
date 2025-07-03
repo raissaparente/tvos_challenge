@@ -42,6 +42,9 @@ class AppCoordinator {
         if idiom == .pad {
 
             let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
+
+//            let viewModel = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
+//            let vc = LetterDrawViewController(viewModel: viewModel, coordinator: self, matchManager: matchManager, gameService: gameService ,roundVM: roundVM)
             
 //            let vc = FinalRankingViewController(coordinator: self, viewModel: roundVM, matchManager: matchManager)
 
@@ -54,7 +57,7 @@ class AppCoordinator {
                 votingViewModel: votingVM
             )
             let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
-//            let vc = VotingPhoneViewController(viewModel: roundVM, coordinator: self, votingVM: votingVM)
+//            let vc = RoundPhoneViewController(viewModel: roundVM, coordinator: self)
 
             nav.viewControllers = [vc]
         }

@@ -28,13 +28,12 @@ class WaitingViewModel: ObservableObject {
         self.connectionManager = connectionManager
         self.gameService = gameService
         self.waitingType = type
-                
     }
     
     var expectedStatus: ConnectionStatus {
          switch waitingType {
          case .explaining:
-             return .startGame
+             return .category
          case .waitingForAnswers:
              return .startVote
          case .waitingForEndVote:

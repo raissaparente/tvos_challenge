@@ -57,9 +57,6 @@ class VotingPhoneViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // mock
-        let count = roundVM.answers[roundVM.currentCategory]?.count ?? 0
-        updateAnswersGridView(with: count)
         view.backgroundColor = .black
         setupLayout()
     }
@@ -77,7 +74,7 @@ class VotingPhoneViewController: UIViewController {
             .sink { [weak self] _ in
                 guard let self else { return }
                 let count = self.roundVM.answers[self.roundVM.currentCategory]?.count ?? 0
-                print("quantidade de respostas: \(count)")
+                print(roundVM.answers)
                 self.updateAnswersGridView(with: count)
             }
             .store(in: &cancellables)

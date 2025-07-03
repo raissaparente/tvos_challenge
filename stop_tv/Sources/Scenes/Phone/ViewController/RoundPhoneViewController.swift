@@ -49,9 +49,17 @@ class RoundPhoneViewController: UIViewController {
     
     private let skipButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Pular a vez", for: .normal)
-        button.titleLabel?.font = UIFont(name: "Clash Display", size: 17)!
-        button.setTitleColor(.white, for: .normal)
+        
+        let attributedTitle = NSAttributedString(
+            string: "Pular a vez",
+            attributes: [
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .foregroundColor: UIColor.white,
+                .font: UIFont(name: "Clash Display", size: 17)
+            ]
+        )
+
+        button.setAttributedTitle(attributedTitle, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()

@@ -83,7 +83,7 @@ class PartialRankingViewController: UIViewController, UITableViewDataSource {
     }
     
     func setupButton() {
-        continueButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
+        continueButton.addTarget(self, action: #selector(continueTapped), for: .primaryActionTriggered)
     }
     
     @objc private func continueTapped() {

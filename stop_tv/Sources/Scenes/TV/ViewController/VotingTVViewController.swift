@@ -13,7 +13,7 @@ class VotingTVViewController: UIViewController {
     private let letterLabel = UILabel()
     private let rodadaLabel = UILabel()
     private let categoryLabel = UILabel()
-    private let submitButton = UIButton(type: .custom)
+    private let submitButton = CapsuleButton.createForTV(withTitle: "Continuar")
 
     private let hStack = UIStackView()
     private let vStackLeft = UIStackView()
@@ -46,6 +46,7 @@ class VotingTVViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         cancellables.removeAll()
+        votingVM.hasHandledEndVote = false
     }
 
     private func observeViewModel() {
@@ -54,8 +55,12 @@ class VotingTVViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self else { return }
+                
+                print("MUDOU O GAME STATUS NA VOTING: \(status)")
 
-                if status == .endVote {
+                if status == .endVote, !votingVM.hasHandledEndVote {
+                    votingVM.hasHandledEndVote = true
+
                     if roundVM.isLastCategory {
                         coordinator.showPartialRanking_TV(from: self)
                     } else {
@@ -85,7 +90,7 @@ class VotingTVViewController: UIViewController {
         [vStackLeft, vStackRight].forEach {
             $0.axis = .vertical
             $0.spacing = 16
-            $0.distribution = .fillEqually
+            $0.distribution = .equalSpacing
             hStack.addArrangedSubview($0)
         }
 
@@ -116,29 +121,34 @@ class VotingTVViewController: UIViewController {
         hStack.translatesAutoresizingMaskIntoConstraints = false
         contentStack.addArrangedSubview(hStack)
 
-        submitButton.setTitle("Continuar", for: .normal)
-        submitButton.setTitleColor(.black, for: .normal)
-        submitButton.titleLabel?.font = .systemFont(ofSize: 21, weight: .medium)
-        submitButton.backgroundColor = .customYellow
-        submitButton.layer.cornerRadius = 8
-        submitButton.clipsToBounds = true
+        
         submitButton.translatesAutoresizingMaskIntoConstraints = false
         submitButton.addTarget(self, action: #selector(handleEndVotingButtonTapped), for: .primaryActionTriggered)
         view.addSubview(submitButton)
 
         NSLayoutConstraint.activate([
-            contentStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            contentStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-            contentStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
+            contentStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            contentStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 28),
+            contentStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -28),
 
-            hStack.heightAnchor.constraint(lessThanOrEqualToConstant: 300),
+//            hStack.heightAnchor.constraint(lessThanOrEqualToConstant: 500),
 
             submitButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
-            submitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            submitButton.heightAnchor.constraint(equalToConstant: 60),
-            submitButton.widthAnchor.constraint(equalToConstant: 200),
+            submitButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
 
-            contentStack.bottomAnchor.constraint(lessThanOrEqualTo: submitButton.topAnchor, constant: -24)
+//            contentStack.bottomAnchor.constraint(lessThanOrEqualTo: submitButton.topAnchor, constant: -24)
+        ])
+        
+        //Background
+        let bg = UIImageView(image: UIImage(named: "paperTexture"))
+        bg.contentMode = .scaleAspectFill
+        bg.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(bg, at: 0)
+        NSLayoutConstraint.activate([
+            bg.topAnchor.constraint(equalTo: view.topAnchor),
+            bg.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bg.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bg.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
 
@@ -150,11 +160,11 @@ class VotingTVViewController: UIViewController {
 //            Response(text: "Lâmpada que muda de cor conforme o humor"),
 //            Response(text: "Luz acesa o mês todo"),
 //            Response(text: "Louis Vuitton"),
-//            Response(text: "Lhama de estimação com pedigree"),
-//            Response(text: "Lote em bairro nobre"),
-//            Response(text: "Lente de contato com realidade aumentada"),
-//            Response(text: "Lamborghini"),
-//            Response(text: "Laje aquecida com controle remoto")
+////            Response(text: "Lhama de estimação com pedigree"),
+////            Response(text: "Lote em bairro nobre"),
+////            Response(text: "Lente de contato com realidade aumentada"),
+////            Response(text: "Lamborghini"),
+////            Response(text: "Laje aquecida com controle remoto")
 //        ]
         
         let words = roundVM.answers[roundVM.currentCategory]
@@ -169,6 +179,18 @@ class VotingTVViewController: UIViewController {
                 vStackRight.addArrangedSubview(fatia)
             }
         }
+        
+        let leftSpacer = UIView()
+        leftSpacer.translatesAutoresizingMaskIntoConstraints = false
+        leftSpacer.setContentHuggingPriority(.defaultLow, for: .vertical)
+        leftSpacer.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        vStackLeft.addArrangedSubview(leftSpacer)
+
+        let rightSpacer = UIView()
+        rightSpacer.translatesAutoresizingMaskIntoConstraints = false
+        rightSpacer.setContentHuggingPriority(.defaultLow, for: .vertical)
+        rightSpacer.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        vStackRight.addArrangedSubview(rightSpacer)
     }
 
     @objc private func handleEndVotingButtonTapped(_ sender: UIButton) {

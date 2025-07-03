@@ -36,56 +36,104 @@ class AnimationManager {
         self.imageViewLetter = imageViewLetter
         self.imageViewPaper = imageViewPaper
     }
-    func animateRodada(
-        label: UILabel,
-        in view: UIView,
-        originalText: String,
-        startConstraints: (x: NSLayoutConstraint, y: NSLayoutConstraint),
-        endConstraints: (x: NSLayoutConstraint, y: NSLayoutConstraint),
-        completion: (() -> Void)? = nil
+    
+    func animateRodadaSlotStyle(word: String, in container: UIView, completion: (() -> Void)? = nil) {
+           let stackView = UIStackView()
+           stackView.axis = .horizontal
+           stackView.spacing = -4
+           stackView.alignment = .center
+           stackView.distribution = .equalSpacing
+           stackView.translatesAutoresizingMaskIntoConstraints = false
+           container.addSubview(stackView)
+
+           NSLayoutConstraint.activate([
+               stackView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+               stackView.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+           ])
+
+           var letterContainers: [UIView] = []
+
+           for _ in word {
+               let container = UIView()
+               container.clipsToBounds = true
+               container.translatesAutoresizingMaskIntoConstraints = false
+               container.widthAnchor.constraint(equalToConstant: 60).isActive = true
+               container.heightAnchor.constraint(equalToConstant: 100).isActive = true
+
+               let label = UILabel()
+               label.text = ""
+               label.textAlignment = .center
+               label.font = UIFont(name: "ClashDisplay-Bold", size: 80) ?? UIFont.systemFont(ofSize: 80, weight: .bold)
+               label.textColor = .white
+               label.frame = CGRect(x: 0, y: 0, width: 80, height: 100)
+
+               container.addSubview(label)
+               stackView.addArrangedSubview(container)
+               letterContainers.append(container)
+           }
+
+        let totalLetters = word.count
+        var completedCount = 0
+
+        for (i, char) in word.enumerated() {
+            let direction: CGFloat = i % 2 == 0 ? -1 : 1
+
+            self.animateFixedLetterSlot(in: letterContainers[i], letter: char, direction: direction, iterations: 5) {
+                completedCount += 1
+                if completedCount == totalLetters {
+                           DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                               stackView.isHidden = true
+                               completion?()
+                           }
+                       }
+                   }
+               }
+       }
+
+    private func animateFixedLetterSlot(
+        in container: UIView,
+        letter: Character,
+        direction: CGFloat,
+        iterations: Int,
+        completion: @escaping () -> Void
     ) {
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = originalText
-        label.alpha = 0
-        view.addSubview(label)
-
-        NSLayoutConstraint.activate([startConstraints.x, startConstraints.y])
-        view.layoutIfNeeded() 
-
-        UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseOut], animations: {
-            label.alpha = 1
-            view.layoutIfNeeded()
-        }) { _ in
-            var shuffleCount = 0
-            let maxShuffles = 10
-            let shuffleInterval = 0.05
-
-            Timer.scheduledTimer(withTimeInterval: shuffleInterval, repeats: true) { timer in
-                shuffleCount += 1
-                label.text = String(originalText.shuffled())
-
-                if shuffleCount >= maxShuffles {
-                    timer.invalidate()
-                    label.text = originalText
-
-                    NSLayoutConstraint.deactivate([startConstraints.x, startConstraints.y])
-                    NSLayoutConstraint.activate([endConstraints.x, endConstraints.y])
-
-                    UIView.animate(withDuration: 0.8,
-                                   delay: 0,
-                                   usingSpringWithDamping: 0.7,
-                                   initialSpringVelocity: 0.8,
-                                   options: [.curveEaseInOut],
-                                   animations: {
-                        label.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-                        label.alpha = 0.9
-                        view.layoutIfNeeded()
-                    }, completion: { _ in
-                        completion?()
-                    })
-                }
+        guard iterations > 0 else {
+            if let label = container.subviews.first as? UILabel {
+                label.text = String(letter)
+                label.frame.origin.y = 0
             }
+            completion()
+            return
         }
+
+        let height: CGFloat = 80
+        let currentLabel = container.subviews.first as? UILabel
+        currentLabel?.frame.origin.y = 0
+
+        let nextLabel = UILabel()
+        nextLabel.text = String(letter)
+        nextLabel.textAlignment = .center
+        nextLabel.font = currentLabel?.font
+        nextLabel.textColor = currentLabel?.textColor
+        nextLabel.frame = CGRect(x: 0, y: direction * height, width: 60, height: height)
+
+        container.addSubview(nextLabel)
+
+        let duration = iterations == 1 ? 1.5 : 0.4
+
+        UIView.animate(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
+            currentLabel?.frame.origin.y -= direction * height
+            nextLabel.frame.origin.y -= direction * height
+        }, completion: { _ in
+            currentLabel?.removeFromSuperview()
+            self.animateFixedLetterSlot(
+                in: container,
+                letter: letter,
+                direction: direction,
+                iterations: iterations - 1,
+                completion: completion
+            )
+        })
     }
 
     func animate(
@@ -124,7 +172,7 @@ class AnimationManager {
                 }) { _ in
                     self.finishAnimation()
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         completion?()
                     }
                 }
