@@ -41,13 +41,12 @@ class SetNameViewController: UIViewController {
         
         setupUI()
         setupBindings()
-        setupActions()
 
-                // Define nome inicial aleatório
-                let initialName = "Player\(Int.random(in: 100...999))"
-                nameTextField.text = initialName
-                viewModel.userName = initialName
-                setButton.isEnabled = true
+        // Define nome inicial aleatório
+        let initialName = "Player\(Int.random(in: 100...999))"
+        nameTextField.text = initialName
+        viewModel.userName = initialName
+        setButton.isEnabled = true
     }
     
     func setupUI() {
@@ -83,29 +82,13 @@ class SetNameViewController: UIViewController {
     }
     
     @objc private func textDidChange(_ sender: UITextField) {
-        viewModel.userName = sender.text ?? ""
-        setButton.isEnabled = !viewModel.userName.isEmpty
+        let text = sender.text ?? ""
+        viewModel.userName = text
+        setButton.isEnabled = !text.trimmingCharacters(in: .whitespaces).isEmpty
     }
     
     @objc private func setButtonTapped() {
         viewModel.saveName()
-        
         onNameSet?(viewModel.userName)
-    }
-
-    private func setupActions() {
-        nameTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
-        setButton.addTarget(self, action: #selector(confirmButtonTapped), for: .touchUpInside)
-    }
-    
-    @objc private func textFieldChanged(_ sender: UITextField) {
-            let text = sender.text ?? ""
-            viewModel.userName = text
-            setButton.isEnabled = !text.trimmingCharacters(in: .whitespaces).isEmpty
-        }
-
-    @objc private func confirmButtonTapped() {
-        viewModel.saveName()
-        // vá para próxima tela
     }
 }

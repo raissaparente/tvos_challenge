@@ -49,6 +49,7 @@ class VotingViewModel {
 
         var votesForCategory = votesByCategory[category] ?? [:]
         var playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
+        guard !playersWhoVoted.contains(voterName) else { return }
         playersWhoVoted.insert(voterName)
         playersWhoVotedByCategory[category] = playersWhoVoted
 
@@ -89,6 +90,8 @@ class VotingViewModel {
 
 
     private func checkIfAllPlayersVoted() {
+        guard round.connectionManager.isHost else { return }
+
         let category = round.currentCategory
         let playersWhoVoted = playersWhoVotedByCategory[category] ?? Set()
         let totalVoted = playersWhoVoted.count
@@ -122,10 +125,17 @@ class VotingViewModel {
 
         votesByCategory[category] = votesForCategory
 
-        for (index, answer) in answers.enumerated() {
+        for answer in answers {
             let votes = votesForCategory[answer.id] ?? []
             print("📊 [\(category)]: \(votes)")
         }
+    }
+
+    func resetVotes() {
+        votesByCategory = [:]
+        playersWhoVotedByCategory = [:]
+        selectedAnswerIndexes.removeAll()
+        hasHandledEndVote = false
     }
 
     func endVoting() {

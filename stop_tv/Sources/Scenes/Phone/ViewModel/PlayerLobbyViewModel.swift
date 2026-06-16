@@ -32,7 +32,6 @@ class PlayerLobbyViewModel: ObservableObject {
         observeConnection()
         observeGame()
         
-        connectionManager.setup(game: gameService, round: roundViewModel, votingVM: votingViewModel)
         connectionManager.startAdvertising()
     }
 

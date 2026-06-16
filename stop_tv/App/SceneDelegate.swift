@@ -19,21 +19,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .pad {
-            let coordinator = AppCoordinator(window: window, username: "tvHost")
-            self.coordinator = coordinator
-            coordinator.start()
-    
-        } else {
-            let setNameVC = SetNameViewController()
-            setNameVC.onNameSet = { name in
-                let coordinator = AppCoordinator(window: window, username: name)
+        let setNameVC = SetNameViewController()
+        setNameVC.onNameSet = { name in
+            if idiom == .tv {
+                let coordinator = AppCoordinator(window: window, username: name, role: .host)
+                self.coordinator = coordinator
+                coordinator.start()
+                return
+            }
+
+            let roleSelectionVC = RoleSelectionViewController()
+            roleSelectionVC.username = name
+            roleSelectionVC.onRoleSelected = { role, username in
+                let coordinator = AppCoordinator(window: window, username: username, role: role)
                 self.coordinator = coordinator
                 coordinator.start()
             }
-            window.rootViewController = setNameVC
+
+            window.rootViewController = roleSelectionVC
             window.makeKeyAndVisible()
         }
+
+        window.rootViewController = setNameVC
+        window.makeKeyAndVisible()
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {

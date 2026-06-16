@@ -13,6 +13,7 @@ class RoundViewModel {
     @Published var answers: [String: [Response]] = [:]
     @Published var answerIndex: Int?
     @Published var playersWhoAnswered: [String] = []
+    @Published var currentLetter: String?
     
     var connectionManager: ConnectionManager
     var gameService: GameService
@@ -37,10 +38,9 @@ class RoundViewModel {
     }
 
     func setCategories() {
-
-            let newCategories = gameService.draw5Categories()
-            print("🟢 categorias sorteadas: \(newCategories)")
-            self.categories = newCategories
+        let newCategories = gameService.draw5Categories()
+        print("🟢 categorias sorteadas: \(newCategories)")
+        prepareNewRound(with: newCategories)
 
         let payload = SetCategoriesPayload(categories: newCategories)
         let action = GameAction(type: .setCategories, payload: payload)
@@ -51,16 +51,31 @@ class RoundViewModel {
         currentIndex += 1
     }
 
-    func saveAnswer(_ answer: Response) {
+    func prepareNewRound(with categories: [String]) {
+        currentIndex = 0
+        answers = [:]
+        playersWhoAnswered.removeAll()
+        didAllPlayersAnswer = false
+        didAllPlayersVote = false
+        self.categories = categories
+        votingViewModel?.resetVotes()
+    }
+
+    func saveAnswer(_ answer: Response, from playerName: String? = nil) {
         guard !isFinished else { return }
         let category = currentCategory
+
+        if let playerName {
+            guard !playersWhoAnswered.contains(playerName) else { return }
+            playersWhoAnswered.append(playerName)
+        }
 
         var currentAnswers = answers[category] ?? []
         currentAnswers.append(answer)
         answers[category] = currentAnswers
     }
 
-    func setAnsers() {
+    func setAnswers() {
         let payload = SetAnswersPayload(answers: self.answers)
         let action = GameAction(type: .setAnswers, payload: payload)
         connectionManager.send(gameAction: action)
@@ -83,16 +98,15 @@ class RoundViewModel {
         let action = GameAction(type: .changeCategory, payload: EmptyPayload())
         connectionManager.send(gameAction: action)
 
-        // local
         currentIndex = nextIndex
-        self.gameService.status = .category
+        resetCategory()
+        changeStatus(to: .category)
     }
     
     func startVoting() {
         didAllPlayersAnswer = false
-        let payload = ChangeStatusPayload(status: .startVote)
-        let action = GameAction(type: .changeStatus, payload: payload)
-        connectionManager.send(gameAction: action)
+        setAnswers()
+        changeStatus(to: .startVote)
     }
 
 
@@ -119,14 +133,18 @@ class RoundViewModel {
     
     func resetCategory() {
         playersWhoAnswered.removeAll()
+        didAllPlayersAnswer = false
     }
     
     func reset() {
         currentIndex = 0
         answers = [:]
         categories = []
+        playersWhoAnswered.removeAll()
+        currentLetter = nil
         didAllPlayersAnswer = false
         didAllPlayersVote = false
+        votingViewModel?.resetVotes()
     }
     
 
@@ -134,7 +152,7 @@ class RoundViewModel {
 
 extension RoundViewModel {
     func calculateScore(for answer: Response, in category: String) -> Int {
-        guard answer.isAnswerValid(letter: gameService.drawLetter()) else {
+        guard let currentLetter, answer.isAnswerValid(letter: currentLetter) else {
             print("Resposta inválida pela letra.")
             return 0
         }

@@ -18,11 +18,11 @@ class AppCoordinator {
     let roundVM: RoundViewModel!
     let votingVM: VotingViewModel!
     let hostLobbyVM: HostLobbyViewModel!
-    
+    let role: AppRole
 
-
-    init(window: UIWindow, username: String) {
+    init(window: UIWindow, username: String, role: AppRole) {
         self.window = window
+        self.role = role
         self.connectionManager = ConnectionManager(username: username)
         self.roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
         self.votingVM = VotingViewModel(round: roundVM)
@@ -34,22 +34,38 @@ class AppCoordinator {
             matchManager: matchManager,
             votingViewModel: votingVM
         )
+
+        connectionManager.onEvent = { [weak self] event in
+            self?.handleGameEvent(event)
+        }
+    }
+
+    private func handleGameEvent(_ event: GameEvent) {
+        switch event {
+        case .didReceiveAnswer(let answer, let playerName):
+            roundVM.saveAnswer(answer, from: playerName)
+        case .didReceiveVote(let category, let voterName, let selectedIndexes):
+            votingVM.appendRemotePlayerVote(voterName: voterName, selectedIndexes: selectedIndexes, category: category)
+        case .didReceiveSetAnswers(let answers):
+            roundVM.answers = answers
+        case .didReceiveChangeStatus(let status):
+            gameService.status = status
+        case .didReceiveChangeCategory:
+            roundVM.advanceCategory()
+        case .didReceiveSetCategories(let categories):
+            roundVM.prepareNewRound(with: categories)
+        }
     }
     
     func start() {
         let nav = UINavigationController()
-        let idiom = UIDevice.current.userInterfaceIdiom
-        if idiom == .pad {
 
+        switch role {
+        case .host:
             let vc = HostLobbyViewController(viewModel: hostLobbyVM, coordinator: self)
-
-//            let viewModel = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
-//            let vc = LetterDrawViewController(viewModel: viewModel, coordinator: self, matchManager: matchManager, gameService: gameService ,roundVM: roundVM)
-            
-//            let vc = FinalRankingViewController(coordinator: self, viewModel: roundVM, matchManager: matchManager)
-
             nav.viewControllers = [vc]
-        } else {
+
+        case .player:
             let vm = PlayerLobbyViewModel(
                 connectionManager: connectionManager,
                 gameService: gameService,
@@ -57,13 +73,11 @@ class AppCoordinator {
                 votingViewModel: votingVM
             )
             let vc = PlayerLobbyViewController(viewModel: vm, coordinator: self)
-//            let vc = RoundPhoneViewController(viewModel: roundVM, coordinator: self)
-
             nav.viewControllers = [vc]
         }
+
         window.rootViewController = nav
         window.makeKeyAndVisible()
-        
     }
     
     //TV

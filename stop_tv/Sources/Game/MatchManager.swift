@@ -19,11 +19,8 @@ class MatchManager: ObservableObject {
     var players: [Player] = []
     
     var currentLetter: String? {
-        if !letters.isEmpty {
-            return letters[currentRound]
-        } else {
-            return nil
-        }
+        guard letters.indices.contains(currentRound) else { return nil }
+        return letters[currentRound]
     }
     
     func finishRound() {
@@ -47,12 +44,13 @@ class MatchManager: ObservableObject {
     
     //só no fim do jogo todo
     func resetGame() {
-        currentRound = 1
+        currentRound = 0
+        letters.removeAll()
         isGameFinished = false
         isRoundFinished = false
     }
     
     var isLastRound: Bool {
-        return currentRound == maxRoundsCount
+        return currentRound >= maxRoundsCount - 1
     }
 }

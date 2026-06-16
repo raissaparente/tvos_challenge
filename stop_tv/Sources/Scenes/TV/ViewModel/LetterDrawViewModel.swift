@@ -13,7 +13,6 @@ class LetterDrawViewModel {
     
     @Published var canGoToCategory = false
     
-    
     init(connectionManager: ConnectionManager, gameService: GameService) {
         self.connectionManager = connectionManager
         self.gameService = gameService

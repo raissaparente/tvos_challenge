@@ -61,7 +61,12 @@ class LetterDrawViewController: UIViewController {
         
         let letter = roundVM.gameService.drawLetter()
         self.letter.text = letter
-        self.matchManager.letters.append(letter)
+        self.roundVM.currentLetter = letter
+        if self.matchManager.letters.indices.contains(self.matchManager.currentRound) {
+            self.matchManager.letters[self.matchManager.currentRound] = letter
+        } else {
+            self.matchManager.letters.append(letter)
+        }
 
         super.init(nibName: nil, bundle: nil)
     }

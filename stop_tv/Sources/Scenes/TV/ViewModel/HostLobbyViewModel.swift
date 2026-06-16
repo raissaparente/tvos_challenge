@@ -64,7 +64,6 @@ class HostLobbyViewModel: ObservableObject {
     }
     
     func browseForPeers() {
-        connectionManager.setup(game: gameService, round: roundViewModel, votingVM: votingViewModel)
         connectionManager.startBrowsing()
     }
     

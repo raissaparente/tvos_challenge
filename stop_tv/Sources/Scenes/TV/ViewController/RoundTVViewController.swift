@@ -8,7 +8,6 @@
 
 import UIKit
 import Combine
-import SwiftUICore
 import StopPlay
 
 class RoundTVViewController: UIViewController {
@@ -115,7 +114,7 @@ class RoundTVViewController: UIViewController {
                 
                 playersView.reloadPlayers(from: viewModel.playersWhoAnswered)
                 
-                if currentAnswers.count == viewModel.connectionManager.connectedPeers.count {
+                if viewModel.playersWhoAnswered.count >= viewModel.connectionManager.connectedPeers.count {
                     viewModel.didAllPlayersAnswer = true
                 }
             }

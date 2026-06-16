@@ -25,10 +25,8 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     let serviceType = String.serviceName  //identify the service
     let session: MCSession //enables and manages communication among all peers
     let myPeerId: MCPeerID
-    weak var game: GameService?
-    weak var round: RoundViewModel?
-    weak var votingVM: VotingViewModel?
-
+    var isHost = false
+    var onEvent: ((GameEvent) -> Void)?
 
     @Published var availablePeers: [MCPeerID] = []
     @Published var connectedPeers: [MCPeerID] = []
@@ -36,12 +34,6 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     @Published var receivedInvite: Bool = false
     @Published var receivedInviteFrom: MCPeerID?
     @Published var invitationHandler: ((Bool, MCSession?) -> Void)?
-    
-    func setup(game: GameService, round: RoundViewModel, votingVM: VotingViewModel) {
-        self.game = game
-        self.round = round
-        self.votingVM = votingVM
-    }
     
     
     init(username: String) {
@@ -59,6 +51,7 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     }
     
     func startAdvertising() {
+        isHost = false
         advertiser.startAdvertisingPeer()
     }
     
@@ -67,6 +60,7 @@ class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc fra
     }
     
     func startBrowsing() {
+        isHost = true
         browser.startBrowsingForPeers()
     }
     
@@ -136,58 +130,52 @@ extension ConnectionManager: MCSessionDelegate {
     //receives data from peer that needs to be responded - main funcs for the game
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         DispatchQueue.main.async {
-            
-            
             guard let typeHint = try? JSONDecoder().decode(GameActionTypeWrapper.self, from: data) else {
                 print("❌ Falha ao detectar tipo da ação")
                 return
             }
-            
+
+            let event: GameEvent?
+
             switch typeHint.type {
-                
             case .sendAnswer:
                 if let action = try? JSONDecoder().decode(GameAction<SendAnswerPayload>.self, from: data) {
-                    let answer = action.payload.answer
-                    let player = action.payload.playerName
-                    
-                    self.round?.saveAnswer(answer)
-                    self.round?.playersWhoAnswered.append(player.name)
+                    event = .didReceiveAnswer(answer: action.payload.answer, from: action.payload.playerName.name)
+                } else {
+                    event = nil
                 }
-                
             case .voteAnswer:
                 if let action = try? JSONDecoder().decode(GameAction<VotePayload>.self, from: data) {
-                    let category = action.payload.category
-                    let voterName = action.payload.voterName
-                    let selectedIndexes = action.payload.selectedIndexes
-
-
-                    self.votingVM?.appendRemotePlayerVote(
-                        voterName: voterName,
-                        selectedIndexes: selectedIndexes,
-                        category: category
-                    )
+                    event = .didReceiveVote(category: action.payload.category,
+                                            voterName: action.payload.voterName,
+                                            selectedIndexes: action.payload.selectedIndexes)
+                } else {
+                    event = nil
                 }
             case .setAnswers:
                 if let action = try? JSONDecoder().decode(GameAction<SetAnswersPayload>.self, from: data) {
-                    self.round?.answers = action.payload.answers
+                    event = .didReceiveSetAnswers(answers: action.payload.answers)
+                } else {
+                    event = nil
                 }
-
             case .changeStatus:
                 if let action = try? JSONDecoder().decode(GameAction<ChangeStatusPayload>.self, from: data) {
-                    let status = action.payload.status
-                    self.game?.status = status
+                    event = .didReceiveChangeStatus(status: action.payload.status)
+                } else {
+                    event = nil
                 }
-                
             case .changeCategory:
-                if let action = try? JSONDecoder().decode(GameAction<EmptyPayload>.self, from: data) {
-                    self.round?.advanceCategory()
-                }
-                
+                event = .didReceiveChangeCategory
             case .setCategories:
                 if let action = try? JSONDecoder().decode(GameAction<SetCategoriesPayload>.self, from: data) {
-                    let categories = action.payload.categories
-                    self.round?.categories = categories
+                    event = .didReceiveSetCategories(categories: action.payload.categories)
+                } else {
+                    event = nil
                 }
+            }
+
+            if let event {
+                self.onEvent?(event)
             }
         }
     }
