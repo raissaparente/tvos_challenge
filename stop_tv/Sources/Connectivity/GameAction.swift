@@ -1,10 +1,3 @@
-//
-//  GameAction.swift
-//  stop_tv
-//
-//  Created by Raissa Bruna Parente on 11/06/25.
-//
-
 import Foundation
 import StopPlay
 

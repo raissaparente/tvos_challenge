@@ -1,9 +1,3 @@
-//
-//  VotingViewModel.swift
-//  stop_tv
-//
-//  Created by Júlia Saboya on 25/06/25.
-//
 import Foundation
 import StopPlay
 

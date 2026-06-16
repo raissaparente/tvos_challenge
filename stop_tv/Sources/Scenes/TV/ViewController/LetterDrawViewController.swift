@@ -7,7 +7,7 @@
 import UIKit
 import Combine
 import SwiftUI
-// letra
+
 class LetterDrawViewController: UIViewController {
   
     let textPaperUp = UILabel()
@@ -20,11 +20,11 @@ class LetterDrawViewController: UIViewController {
         return iv
     }()
     private let imagesPaper: [UIImage] = [
-          UIImage(named: "Papel1")!,
-          UIImage(named: "Papel2")!,
-          UIImage(named: "Papel3")!,
-          UIImage(named: "Papel4")!
-      ]
+          UIImage(named: "Papel1"),
+          UIImage(named: "Papel2"),
+          UIImage(named: "Papel3"),
+          UIImage(named: "Papel4")
+      ].compactMap { $0 }
     let imageViewPaper: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -145,8 +145,7 @@ class LetterDrawViewController: UIViewController {
         drawLabel.text = "\(currentRound)ª RODADA"
         drawLabel.font = UIFont(name: "ClashDisplay-Semibold", size: 40)
         view.addSubview(drawLabel)
-        
-        //Background
+
         let bg = UIImageView(image: UIImage(named: "paperTexture"))
         bg.contentMode = .scaleAspectFill
         bg.translatesAutoresizingMaskIntoConstraints = false
@@ -163,22 +162,18 @@ class LetterDrawViewController: UIViewController {
         let currentRound: Int = (matchManager.currentRound + 1)
         
         animator = AnimationManager(label: letter, imageViewLetter: imageViewLetter, imageViewPaper: imageViewPaper)
-        
-        //ANIMACAO DA PALAVRA RODADA
+
         animator.animateRodadaSlotStyle(word: "\(currentRound) RODADA", in: self.view) {
-            
-            //ANIMACAO DO PAPEL ABRINDO
+
             self.animator.startPaperAnimation(images: self.imagesPaper, interval: 0.5) {
                 self.letter.isHidden = true
                 self.drawLabel.isHidden = false
                 self.imageViewLetter.isHidden = false
                 self.textPaperDown.isHidden = false
                 self.textPaperUp.isHidden = false
-                
-                //ANIMACAO DAS LETRAS DO ALFABETO
-                self.animator.animate(letter: self.letter.text!) {
-                    
-                    //PASSA PRA VIEW DA CATEGORIA
+
+                self.animator.animate(letter: self.letter.text ?? "") {
+
                     self.viewModel.canGoToCategory = true
                 }
             }
@@ -199,12 +194,3 @@ class LetterDrawViewController: UIViewController {
             .store(in: &cancellables)
     }
 }
-
-//#Preview {
-//    let connectionManager = ConnectionManager(username: "julia")
-//    let gameService = GameService()
-//    let roundVM = RoundViewModel(connectionManager: connectionManager, gameService: gameService)
-//    let cordinator = AppCoordinator(window: UIWindow(), username: "julia")
-//    let viewModel = LetterDrawViewModel(connectionManager: connectionManager, gameService: gameService)
-//    LetterDrawViewController(viewModel: viewModel,coordinator: cordinator, gameService: Game,roundVM: roundVM)
-//}

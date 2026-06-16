@@ -1,15 +1,9 @@
-//
-//  RoundTestViewModel.swift
-//  stop_tv
-//
-//  Created by Júlia Saboya on 13/06/25.
-//
 import Foundation
 import StopPlay
 
 
 class RoundViewModel {
-    @Published private(set) var currentIndex = 0 // TODO: mudar para categoryIndex
+    @Published private(set) var currentIndex = 0
     @Published var answers: [String: [Response]] = [:]
     @Published var answerIndex: Int?
     @Published var playersWhoAnswered: [String] = []

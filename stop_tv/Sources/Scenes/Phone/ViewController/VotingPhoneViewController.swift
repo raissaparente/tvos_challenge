@@ -230,6 +230,6 @@ extension VotingPhoneViewController: UITextFieldDelegate {
 }
 
 
-#Preview {
-    RoundPhoneViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "raissa"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""))
-}
+//#Preview {
+//    RoundPhoneViewController(viewModel: RoundViewModel( connectionManager: ConnectionManager(username: "raissa"), gameService: GameService()), coordinator: AppCoordinator(window: .init(), username: ""))
+//}

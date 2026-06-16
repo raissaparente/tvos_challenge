@@ -1,11 +1,3 @@
-//
-//  RoundTestViewController.swift
-//  stop_tv
-//
-//  Created by Júlia Saboya on 13/06/25.
-//
-//categorias
-
 import UIKit
 import Combine
 import StopPlay
@@ -29,13 +21,14 @@ class RoundTVViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+
     private let imagesCard: [UIImage] = [
-        UIImage(named: "Mao1")!,
-        UIImage(named: "Mao2")!,
-        UIImage(named: "Mao3")!,
-        UIImage(named: "Mao4")!
-    ]
-    
+        UIImage(named: "Mao1"),
+        UIImage(named: "Mao2"),
+        UIImage(named: "Mao3"),
+        UIImage(named: "Mao4")
+    ].compactMap { $0 }
+
     let imageViewCard: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -43,15 +36,7 @@ class RoundTVViewController: UIViewController {
         iv.isHidden = true
         return iv
     }()
-    var categoriesAnimate: [String] {
-        viewModel.categories
-    }
-    // UI...
-    private let containerView = UIView()
-    private let textField = UITextField()
     private let categoryLabel = UILabel()
-    private let finishButton = UIButton(type: .custom)
-    private let stackView = UIStackView()
     
     
     init(viewModel: RoundViewModel,matchManager:MatchManager, coordinator: AppCoordinator) {
@@ -107,11 +92,6 @@ class RoundTVViewController: UIViewController {
                 
                 guard let self else { return }
                 guard let currentAnswers = allAnswers[viewModel.currentCategory] else { return }
-                
-//                let playersWhoAnswered = currentAnswers.enumerated().map { index, _ in
-//                    String(format: "Jogador %02d", index + 1)
-//                }
-                
                 playersView.reloadPlayers(from: viewModel.playersWhoAnswered)
                 
                 if viewModel.playersWhoAnswered.count >= viewModel.connectionManager.connectedPeers.count {
@@ -133,20 +113,16 @@ class RoundTVViewController: UIViewController {
     }
     
     private func setupLayout() {
-        //add letra
         view.addSubview(letter)
-        //aqui eu coloco a letra que foi sorteada pegando da viewmodel
         letter.text = "Letra \(matchManager.currentLetter ?? "")"
         letter.font =  UIFont(name: "ClashDisplay-Semibold", size: 40)
         letter.translatesAutoresizingMaskIntoConstraints = false
         
-        //add palavra rodada
         drawLabel.text = "\(matchManager.currentRound + 1)ª RODADA"
         drawLabel.font =  UIFont(name: "ClashDisplay-Semibold", size: 40)
         drawLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(drawLabel)
         
-        // Category label
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
         categoryLabel.font =  UIFont(name: "AnonymousPro-Bold", size: 50)
         categoryLabel.textColor = .customBlack
@@ -157,13 +133,9 @@ class RoundTVViewController: UIViewController {
         categoryLabel.isHidden = true
         
         //Players who answered
-        playersView.isHidden = true
         playersView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(playersView)
-        
-        //Card
-        view.addSubview(imageViewCard)
-        
+
         NSLayoutConstraint.activate([
             imageViewCard.topAnchor.constraint(equalTo: view.topAnchor),
             imageViewCard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -188,6 +160,7 @@ class RoundTVViewController: UIViewController {
         ])
         
         //Background
+
         let bg = UIImageView(image: UIImage(named: "paperTexture"))
         bg.contentMode = .scaleAspectFill
         bg.translatesAutoresizingMaskIntoConstraints = false
@@ -203,12 +176,5 @@ class RoundTVViewController: UIViewController {
     private func updateCategory() {
         categoryLabel.text = viewModel.currentCategory
         animator.animate(letter: viewModel.currentCategory)
-    }
-    
-    
-    @objc private func handleFinishButtonTapped(_ sender: UIButton) {
-        
-    }
-    
 }
 

@@ -156,17 +156,6 @@ class VotingTVViewController: UIViewController {
         vStackLeft.arrangedSubviews.forEach { $0.removeFromSuperview() }
         vStackRight.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
-//        let words = [
-//            Response(text: "Lâmpada que muda de cor conforme o humor"),
-//            Response(text: "Luz acesa o mês todo"),
-//            Response(text: "Louis Vuitton"),
-////            Response(text: "Lhama de estimação com pedigree"),
-////            Response(text: "Lote em bairro nobre"),
-////            Response(text: "Lente de contato com realidade aumentada"),
-////            Response(text: "Lamborghini"),
-////            Response(text: "Laje aquecida com controle remoto")
-//        ]
-        
         let words = roundVM.answers[roundVM.currentCategory]
 
         for (index, word) in words!.enumerated() {

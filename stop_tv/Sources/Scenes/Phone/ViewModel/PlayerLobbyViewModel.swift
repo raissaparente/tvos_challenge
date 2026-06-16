@@ -1,10 +1,3 @@
-//
-//  PlayerLobbyViewModel.swift
-//  stop_tv
-//
-//  Created by Raissa Bruna Parente on 13/06/25.
-//
-
 import Combine
 import MultipeerConnectivity
 

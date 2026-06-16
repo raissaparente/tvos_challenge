@@ -11,15 +11,13 @@ import StopPlay
 
 class FinalRankingViewController: UIViewController, UITableViewDataSource {
     
-    let mockplayers = [Player(name: "Raissa", points: 50),
-                   Player(name: "Plutarco", points: 100),
-                   Player(name: "Julia", points: 20),
-                   Player(name: "Bey", points: 150)
-    ]
-    
     var coordinator: AppCoordinator
     var viewModel: RoundViewModel
     var matchManager: MatchManager
+    
+    private var players: [Player] {
+        matchManager.players
+    }
     
     private let titleLabel1: UILabel = {
         let label = UILabel()
@@ -128,7 +126,7 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
     }
     
     func setupPodium() {
-        let topThree = getTopThree(from: mockplayers)
+        let topThree = getTopThree(from: players)
            let podiumOrder = [1, 0, 2]
 
            let verticalOffsets: [CGFloat] = [100, 0, 100]
@@ -242,19 +240,15 @@ class FinalRankingViewController: UIViewController, UITableViewDataSource {
     // MARK: - UITableViewDataSource
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if mockplayers.count > 3 {
-            return (mockplayers.count) - 3
+        if players.count > 3 {
+            return (players.count) - 3
         } else {
             return 0
         }
-        
-//        return matchManager.players.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let rankedPlayers = viewModel.gameService.makeRanking(from: matchManager.players)
-        
-        let rankedPlayers = viewModel.gameService.makeRanking(from: mockplayers)
+        let rankedPlayers = viewModel.gameService.makeRanking(from: players)
         let remainingPlayers = Array(rankedPlayers.dropFirst(3))
 
         let player = remainingPlayers[indexPath.row]

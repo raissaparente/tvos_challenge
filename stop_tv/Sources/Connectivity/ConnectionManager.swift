@@ -5,25 +5,22 @@
 //  Created by Raissa Bruna Parente on 11/06/25.
 //
 import MultipeerConnectivity
-//import StopPlay
-
-//first: infoplist - bonjour with _name._tcp/udp and local network string
 
 extension String {
     static var serviceName = "stoptv"
 }
 
-class ConnectionManager: NSObject, ObservableObject { //nsobject bc its objc framework
+class ConnectionManager: NSObject, ObservableObject {
     private lazy var advertiser: MCNearbyServiceAdvertiser = {
         MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: String.serviceName)
-    }() //advertises the device availability to connect (has delegates)
+    }()
     private lazy var browser: MCNearbyServiceBrowser = {
         MCNearbyServiceBrowser(peer: myPeerId, serviceType: String.serviceName)
-    }() //searches for devices available to connect through wifi (has delegates)
+    }()
     
     
-    let serviceType = String.serviceName  //identify the service
-    let session: MCSession //enables and manages communication among all peers
+    let serviceType = String.serviceName
+    let session: MCSession
     let myPeerId: MCPeerID
     var isHost = false
     var onEvent: ((GameEvent) -> Void)?
